@@ -1,246 +1,248 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../../../context/StoreContext';
 import { useTradingForm } from '../hooks/useTradingForm';
 import { TradingChart } from './TradingChart';
-import { NewsFeedList } from '../../news/components/NewsFeedList';
-import { DiscussionSection } from '../../community/components/DiscussionSection';
-import { PartyBadge } from '../../../shared/ui/PartyBadge';
+import { X, TrendingUp, TrendingDown, Lock } from 'lucide-react';
+import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
-import { X, TrendingUp, TrendingDown, CheckCircle2, AlertCircle } from 'lucide-react';
+import { PartyBadge } from '../../../shared/ui/PartyBadge';
+import { getMarketStatus } from '../../../core/trading/marketHours';
 
 export const StockDetailModal: React.FC = () => {
-  const { selectedPoliticianId, setSelectedPoliticianId, getPoliticianById } = useStore();
+  const { selectedPoliticianId, setSelectedPoliticianId, getPoliticianById, user } = useStore();
+  const [activeSubTab, setActiveSubTab] = useState<'chart' | 'news'>('chart');
 
   if (!selectedPoliticianId) return null;
-  const pol = getPoliticianById(selectedPoliticianId);
-  if (!pol) return null;
+  const politician = getPoliticianById(selectedPoliticianId);
+  if (!politician) return null;
 
-  return <StockDetailModalContent pol={pol} onClose={() => setSelectedPoliticianId(null)} />;
-};
-
-const StockDetailModalContent: React.FC<{ pol: any; onClose: () => void }> = ({ pol, onClose }) => {
-  const isUp = pol.change24h >= 0;
+  const mStatus = getMarketStatus();
+  const isUp = politician.change24h >= 0;
+  const userHolding = user.holdings[politician.id];
+  const userShares = userHolding ? userHolding.shares : 0;
 
   const {
     tradeType,
     setTradeType,
     sharesInput,
     setSharesInput,
-    sharesNum,
-    userHolding,
     buyQuote,
     sellQuote,
-    maxBuyShares,
-    feedback,
-    setFeedback,
     handleExecuteOrder,
-    handlePercentSelect,
-    userBalance,
-  } = useTradingForm(pol);
+    feedback,
+  } = useTradingForm(politician);
+
+  const currentQuote = tradeType === 'BUY' ? buyQuote : sellQuote;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden my-auto p-6 space-y-6">
         
         {/* Modal Header */}
-        <div className="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+        <div className="flex items-start justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center space-x-4">
             <img
-              src={pol.imageUrl}
-              alt={pol.name}
-              className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl object-cover ring-2 ring-blue-500/50 shadow-md"
+              src={politician.imageUrl}
+              alt={politician.name}
+              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-blue-500/40 shadow-lg"
             />
             <div>
               <div className="flex items-center space-x-2">
-                <h1 className="text-xl sm:text-2xl font-black text-white">{pol.name}</h1>
-                <PartyBadge party={pol.party} />
-                <span className="text-xs text-slate-400 font-mono hidden sm:inline">{pol.district}</span>
+                <h2 className="text-xl font-extrabold text-white">{politician.name}</h2>
+                <PartyBadge party={politician.party} />
+                <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                  {politician.district}
+                </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">{pol.title}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{politician.title}</p>
             </div>
           </div>
 
           <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            onClick={() => setSelectedPoliticianId(null)}
+            className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/60 hover:bg-slate-800 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modal Body - 2 Columns */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Market Status Lock Banner if Closed */}
+        {!mStatus.isOpen && (
+          <div className="bg-rose-500/10 border border-rose-500/30 p-3.5 rounded-xl flex items-center justify-between text-xs text-rose-300">
+            <div className="flex items-center space-x-2">
+              <Lock className="w-4 h-4 text-rose-400 shrink-0" />
+              <span className="font-bold">🔴 현재는 {BRAND_STOCK_NAME} 정규 장 마감 시간입니다.</span>
+            </div>
+            <span className="font-mono text-[11px] bg-rose-950/60 px-2.5 py-1 rounded-lg border border-rose-500/30">
+              정규장: 매일 12:00 ~ 14:00 ({mStatus.countdownText})
+            </span>
+          </div>
+        )}
+
+        {/* Main Content Grid: Chart & Trading Panel */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Left Column */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* Left Column: Chart & Info */}
+          <div className="lg:col-span-2 space-y-4">
             
-            {/* Price Banner */}
-            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/60 flex items-center justify-between">
+            {/* Price Cards Header */}
+            <div className="grid grid-cols-3 gap-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 font-mono">
               <div>
-                <span className="text-xs text-slate-400">실시간 AMM 주가</span>
-                <div className="flex items-baseline space-x-2">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-white font-mono">
-                    {formatPoints(pol.currentPrice)}
-                  </span>
+                <span className="text-[10px] text-slate-400 font-sans">현재가 (Spot)</span>
+                <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice)}</div>
+              </div>
+
+              <div>
+                <span className="text-[10px] text-slate-400 font-sans">24시간 변동률</span>
+                <div className={`text-base font-extrabold flex items-center gap-0.5 ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {isUp ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                  <span>{formatPercent(politician.change24h)}</span>
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="text-xs text-slate-400">24H 변동률</span>
-                <div className={`flex items-center justify-end space-x-1 font-mono font-bold text-base ${
-                  isUp ? 'text-emerald-400' : 'text-rose-400'
-                }`}>
-                  {isUp ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                  <span>{formatPercent(pol.change24h)}</span>
-                </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-sans">내 보유 수량</span>
+                <div className="text-lg font-extrabold text-amber-400">{userShares} 주</div>
               </div>
             </div>
 
-            {/* Trading Chart */}
-            <TradingChart data={pol.priceHistory} isUp={isUp} high24h={pol.high24h} low24h={pol.low24h} />
+            {/* Sub Tabs */}
+            <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
+              <button
+                onClick={() => setActiveSubTab('chart')}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
+                  activeSubTab === 'chart' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                주가 추이 차트
+              </button>
+              <button
+                onClick={() => setActiveSubTab('news')}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
+                  activeSubTab === 'news' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                관련 뉴스 ({politician.news.length})
+              </button>
+            </div>
 
-            {/* News List */}
-            <NewsFeedList news={pol.news} />
-
-            {/* Discussion Room */}
-            <DiscussionSection politicianId={pol.id} politicianName={pol.name} />
+            {/* Chart / News Body */}
+            {activeSubTab === 'chart' ? (
+              <TradingChart
+                data={politician.priceHistory}
+                isUp={isUp}
+                high24h={politician.high24h}
+                low24h={politician.low24h}
+              />
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {politician.news.map((item) => (
+                  <div key={item.id} className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <span>{item.source}</span>
+                      <span>{item.time}</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-slate-200">{item.title}</h4>
+                  </div>
+                ))}
+              </div>
+            )}
 
           </div>
 
-          {/* Right Column: Order Form */}
-          <div className="lg:col-span-5 bg-slate-800/90 rounded-2xl p-5 border border-slate-700/80 space-y-5 flex flex-col justify-between">
+          {/* Right Column: AMM Trading Order Form */}
+          <div className="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/80 space-y-4 flex flex-col justify-between">
             
             <div className="space-y-4">
-              
-              {/* Buy / Sell Tab Switch */}
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-extrabold text-white">{BRAND_STOCK_NAME} AMM 매매</h3>
+                <span className="text-[10px] text-slate-400 font-mono">100% 즉시 체결</span>
+              </div>
+
+              {/* Order Type Switch */}
               <div className="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-slate-700">
                 <button
-                  onClick={() => { setTradeType('BUY'); setFeedback(null); }}
-                  className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                  onClick={() => setTradeType('BUY')}
+                  className={`py-2 text-xs font-extrabold rounded-lg transition-all ${
                     tradeType === 'BUY'
-                      ? 'bg-emerald-600 text-white shadow-lg'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   매수 (Buy)
                 </button>
                 <button
-                  onClick={() => { setTradeType('SELL'); setFeedback(null); }}
-                  className={`py-2 rounded-lg text-xs font-bold transition-all ${
+                  onClick={() => setTradeType('SELL')}
+                  className={`py-2 text-xs font-extrabold rounded-lg transition-all ${
                     tradeType === 'SELL'
-                      ? 'bg-rose-600 text-white shadow-lg'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-rose-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   매도 (Sell)
                 </button>
               </div>
 
-              {/* Balance & Holding Status */}
-              <div className="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 space-y-1 text-xs font-mono">
-                <div className="flex justify-between text-slate-400">
-                  <span>보유 가상머니</span>
-                  <span className="text-amber-400 font-bold">{formatPoints(userBalance)}</span>
-                </div>
-                <div className="flex justify-between text-slate-400">
-                  <span>보유 수량</span>
-                  <span className="text-white font-bold">{userHolding.shares.toLocaleString()} 주</span>
-                </div>
-                {userHolding.shares > 0 && (
-                  <div className="flex justify-between text-slate-400">
-                    <span>매수 평단가</span>
-                    <span className="text-slate-300">{formatPoints(userHolding.avgPrice)}</span>
-                  </div>
-                )}
+              {/* Share Amount Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300">주문 수량 (주)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={tradeType === 'SELL' ? userShares : 100}
+                  value={sharesInput}
+                  onChange={e => setSharesInput(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500"
+                />
               </div>
 
-              {/* Shares Input */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-300 flex justify-between">
-                  <span>{tradeType === 'BUY' ? '매수 수량' : '매도 수량'}</span>
-                  <span className="text-slate-400 font-normal">
-                    {tradeType === 'BUY' ? `최대 매수: ${maxBuyShares}주` : `최대 매도: ${userHolding.shares}주`}
+              {/* Quote Estimates */}
+              <div className="space-y-2 bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/50 text-xs font-mono">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">총 예상 포인트</span>
+                  <span className="font-bold text-white text-sm">
+                    {formatPoints(tradeType === 'BUY' ? buyQuote.totalCost : sellQuote.totalRefund)}
                   </span>
-                </label>
-
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="1"
-                    value={sharesInput}
-                    onChange={e => setSharesInput(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white font-mono font-bold focus:outline-none focus:border-blue-500"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400">주</span>
                 </div>
-
-                <div className="grid grid-cols-4 gap-1.5 pt-1">
-                  {[25, 50, 75, 100].map(pct => (
-                    <button
-                      key={pct}
-                      onClick={() => handlePercentSelect(pct)}
-                      className="bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-[11px] py-1 rounded-lg font-mono font-medium transition-colors"
-                    >
-                      {pct}%
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400">주당 평단가</span>
+                  <span className="text-slate-300">{formatPoints(currentQuote.avgPrice)}</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400">슬리피지 (가격 영향도)</span>
+                  <span className="text-indigo-400 font-bold">{formatPercent(currentQuote.slippage)}</span>
                 </div>
               </div>
 
-              {/* AMM Quote Estimation */}
-              <div className="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80 space-y-2 text-xs font-mono">
-                <div className="text-slate-400 font-sans font-bold text-[11px] border-b border-slate-800 pb-1.5 flex items-center justify-between">
-                  <span>AMM 시세 예상 견적</span>
-                  <span className="text-blue-400 font-normal text-[10px]">Bonding Curve</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-slate-400">{tradeType === 'BUY' ? '총 결제 포인트' : '총 환급 포인트'}</span>
-                  <span className={`font-bold text-sm ${tradeType === 'BUY' ? 'text-amber-400' : 'text-emerald-400'}`}>
-                    {tradeType === 'BUY' ? formatPoints(buyQuote.totalCost) : formatPoints(sellQuote.totalRefund)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-slate-400">
-                  <span>평균 체결가</span>
-                  <span>{tradeType === 'BUY' ? formatPoints(buyQuote.avgPrice) : formatPoints(sellQuote.avgPrice)}</span>
-                </div>
-
-                <div className="flex justify-between text-slate-400">
-                  <span>주가 영향도 (Price Impact)</span>
-                  <span className={tradeType === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}>
-                    {tradeType === 'BUY' ? `+${buyQuote.priceImpact}%` : `${sellQuote.priceImpact}%`}
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-slate-400">
-                  <span>체결 후 예상 시가</span>
-                  <span>{tradeType === 'BUY' ? formatPoints(buyQuote.newSpotPrice) : formatPoints(sellQuote.newSpotPrice)}</span>
-                </div>
-              </div>
-
-              {/* Feedback Toast */}
+              {/* Feedback messages */}
               {feedback && (
-                <div className={`p-3 rounded-xl text-xs flex items-center space-x-2 ${
-                  feedback.type === 'success' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                <div className={`p-3 rounded-xl border text-xs ${
+                  feedback.type === 'error'
+                    ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
+                    : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
                 }`}>
-                  {feedback.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-                  <span>{feedback.message}</span>
+                  {feedback.message}
                 </div>
               )}
-
             </div>
 
-            {/* Order Execute Button */}
+            {/* Execute Order Button (Locked during Off-Hours) */}
             <button
               onClick={handleExecuteOrder}
-              className={`w-full py-3.5 rounded-xl font-extrabold text-sm transition-all shadow-xl flex items-center justify-center space-x-2 ${
-                tradeType === 'BUY'
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-emerald-500/20'
-                  : 'bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-400 text-white shadow-rose-500/20'
+              disabled={!mStatus.isOpen}
+              className={`w-full py-3.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center justify-center space-x-1 ${
+                !mStatus.isOpen
+                  ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
+                  : tradeType === 'BUY'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/20'
+                  : 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white shadow-rose-500/20'
               }`}
             >
-              <span>{pol.name} {sharesNum}주 {tradeType === 'BUY' ? '매수하기' : '매도하기'}</span>
+              {!mStatus.isOpen ? (
+                <span>🔒 장 마감 (정규장: 매일 12:00 ~ 14:00)</span>
+              ) : (
+                <span>{politician.name} {BRAND_STOCK_NAME} {tradeType === 'BUY' ? '매수하기' : '매도하기'}</span>
+              )}
             </button>
 
           </div>

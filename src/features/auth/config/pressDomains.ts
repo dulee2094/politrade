@@ -4,6 +4,12 @@ export interface PressMedia {
   category: '방송/보도' | '신문/일간지' | '경제지' | '통신/인터넷' | 'IT/전문지';
 }
 
+/**
+ * FEATURE FLAG: Set to true during test phase to allow any arbitrary email/ID.
+ * Set to false when ready for production strict press domain verification.
+ */
+export const IS_TEST_BYPASS_MODE = true;
+
 export const PRESS_DOMAINS_LIST: PressMedia[] = [
   // 지상파 / 보도전문 / 종편
   { domain: 'kbs.co.kr', name: 'KBS 한국방송', category: '방송/보도' },
@@ -47,18 +53,25 @@ export const PRESS_DOMAINS_LIST: PressMedia[] = [
 ];
 
 /**
- * Check if the email belongs to an approved press domain
+ * Check if the email belongs to an approved press domain (supports test bypass mode)
  */
 export function validatePressEmail(email: string): { isValid: boolean; mediaName?: string; error?: string } {
-  if (!email || !email.includes('@')) {
-    return { isValid: false, error: '올바른 이메일 형식을 입력해 주세요.' };
+  if (!email) {
+    return { isValid: false, error: '아이디 또는 이메일을 입력해 주세요.' };
   }
 
-  const domain = email.split('@')[1].toLowerCase().trim();
+  const cleanEmail = email.trim();
+  const domain = cleanEmail.includes('@') ? cleanEmail.split('@')[1].toLowerCase() : '';
   const matched = PRESS_DOMAINS_LIST.find(p => p.domain === domain);
 
   if (matched) {
     return { isValid: true, mediaName: matched.name };
+  }
+
+  // If in TEST BYPASS MODE, accept any input and assign test badge!
+  if (IS_TEST_BYPASS_MODE) {
+    const fallbackMedia = domain ? `${domain.split('.')[0].toUpperCase()} 언론사` : '시범 언론사';
+    return { isValid: true, mediaName: fallbackMedia };
   }
 
   return { 

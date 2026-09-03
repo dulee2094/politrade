@@ -3,6 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { useMarketFilter } from '../features/market/hooks/useMarketFilter';
 import { PoliticianCard } from '../features/market/components/PoliticianCard';
 import { Search, BarChart2 } from 'lucide-react';
+import { BRAND_STOCK_NAME } from '../config/constants';
 
 export const MarketBoard: React.FC = () => {
   const { politicians, setSelectedPoliticianId } = useStore();
@@ -32,7 +33,7 @@ export const MarketBoard: React.FC = () => {
         <div>
           <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
             <BarChart2 className="w-5 h-5 text-blue-400" />
-            <span>정치인 주식 실시간 전광판</span>
+            <span>{BRAND_STOCK_NAME} 실시간 전광판</span>
             <span className="text-xs text-slate-400 font-normal">시범 10인 라인업</span>
           </h2>
           <p className="text-xs text-slate-400">AMM 기반 실시간 수급 및 민심 주가 모니터링</p>

@@ -1,14 +1,14 @@
 import React from 'react';
-import { Newspaper, TrendingUp, Calendar, Lock, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, TrendingUp, Calendar, CheckCircle2 } from 'lucide-react';
 
 export const FeatureCards: React.FC = () => {
   const features = [
     {
-      icon: <Newspaper className="w-6 h-6 text-blue-400" />,
-      badge: '기자 전용 인증',
-      title: '언론사 이메일 도메인 검증 & 취재 보안',
-      description: 'KBS, SBS, MBC, 조선, 중앙, 동아 등 승인된 기자 이메일 도메인만 가입 허용. 자유 닉네임과 [📰 기자 인증] 뱃지로 안전한 익명 의사 개진을 보장합니다.',
-      list: ['사전 승인 언론사 이메일 검증', '자유 닉네임 익명성 보장', '가짜 뉴스/어뷰징 100% 차단'],
+      icon: <ShieldCheck className="w-6 h-6 text-blue-400" />,
+      badge: '신뢰 검증 회원',
+      title: '신뢰도 높은 검증 회원 시스템 (Trust & Verification)',
+      description: '가짜 뉴스와 상업적 어뷰징을 예방하고 공적 토론의 신뢰성을 보장하기 위한 도메인 검증 시스템. 자유 닉네임으로 취재 및 의견 개진의 안전한 익명성을 보장합니다.',
+      list: ['신뢰할 수 있는 도메인 검증', '자유 닉네임 익명성 보장', '가짜 뉴스/어뷰징 100% 차단'],
     },
     {
       icon: <TrendingUp className="w-6 h-6 text-indigo-400" />,
@@ -21,7 +21,7 @@ export const FeatureCards: React.FC = () => {
       icon: <Calendar className="w-6 h-6 text-amber-400" />,
       badge: '월간 정기 지원금',
       title: '매월 1일 정기 지원금 (100,000 P) 자동 입금',
-      description: '현금 결제나 포인트 획득용 글 작성 어뷰징을 완벽히 배제했습니다. 모든 기자 회원이 매월 동일한 소액 예산으로 순수 지지도 예측력을 겨룹니다.',
+      description: '현금 결제나 포인트 획득용 도배를 완벽히 배제했습니다. 모든 회원이 매월 동일한 소액 예산으로 순수 지지도 예측력을 겨룹니다.',
       list: ['현금 충전 결제 0원', '활동 도배 어뷰징 0%', '매월 1일 자동 이월 지급'],
     },
   ];
@@ -30,7 +30,7 @@ export const FeatureCards: React.FC = () => {
     <div className="space-y-6">
       <div className="text-center sm:text-left space-y-1">
         <h2 className="text-xl font-extrabold text-white">Politrade만의 3대 혁신 시스템</h2>
-        <p className="text-xs text-slate-400">품격 있는 기자 커뮤니티와 투명한 주가 체결 엔진</p>
+        <p className="text-xs text-slate-400">신뢰성 높은 지지도 예측과 투명한 AMM 주가 체결 엔진</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

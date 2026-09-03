@@ -2,6 +2,7 @@ import React from 'react';
 import { useStore } from '../context/StoreContext';
 import { TrendingUp, Wallet, Award, BarChart2, MessageSquare, Newspaper, Home } from 'lucide-react';
 import { PressBadge } from '../features/auth/components/PressBadge';
+import { MarketStatusBadge } from '../shared/ui/MarketStatusBadge';
 import { formatPoints } from '../core/utils/formatters';
 
 interface HeaderProps {
@@ -26,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ onShowLanding }) => {
                 <span className="font-extrabold text-xl tracking-tight text-white font-mono">POLITRADE</span>
                 <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded-full font-medium border border-blue-500/30">REPORTER 10</span>
               </div>
-              <p className="text-[10px] text-slate-400 font-medium">기자 전용 정치인 주식 & 실시간 민심 펄스</p>
+              <p className="text-[10px] text-slate-400 font-medium">정치인 POLI주식 & 실시간 민심 펄스</p>
             </div>
           </div>
 
@@ -91,23 +92,13 @@ export const Header: React.FC<HeaderProps> = ({ onShowLanding }) => {
             </button>
           </nav>
 
-          {/* User Money & Press Verification */}
+          {/* User Money, Market Status & Press Verification */}
           <div className="flex items-center space-x-3">
             
-            {/* Press Verification Status */}
-            {user.isReporterVerified ? (
-              <div className="hidden lg:block">
-                <PressBadge mediaName={user.pressName} />
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsSignUpModalOpen(true)}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-[11px] px-2.5 py-1.5 rounded-xl transition-all shadow-md flex items-center space-x-1"
-              >
-                <Newspaper className="w-3.5 h-3.5" />
-                <span>기자 인증하기</span>
-              </button>
-            )}
+            {/* Live Trading Market Status Badge */}
+            <div className="hidden lg:block">
+              <MarketStatusBadge />
+            </div>
 
             {/* Balance Badge */}
             <div className="flex items-center bg-slate-800 border border-slate-700/80 rounded-xl px-3 py-1.5 space-x-2">
@@ -135,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({ onShowLanding }) => {
         </div>
 
         {/* Mobile Navigation Tabs */}
-        <div className="flex md:hidden border-t border-slate-800/80 py-2 justify-around">
+        <div className="flex md:hidden border-t border-slate-800/80 py-2 justify-around items-center">
           {onShowLanding && (
             <button
               onClick={onShowLanding}

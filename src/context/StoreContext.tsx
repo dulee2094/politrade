@@ -3,7 +3,8 @@ import { Politician, UserProfile, CommentItem, Holding, TradeOrder } from '../ty
 import { INITIAL_POLITICIANS } from '../data/mockPoliticians';
 import { INITIAL_COMMENTS } from '../data/mockCommunity';
 import { calculateBuyQuote, calculateSellQuote, getSpotPrice } from '../utils/amm';
-import { checkMonthlyAllowance, MONTHLY_ALLOWANCE_AMOUNT } from '../core/allowance/monthlyAllowance';
+import { checkMonthlyAllowance } from '../core/allowance/monthlyAllowance';
+import { getMarketStatus } from '../core/trading/marketHours';
 
 export interface ExtendedUserProfile extends UserProfile {
   isReporterVerified?: boolean;
@@ -31,18 +32,34 @@ interface StoreContextType {
   addComment: (politicianId: string, content: string) => void;
   getPoliticianById: (id: string) => Politician | undefined;
   updatePressVerification: (data: { isVerified: boolean; email: string; mediaName: string; verifiedAt: string }, nickname: string) => void;
+  resetAllCache: () => void;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'politrade_user_v4';
-const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v4';
+const LOCAL_STORAGE_KEY_USER = 'politrade_user_v8';
+const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v8';
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Always ensure fresh politicians data on version bump
   const [politicians, setPoliticians] = useState<Politician[]>(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY_POLS);
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { /* fallback */ }
+      try { 
+        const parsed: Politician[] = JSON.parse(saved); 
+        return INITIAL_POLITICIANS.map(initPol => {
+          const cached = parsed.find(p => p.id === initPol.id);
+          if (!cached) return initPol;
+          return {
+            ...cached,
+            imageUrl: initPol.imageUrl,
+            name: initPol.name,
+            party: initPol.party,
+            district: initPol.district,
+            title: initPol.title,
+          };
+        });
+      } catch (e) { /* fallback */ }
     }
     return INITIAL_POLITICIANS;
   });
@@ -155,6 +172,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const getPoliticianById = (id: string) => politicians.find(p => p.id === id);
 
   const buyStock = (politicianId: string, shares: number) => {
+    // Check Market Hours Enforcement
+    const mStatus = getMarketStatus();
+    if (!mStatus.isOpen) {
+      return {
+        success: false,
+        message: `🔴 장 마감: POLI주식 매매는 매일 12:00 ~ 14:00 정규장에만 가능합니다. (${mStatus.countdownText})`,
+      };
+    }
+
     const targetPol = getPoliticianById(politicianId);
     if (!targetPol) return { success: false, message: '정치인 정보를 찾을 수 없습니다.' };
     if (shares <= 0) return { success: false, message: '올바른 매수 수량을 입력해 주세요.' };
@@ -230,11 +256,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     return { 
       success: true, 
-      message: `${targetPol.name} ${shares}주 매수 완료! (${quote.totalCost.toLocaleString()} P 차감)` 
+      message: `${targetPol.name} POLI주식 ${shares}주 매수 완료! (${quote.totalCost.toLocaleString()} P 차감)` 
     };
   };
 
   const sellStock = (politicianId: string, shares: number) => {
+    // Check Market Hours Enforcement
+    const mStatus = getMarketStatus();
+    if (!mStatus.isOpen) {
+      return {
+        success: false,
+        message: `🔴 장 마감: POLI주식 매매는 매일 12:00 ~ 14:00 정규장에만 가능합니다. (${mStatus.countdownText})`,
+      };
+    }
+
     const targetPol = getPoliticianById(politicianId);
     if (!targetPol) return { success: false, message: '정치인 정보를 찾을 수 없습니다.' };
 
@@ -304,7 +339,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     return { 
       success: true, 
-      message: `${targetPol.name} ${shares}주 매도 완료! (+${quote.totalRefund.toLocaleString()} P 입금)` 
+      message: `${targetPol.name} POLI주식 ${shares}주 매도 완료! (+${quote.totalRefund.toLocaleString()} P 입금)` 
     };
   };
 
@@ -336,6 +371,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }));
   };
 
+  const resetAllCache = () => {
+    localStorage.clear();
+    setPoliticians(INITIAL_POLITICIANS);
+    window.location.reload();
+  };
+
   return (
     <StoreContext.Provider
       value={{
@@ -355,6 +396,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         addComment,
         getPoliticianById,
         updatePressVerification,
+        resetAllCache,
       }}
     >
       {children}

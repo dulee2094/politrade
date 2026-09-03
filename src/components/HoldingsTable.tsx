@@ -1,6 +1,9 @@
 import React from 'react';
 import { useStore } from '../context/StoreContext';
 import { TrendingUp, TrendingDown, ArrowRight, Layers } from 'lucide-react';
+import { BRAND_STOCK_NAME } from '../config/constants';
+import { formatPoints, formatPercent } from '../core/utils/formatters';
+import { PartyBadge } from '../shared/ui/PartyBadge';
 
 export const HoldingsTable: React.FC = () => {
   const { user, politicians, setSelectedPoliticianId, setActiveTab } = useStore();
@@ -32,43 +35,33 @@ export const HoldingsTable: React.FC = () => {
           <Layers className="w-6 h-6" />
         </div>
         <div className="space-y-1">
-          <h3 className="text-base font-bold text-slate-200">보유 중인 정치인 주식이 없습니다</h3>
+          <h3 className="text-base font-bold text-slate-200">보유 중인 {BRAND_STOCK_NAME}이 없습니다</h3>
           <p className="text-xs text-slate-400">
-            정치인 전광판에서 마음에 드는 국회의원의 주식을 가상머니로 매수해 보세요!
+            정치인 전광판에서 마음에 드는 국회의원의 {BRAND_STOCK_NAME}을 가상머니로 매수해 보세요!
           </p>
         </div>
         <button
           onClick={() => setActiveTab('market')}
           className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20"
         >
-          <span>정치인 전광판 보러가기</span>
+          <span>{BRAND_STOCK_NAME} 전광판 보러가기</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     );
   }
 
-  const getPartyColorClass = (party: string) => {
-    switch (party) {
-      case '국민의힘': return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
-      case '더불어민주당': return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
-      case '조국혁신당': return 'bg-teal-500/10 text-teal-400 border-teal-500/30';
-      case '개혁신당': return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/30';
-    }
-  };
-
   return (
     <div className="bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-xl">
       <div className="p-5 border-b border-slate-700/60 flex items-center justify-between">
         <div>
           <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <span>보유 정치인 주식 현황</span>
+            <span>보유 {BRAND_STOCK_NAME} 현황</span>
             <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded-full font-mono">
               {holdingsList.length} 종목
             </span>
           </h2>
-          <p className="text-xs text-slate-400">AMM 실시간 시세 기준 평가손익</p>
+          <p className="text-xs text-slate-400">AMM 실시간 시세 기준 {BRAND_STOCK_NAME} 평가손익</p>
         </div>
       </div>
 
@@ -76,7 +69,7 @@ export const HoldingsTable: React.FC = () => {
         <table className="w-full text-left text-xs">
           <thead className="bg-slate-900/60 text-slate-400 uppercase font-mono border-b border-slate-700/50">
             <tr>
-              <th className="py-3 px-4">정치인</th>
+              <th className="py-3 px-4">정치인 ({BRAND_STOCK_NAME})</th>
               <th className="py-3 px-4 text-right">보유 수량</th>
               <th className="py-3 px-4 text-right">평균 매수가</th>
               <th className="py-3 px-4 text-right">현재가</th>
@@ -97,7 +90,6 @@ export const HoldingsTable: React.FC = () => {
                   className="hover:bg-slate-700/30 transition-colors cursor-pointer"
                   onClick={() => setSelectedPoliticianId(pol.id)}
                 >
-                  {/* Politician Info */}
                   <td className="py-3.5 px-4">
                     <div className="flex items-center space-x-3">
                       <img
@@ -108,47 +100,39 @@ export const HoldingsTable: React.FC = () => {
                       <div>
                         <div className="flex items-center space-x-2">
                           <span className="font-bold text-sm text-white">{pol.name}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${getPartyColorClass(pol.party)}`}>
-                            {pol.party}
-                          </span>
+                          <PartyBadge party={pol.party} />
                         </div>
                         <span className="text-[11px] text-slate-400">{pol.district}</span>
                       </div>
                     </div>
                   </td>
 
-                  {/* Quantity */}
                   <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-200">
                     {holding.shares.toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">주</span>
                   </td>
 
-                  {/* Avg Price */}
                   <td className="py-3.5 px-4 text-right font-mono text-slate-300">
-                    {holding.avgPrice.toLocaleString()} P
+                    {formatPoints(holding.avgPrice)}
                   </td>
 
-                  {/* Current Price */}
                   <td className="py-3.5 px-4 text-right font-mono font-bold text-white">
-                    {pol.currentPrice.toLocaleString()} P
+                    {formatPoints(pol.currentPrice)}
                   </td>
 
-                  {/* Total Value */}
                   <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-100">
-                    {Math.round(currentValue).toLocaleString()} P
+                    {formatPoints(currentValue)}
                   </td>
 
-                  {/* PnL */}
                   <td className="py-3.5 px-4 text-right font-mono font-bold">
                     <div className={isProfit ? 'text-emerald-400' : 'text-rose-400'}>
-                      <div>{isProfit ? '+' : ''}{Math.round(pnlPoints).toLocaleString()} P</div>
+                      <div>{isProfit ? '+' : ''}{formatPoints(pnlPoints)}</div>
                       <div className="text-[11px] font-normal opacity-90 flex items-center justify-end gap-0.5">
                         {isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        <span>{isProfit ? '+' : ''}{pnlPct.toFixed(2)}%</span>
+                        <span>{formatPercent(pnlPct)}</span>
                       </div>
                     </div>
                   </td>
 
-                  {/* Action */}
                   <td className="py-3.5 px-4 text-center">
                     <button
                       onClick={(e) => {

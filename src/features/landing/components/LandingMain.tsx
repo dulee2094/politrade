@@ -4,7 +4,8 @@ import { LivePulsePreview } from './LivePulsePreview';
 import { FeatureCards } from './FeatureCards';
 import { LoginModal } from './LoginModal';
 import { useStore } from '../../../context/StoreContext';
-import { ShieldAlert, Vote, Newspaper } from 'lucide-react';
+import { ShieldAlert, Vote, UserPlus } from 'lucide-react';
+import { BRAND_STOCK_NAME } from '../../../config/constants';
 
 interface LandingMainProps {
   onEnterApp: () => void;
@@ -38,8 +39,8 @@ export const LandingMain: React.FC<LandingMainProps> = ({ onEnterApp }) => {
               onClick={() => setIsSignUpModalOpen(true)}
               className="bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-md flex items-center space-x-1"
             >
-              <Newspaper className="w-3.5 h-3.5" />
-              <span>기자 회원가입</span>
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>{BRAND_STOCK_NAME} 회원가입</span>
             </button>
           </div>
         </div>
@@ -77,12 +78,12 @@ export const LandingMain: React.FC<LandingMainProps> = ({ onEnterApp }) => {
             <p className="font-bold text-slate-400">POLITRADE © 2026 Politrade Inc. All rights reserved.</p>
             <p className="text-[11px] text-slate-500 flex items-center justify-center sm:justify-start gap-1">
               <ShieldAlert className="w-3.5 h-3.5 text-amber-500/80 shrink-0" />
-              <span>본 플랫폼은 현직 언론사 기자 전용 매월 초 정기 지원금 기반의 엔터테인먼트/모의투자 펄스 지표 서비스입니다.</span>
+              <span>본 플랫폼은 매월 초 정기 지원금 기반의 엔터테인먼트/모의투자 지표 서비스입니다.</span>
             </p>
           </div>
 
           <div className="text-[11px] text-slate-500 font-mono">
-            Press Verified Domain Auth • AMM Bonding Curve Engine
+            Trust & Verification Auth • AMM Bonding Curve Engine
           </div>
         </div>
       </footer>

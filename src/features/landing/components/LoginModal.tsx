@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../../context/StoreContext';
-import { X, Key, Mail, Newspaper, ArrowRight } from 'lucide-react';
+import { X, Key, Mail, ArrowRight } from 'lucide-react';
 import { validatePressEmail } from '../../auth/config/pressDomains';
 
 interface LoginModalProps {
@@ -23,7 +23,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
 
     const res = validatePressEmail(emailInput);
     if (!res.isValid) {
-      setErrorMsg(res.error || '언론사 이메일을 입력하세요.');
+      setErrorMsg(res.error || '이메일을 입력하세요.');
       return;
     }
 
@@ -32,11 +32,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
     updatePressVerification({
       isVerified: true,
       email: emailInput,
-      mediaName: res.mediaName || '언론사',
+      mediaName: res.mediaName || '시범 언론사',
       verifiedAt: new Date().toLocaleDateString('ko-KR'),
     }, finalNickname);
 
-    alert(`🎉 로그인 성공! (${res.mediaName} ${finalNickname} 기자님 환영합니다.)`);
+    alert(`🎉 로그인 성공! (${finalNickname} 님 환영합니다.)`);
     onSuccess();
     onClose();
   };
@@ -52,8 +52,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
               <Key className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white">기자 간편 로그인</h2>
-              <p className="text-xs text-slate-400">인증받은 언론사 이메일로 로그인</p>
+              <h2 className="text-base font-extrabold text-white">회원 간편 로그인</h2>
+              <p className="text-xs text-slate-400">인증받은 이메일/아이디로 로그인</p>
             </div>
           </div>
 
@@ -66,13 +66,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSucce
         <form onSubmit={handleLoginSubmit} className="space-y-4">
           
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-300">언론사 이메일 주소</label>
+            <label className="text-xs font-bold text-slate-300">이메일 주소 또는 아이디</label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                type="email"
+                type="text"
                 required
-                placeholder="reporter@kbs.co.kr, @chosun.com 등"
+                placeholder="test@naver.com, admin, reporter@kbs.co.kr 등"
                 value={emailInput}
                 onChange={e => setEmailInput(e.target.value)}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-blue-500"

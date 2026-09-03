@@ -2,20 +2,22 @@ import React, { useState } from 'react';
 import { StoreProvider, useStore } from './context/StoreContext';
 import { Header } from './components/Header';
 import { LandingMain } from './features/landing/components/LandingMain';
-import { PortfolioSummaryCard } from './features/portfolio/components/PortfolioSummaryCard';
-import { HoldingsTable } from './components/HoldingsTable';
+import { CompactAssetWidget } from './features/portfolio/components/CompactAssetWidget';
+import { FullPortfolioDetail } from './features/portfolio/components/FullPortfolioDetail';
 import { MarketBoard } from './components/MarketBoard';
 import { BoardMain } from './features/board/components/BoardMain';
 import { Leaderboard } from './components/Leaderboard';
 import { StockDetailModal } from './features/trading/components/StockDetailModal';
 import { SignUpModal } from './features/auth/components/SignUpModal';
 import { PressBadge } from './features/auth/components/PressBadge';
-import { ShieldAlert, Sparkles, TrendingUp, Calendar, Newspaper } from 'lucide-react';
+import { NewsFeedList } from './features/news/components/NewsFeedList';
+import { ShieldAlert, Sparkles, TrendingUp, Calendar, Newspaper, ArrowRight } from 'lucide-react';
 import { formatPoints, formatPercent } from './core/utils/formatters';
 
 const MainContent: React.FC = () => {
   const { 
     activeTab, 
+    setActiveTab,
     politicians, 
     setSelectedPoliticianId, 
     user, 
@@ -28,6 +30,7 @@ const MainContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<'landing' | 'app'>('landing');
 
   const topGainers = [...politicians].sort((a, b) => b.change24h - a.change24h).slice(0, 3);
+  const sampleNews = politicians[0]?.news || [];
 
   if (currentView === 'landing') {
     return (
@@ -96,18 +99,31 @@ const MainContent: React.FC = () => {
         </div>
 
         {/* Tab Switch Routing */}
+        
+        {/* 1. Dashboard (Home Entry Screen: Uncluttered News & Compact Asset Widget) */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
             
-            {/* Modular Portfolio Summary Card */}
-            <PortfolioSummaryCard />
+            {/* Clickable Compact Asset Widget */}
+            <CompactAssetWidget onClick={() => setActiveTab('market')} />
 
             {/* Top Gainers Highlight Cards */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>오늘의 인기도 급상승 정치인 TOP 3</span>
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>오늘의 인기도 급상승 정치인 TOP 3</span>
+                </h3>
+
+                <button
+                  onClick={() => setActiveTab('market')}
+                  className="text-xs text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1"
+                >
+                  <span>전체 10인 전광판 보러가기</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {topGainers.map((pol) => (
                   <div
@@ -135,15 +151,24 @@ const MainContent: React.FC = () => {
               </div>
             </div>
 
-            {/* Holdings Table */}
-            <HoldingsTable />
+            {/* General News Feed Section */}
+            <NewsFeedList news={sampleNews} />
+
           </div>
         )}
 
-        {activeTab === 'market' && <MarketBoard />}
+        {/* 2. Market Board */}
+        {activeTab === 'market' && (
+          <div className="space-y-6">
+            <FullPortfolioDetail onBackToHome={() => setActiveTab('dashboard')} />
+            <MarketBoard />
+          </div>
+        )}
 
+        {/* 3. Community Board */}
         {activeTab === 'board' && <BoardMain />}
 
+        {/* 4. Leaderboard */}
         {activeTab === 'leaderboard' && <Leaderboard />}
 
       </main>
@@ -169,7 +194,7 @@ const MainContent: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-slate-500 font-mono">
-            Landing Gate Router v5.0 • AMM Engine
+            Uncluttered UX Dashboard v6.0 • AMM Engine
           </div>
         </div>
       </footer>
