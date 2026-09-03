@@ -1,0 +1,87 @@
+import { CommentItem, LeaderboardUser } from '../types';
+
+export const INITIAL_COMMENTS: CommentItem[] = [
+  {
+    id: 'c1',
+    politicianId: 'POL01',
+    userName: '여의도개미',
+    userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+    content: '민생 법안 관련 뉴스 나오고 오늘 상승세 강하네요. 풀매수 완료했습니다!',
+    holdingStatus: 'BUYER',
+    likes: 12,
+    timestamp: '5분 전',
+  },
+  {
+    id: 'c2',
+    politicianId: 'POL01',
+    userName: '국회의원추적기',
+    userAvatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80',
+    content: '다음 주 대정부 질문 일정 있으니 그때 주가 더 오를 듯합니다.',
+    holdingStatus: 'HOLDER',
+    likes: 8,
+    timestamp: '15분 전',
+  },
+  {
+    id: 'c3',
+    politicianId: 'POL03',
+    userName: '청년투자자',
+    userAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80',
+    content: '이준석 의원 오늘 거래량 급증 장난 아니네요. 14,000P 돌파 🚀',
+    holdingStatus: 'BUYER',
+    likes: 24,
+    timestamp: '2분 전',
+  },
+  {
+    id: 'c4',
+    politicianId: 'POL02',
+    userName: '보수개혁파',
+    userAvatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&auto=format&fit=crop&q=80',
+    content: '단기 조정 받는 중인데 지금 가격대가 분할 매수 적기인 것 같습니다.',
+    holdingStatus: 'HOLDER',
+    likes: 5,
+    timestamp: '30분 전',
+  },
+];
+
+export const INITIAL_LEADERBOARD: LeaderboardUser[] = [
+  {
+    rank: 1,
+    name: '정치버핏',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    totalAsset: 3450000,
+    returnRate: 245.0,
+    badge: '👑 여의도 신',
+  },
+  {
+    rank: 2,
+    name: '스캘핑킹',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    totalAsset: 2890000,
+    returnRate: 189.0,
+    badge: '⚡ 초단타 마스터',
+  },
+  {
+    rank: 3,
+    name: '국회분석가',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+    totalAsset: 2410000,
+    returnRate: 141.0,
+    badge: '📊 정밀 가치투자자',
+  },
+  {
+    rank: 4,
+    name: '여야균형투자자',
+    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80',
+    totalAsset: 1980000,
+    returnRate: 98.0,
+    badge: '⚖️ 밸런스 마스터',
+  },
+  {
+    rank: 5,
+    name: '민심센서',
+    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80',
+    totalAsset: 1650000,
+    returnRate: 65.0,
+    badge: '🎯 펄스 트레이더',
+  },
+];
