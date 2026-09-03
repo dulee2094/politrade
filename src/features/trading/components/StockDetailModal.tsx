@@ -19,8 +19,9 @@ export const StockDetailModal: React.FC = () => {
   if (!politician) return null;
 
   const mStatus = getMarketStatus();
-  const isUp = politician.change24h >= 0;
-  const userHolding = user.holdings[politician.id];
+  const isUp = (politician.change24h || 0) >= 0;
+  const userHoldingsMap = user?.holdings || {};
+  const userHolding = userHoldingsMap[politician.id];
   const userShares = userHolding ? userHolding.shares : 0;
   const isIPO = politician.phase === 'IPO';
 
@@ -36,6 +37,8 @@ export const StockDetailModal: React.FC = () => {
   } = useTradingForm(politician);
 
   const currentQuote = tradeType === 'BUY' ? buyQuote : sellQuote;
+  const newsList = politician.news || [];
+  const priceHistoryData = politician.priceHistory || [];
 
   return (
     <div 
@@ -118,14 +121,14 @@ export const StockDetailModal: React.FC = () => {
             <div className="grid grid-cols-3 gap-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 font-mono">
               <div>
                 <span className="text-[10px] text-slate-400 font-sans">현재가</span>
-                <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice)}</div>
+                <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice || 10000)}</div>
               </div>
 
               <div>
                 <span className="text-[10px] text-slate-400 font-sans">24시간 변동률</span>
                 <div className={`text-base font-extrabold flex items-center gap-0.5 ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {isUp ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                  <span>{formatPercent(politician.change24h)}</span>
+                  <span>{formatPercent(politician.change24h || 0)}</span>
                 </div>
               </div>
 
@@ -153,21 +156,21 @@ export const StockDetailModal: React.FC = () => {
                   activeSubTab === 'news' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                관련 뉴스 ({politician.news.length})
+                관련 뉴스 ({newsList.length})
               </button>
             </div>
 
             {/* Chart / News Body */}
             {activeSubTab === 'chart' ? (
               <TradingChart
-                data={politician.priceHistory}
+                data={priceHistoryData}
                 isUp={isUp}
-                high24h={politician.high24h}
-                low24h={politician.low24h}
+                high24h={politician.high24h || politician.currentPrice || 10000}
+                low24h={politician.low24h || politician.currentPrice || 10000}
               />
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                {politician.news.map((item) => (
+                {newsList.map((item) => (
                   <div key={item.id} className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
                     <div className="flex items-center justify-between text-[10px] text-slate-400">
                       <span>{item.source}</span>
@@ -238,12 +241,12 @@ export const StockDetailModal: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">총 필요 포인트</span>
                   <span className="font-bold text-white text-sm">
-                    {formatPoints(tradeType === 'BUY' ? buyQuote.totalCost : sellQuote.totalRefund)}
+                    {formatPoints(tradeType === 'BUY' ? (buyQuote?.totalCost || 0) : (sellQuote?.totalRefund || 0))}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-slate-400">주당 체결가</span>
-                  <span className="text-slate-300">{formatPoints(currentQuote.avgPrice)}</span>
+                  <span className="text-slate-300">{formatPoints(currentQuote?.avgPrice || 10000)}</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-slate-400">가격 체결 방식</span>

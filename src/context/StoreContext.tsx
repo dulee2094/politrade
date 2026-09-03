@@ -37,8 +37,8 @@ interface StoreContextType {
   resetAllCache: () => void;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'politrade_user_v14';
-const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v14';
+const LOCAL_STORAGE_KEY_USER = 'politrade_user_v15';
+const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v15';
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 

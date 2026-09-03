@@ -11,14 +11,34 @@ export function useTradingForm(politician: Politician) {
   const [sharesInput, setSharesInput] = useState<string>('1');
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const userHolding = user.holdings[politician.id] || { shares: 0, avgPrice: 0, totalInvested: 0 };
-  const sharesNum = parseInt(sharesInput, 10) || 0;
+  const userHoldingsMap = user?.holdings || {};
+  const userHolding = userHoldingsMap[politician.id] || { shares: 0, avgPrice: 0, totalInvested: 0 };
+  const sharesNum = Math.max(1, parseInt(sharesInput, 10) || 1);
 
   const isIPO = politician.phase === 'IPO';
 
-  // Calculations for Phase 1 vs Phase 2
-  let buyQuote = calculateBuyQuote(politician.reserveMoney, politician.reserveShares, sharesNum);
-  let sellQuote = calculateSellQuote(politician.reserveMoney, politician.reserveShares, sharesNum);
+  // Safe reserve values
+  const reserveMoney = politician.reserveMoney || 10000000;
+  const reserveShares = politician.reserveShares || 1000;
+
+  // Default Quotes
+  let buyQuote = {
+    totalCost: sharesNum * INITIAL_IPO_PRICE,
+    avgPrice: INITIAL_IPO_PRICE,
+    spotPrice: INITIAL_IPO_PRICE,
+    slippage: 0,
+    priceImpact: 0,
+    newSpotPrice: INITIAL_IPO_PRICE,
+  };
+
+  let sellQuote = {
+    totalRefund: sharesNum * INITIAL_IPO_PRICE,
+    avgPrice: INITIAL_IPO_PRICE,
+    spotPrice: INITIAL_IPO_PRICE,
+    slippage: 0,
+    priceImpact: 0,
+    newSpotPrice: INITIAL_IPO_PRICE,
+  };
 
   if (isIPO) {
     buyQuote = {
@@ -58,6 +78,13 @@ export function useTradingForm(politician: Politician) {
       priceImpact: 0,
       newSpotPrice: obMatchSell.avgExecutedPrice,
     };
+  } else {
+    try {
+      buyQuote = calculateBuyQuote(reserveMoney, reserveShares, sharesNum);
+      sellQuote = calculateSellQuote(reserveMoney, reserveShares, sharesNum);
+    } catch (e) {
+      /* fallback to IPO quotes */
+    }
   }
 
   const handleExecuteOrder = () => {
@@ -93,6 +120,6 @@ export function useTradingForm(politician: Politician) {
     sellQuote,
     handleExecuteOrder,
     feedback,
-    userBalance: user.balance,
+    userBalance: user?.balance || 0,
   };
 }
