@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../../../context/StoreContext';
 import { useTradingForm } from '../hooks/useTradingForm';
 import { TradingChart } from './TradingChart';
+import { OrderBookWidget } from './OrderBookWidget';
 import { X, TrendingUp, TrendingDown, Lock } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
@@ -20,6 +21,7 @@ export const StockDetailModal: React.FC = () => {
   const isUp = politician.change24h >= 0;
   const userHolding = user.holdings[politician.id];
   const userShares = userHolding ? userHolding.shares : 0;
+  const isIPO = politician.phase === 'IPO';
 
   const {
     tradeType,
@@ -53,6 +55,15 @@ export const StockDetailModal: React.FC = () => {
                 <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
                   {politician.district}
                 </span>
+                {isIPO ? (
+                  <span className="bg-indigo-600/30 text-indigo-300 text-xs px-2.5 py-0.5 rounded-full border border-indigo-500/40 font-mono font-bold">
+                    Phase 1 공모 중 (10,000 P)
+                  </span>
+                ) : (
+                  <span className="bg-emerald-600/30 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-mono font-bold">
+                    Phase 2 호가창 시장
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 mt-0.5">{politician.title}</p>
             </div>
@@ -79,16 +90,19 @@ export const StockDetailModal: React.FC = () => {
           </div>
         )}
 
-        {/* Main Content Grid: Chart & Trading Panel */}
+        {/* Main Content Grid: Chart/OrderBook & Trading Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Left Column: Chart & Info */}
+          {/* Left Column: OrderBook / Chart & Info */}
           <div className="lg:col-span-2 space-y-4">
             
+            {/* Phase Status OrderBook Widget */}
+            <OrderBookWidget politician={politician} />
+
             {/* Price Cards Header */}
             <div className="grid grid-cols-3 gap-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 font-mono">
               <div>
-                <span className="text-[10px] text-slate-400 font-sans">현재가 (Spot)</span>
+                <span className="text-[10px] text-slate-400 font-sans">현재가</span>
                 <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice)}</div>
               </div>
 
@@ -150,13 +164,17 @@ export const StockDetailModal: React.FC = () => {
 
           </div>
 
-          {/* Right Column: AMM Trading Order Form */}
+          {/* Right Column: Order Form */}
           <div className="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/80 space-y-4 flex flex-col justify-between">
             
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-white">{BRAND_STOCK_NAME} AMM 매매</h3>
-                <span className="text-[10px] text-slate-400 font-mono">100% 즉시 체결</span>
+                <h3 className="text-sm font-extrabold text-white">
+                  {isIPO ? 'Phase 1 공모 청약' : 'Phase 2 호가 주문'}
+                </h3>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  {isIPO ? '고정가 10,000 P' : '실시간 지정가 호가'}
+                </span>
               </div>
 
               {/* Order Type Switch */}
@@ -169,7 +187,7 @@ export const StockDetailModal: React.FC = () => {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  매수 (Buy)
+                  {isIPO ? '공모 매수' : '매수 (Buy)'}
                 </button>
                 <button
                   onClick={() => setTradeType('SELL')}
@@ -179,7 +197,7 @@ export const StockDetailModal: React.FC = () => {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  매도 (Sell)
+                  {isIPO ? '공모 환불' : '매도 (Sell)'}
                 </button>
               </div>
 
@@ -199,18 +217,20 @@ export const StockDetailModal: React.FC = () => {
               {/* Quote Estimates */}
               <div className="space-y-2 bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/50 text-xs font-mono">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">총 예상 포인트</span>
+                  <span className="text-slate-400">총 필요 포인트</span>
                   <span className="font-bold text-white text-sm">
                     {formatPoints(tradeType === 'BUY' ? buyQuote.totalCost : sellQuote.totalRefund)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">주당 평단가</span>
+                  <span className="text-slate-400">주당 체결가</span>
                   <span className="text-slate-300">{formatPoints(currentQuote.avgPrice)}</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">슬리피지 (가격 영향도)</span>
-                  <span className="text-indigo-400 font-bold">{formatPercent(currentQuote.slippage)}</span>
+                  <span className="text-slate-400">가격 체결 방식</span>
+                  <span className="text-indigo-400 font-bold font-sans">
+                    {isIPO ? '10,000P 고정가' : '유저 실제 호가'}
+                  </span>
                 </div>
               </div>
 
@@ -241,7 +261,7 @@ export const StockDetailModal: React.FC = () => {
               {!mStatus.isOpen ? (
                 <span>🔒 장 마감 (정규장: 매일 12:00 ~ 14:00)</span>
               ) : (
-                <span>{politician.name} {BRAND_STOCK_NAME} {tradeType === 'BUY' ? '매수하기' : '매도하기'}</span>
+                <span>{politician.name} {BRAND_STOCK_NAME} {tradeType === 'BUY' ? (isIPO ? '공모 청약' : '매수하기') : '매도하기'}</span>
               )}
             </button>
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../../../context/StoreContext';
-import { calculateBuyQuote, calculateSellQuote, calculateMaxBuyShares } from '../../../core/amm/ammEngine';
+import { calculateBuyQuote, calculateSellQuote } from '../../../core/amm/ammEngine';
+import { matchOrderBook, INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
 import { Politician } from '../../../types';
 
 export function useTradingForm(politician: Politician) {
@@ -13,9 +14,51 @@ export function useTradingForm(politician: Politician) {
   const userHolding = user.holdings[politician.id] || { shares: 0, avgPrice: 0, totalInvested: 0 };
   const sharesNum = parseInt(sharesInput, 10) || 0;
 
-  const buyQuote = calculateBuyQuote(politician.reserveMoney, politician.reserveShares, sharesNum);
-  const sellQuote = calculateSellQuote(politician.reserveMoney, politician.reserveShares, sharesNum);
-  const maxBuyShares = calculateMaxBuyShares(politician.reserveMoney, politician.reserveShares, user.balance);
+  const isIPO = politician.phase === 'IPO';
+
+  // Calculations for Phase 1 vs Phase 2
+  let buyQuote = calculateBuyQuote(politician.reserveMoney, politician.reserveShares, sharesNum);
+  let sellQuote = calculateSellQuote(politician.reserveMoney, politician.reserveShares, sharesNum);
+
+  if (isIPO) {
+    buyQuote = {
+      totalCost: sharesNum * INITIAL_IPO_PRICE,
+      avgPrice: INITIAL_IPO_PRICE,
+      spotPrice: INITIAL_IPO_PRICE,
+      slippage: 0,
+      priceImpact: 0,
+      newSpotPrice: INITIAL_IPO_PRICE,
+    };
+    sellQuote = {
+      totalRefund: sharesNum * INITIAL_IPO_PRICE,
+      avgPrice: INITIAL_IPO_PRICE,
+      spotPrice: INITIAL_IPO_PRICE,
+      slippage: 0,
+      priceImpact: 0,
+      newSpotPrice: INITIAL_IPO_PRICE,
+    };
+  } else if (politician.orderBook) {
+    const obMatchBuy = matchOrderBook(politician.orderBook, 'BUY', politician.currentPrice + 1000, sharesNum);
+    const obMatchSell = matchOrderBook(politician.orderBook, 'SELL', Math.max(1, politician.currentPrice - 1000), sharesNum);
+    
+    buyQuote = {
+      totalCost: obMatchBuy.totalCostOrRefund,
+      avgPrice: obMatchBuy.avgExecutedPrice,
+      spotPrice: politician.currentPrice,
+      slippage: 0,
+      priceImpact: 0,
+      newSpotPrice: obMatchBuy.avgExecutedPrice,
+    };
+
+    sellQuote = {
+      totalRefund: obMatchSell.totalCostOrRefund,
+      avgPrice: obMatchSell.avgExecutedPrice,
+      spotPrice: politician.currentPrice,
+      slippage: 0,
+      priceImpact: 0,
+      newSpotPrice: obMatchSell.avgExecutedPrice,
+    };
+  }
 
   const handleExecuteOrder = () => {
     setFeedback(null);
@@ -41,30 +84,15 @@ export function useTradingForm(politician: Politician) {
     }
   };
 
-  const handlePercentSelect = (pct: number) => {
-    if (tradeType === 'BUY') {
-      const targetShares = Math.floor(maxBuyShares * (pct / 100));
-      setSharesInput(targetShares > 0 ? targetShares.toString() : '1');
-    } else {
-      const targetShares = Math.floor(userHolding.shares * (pct / 100));
-      setSharesInput(targetShares > 0 ? targetShares.toString() : '1');
-    }
-  };
-
   return {
     tradeType,
     setTradeType,
     sharesInput,
     setSharesInput,
-    sharesNum,
-    userHolding,
     buyQuote,
     sellQuote,
-    maxBuyShares,
-    feedback,
-    setFeedback,
     handleExecuteOrder,
-    handlePercentSelect,
+    feedback,
     userBalance: user.balance,
   };
 }

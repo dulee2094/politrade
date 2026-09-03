@@ -11,6 +11,8 @@ interface PoliticianCardProps {
 
 export const PoliticianCard: React.FC<PoliticianCardProps> = ({ politician: pol, onSelect }) => {
   const isUp = pol.change24h >= 0;
+  const isIPO = pol.phase === 'IPO';
+  const ipoPct = Math.round((pol.ipoSoldShares / pol.ipoTargetShares) * 100);
 
   return (
     <div
@@ -32,7 +34,18 @@ export const PoliticianCard: React.FC<PoliticianCardProps> = ({ politician: pol,
             )}
           </div>
           
-          <PartyBadge party={pol.party} />
+          <div className="flex flex-col items-end space-y-1">
+            <PartyBadge party={pol.party} />
+            {isIPO ? (
+              <span className="bg-indigo-600/30 text-indigo-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border border-indigo-500/30">
+                Phase 1 공모 중
+              </span>
+            ) : (
+              <span className="bg-emerald-600/30 text-emerald-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border border-emerald-500/30">
+                Phase 2 호가 상장
+              </span>
+            )}
+          </div>
         </div>
 
         <div>
@@ -44,40 +57,48 @@ export const PoliticianCard: React.FC<PoliticianCardProps> = ({ politician: pol,
         </div>
       </div>
 
-      <div className="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 space-y-1">
-        <div className="flex items-baseline justify-between">
-          <span className="text-[11px] text-slate-400">현재 주가</span>
-          <div className="text-base font-extrabold text-white font-mono">
-            {formatPoints(pol.currentPrice)}
+      {isIPO ? (
+        <div className="bg-slate-900/80 rounded-xl p-3 border border-indigo-500/30 space-y-1 font-mono">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-slate-400">공모 청약가</span>
+            <span className="font-bold text-amber-400">10,000 P (고정)</span>
+          </div>
+          <div className="space-y-1 pt-1">
+            <div className="flex items-center justify-between text-[10px] text-slate-300">
+              <span>공모 달성률</span>
+              <span>{ipoPct}% ({pol.ipoSoldShares}/1000주)</span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${ipoPct}%` }} />
+            </div>
           </div>
         </div>
+      ) : (
+        <div className="bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 space-y-1 font-mono">
+          <div className="flex items-baseline justify-between">
+            <span className="text-[11px] text-slate-400 font-sans">현재가</span>
+            <div className="text-base font-extrabold text-white">
+              {formatPoints(pol.currentPrice)}
+            </div>
+          </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] text-slate-400">24H 변동</span>
-          <div className={`flex items-center space-x-1 font-mono font-bold text-xs ${
-            isUp ? 'text-emerald-400' : 'text-rose-400'
-          }`}>
-            {isUp ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
-            <span>{formatPercent(pol.change24h)}</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-slate-400 font-sans">24H 변동</span>
+            <div className={`flex items-center space-x-1 font-bold text-xs ${
+              isUp ? 'text-emerald-400' : 'text-rose-400'
+            }`}>
+              {isUp ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+              <span>{formatPercent(pol.change24h)}</span>
+            </div>
           </div>
         </div>
-
-        <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-[10px] text-slate-400 font-mono">
-          <span>24H 거래액</span>
-          <span>{formatVolume(pol.volume24h)}</span>
-        </div>
-      </div>
+      )}
 
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect(pol.id);
-        }}
-        className="w-full bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs py-2 rounded-xl transition-all shadow-md flex items-center justify-center space-x-1"
+        className="w-full bg-blue-600/20 group-hover:bg-blue-600 text-blue-300 group-hover:text-white font-extrabold text-xs py-2.5 rounded-xl border border-blue-500/30 transition-all text-center"
       >
-        <span>차트보기 / 매매하기</span>
+        {isIPO ? 'Phase 1 공모 청약하기' : '차트보기 / 호가 매매'}
       </button>
-
     </div>
   );
 };

@@ -59,11 +59,7 @@ export const DiscussionSection: React.FC<DiscussionSectionProps> = ({ politician
                       주주
                     </span>
                   )}
-                  {cmt.holdingStatus === 'BUYER' && (
-                    <span className="bg-blue-500/20 text-blue-400 text-[10px] px-1.5 py-0.2 rounded border border-blue-500/30">
-                      매수자
-                    </span>
-                  )}
+
                 </div>
                 <span className="text-[10px] text-slate-500">{cmt.timestamp}</span>
               </div>

@@ -1,3 +1,5 @@
+import { TradingPhase, OrderBookSnapshot } from '../core/orderbook/orderbookTypes';
+
 export type Party = '국민의힘' | '더불어민주당' | '조국혁신당' | '개혁신당' | '무소속';
 
 export interface PricePoint {
@@ -15,6 +17,12 @@ export interface Politician {
   imageUrl: string;
   bio: string;
   
+  // Trading Phase (Phase 1: IPO Fixed Price / Phase 2: Real Order Book)
+  phase: TradingPhase;
+  ipoSoldShares: number;    // e.g. 850 / 1000
+  ipoTargetShares: number;  // 1,000 shares
+  orderBook?: OrderBookSnapshot;
+
   // AMM Reserves
   reserveMoney: number;  // R_money (가상 유동성 포인트)
   reserveShares: number; // R_shares (가상 유동성 주식 수량)
@@ -50,31 +58,22 @@ export interface TradeOrder {
   timestamp: string;
 }
 
+export interface UserProfile {
+  name: string;
+  avatar: string;
+  balance: number;       // 보유 포인트 (가상 현금)
+  initialBalance: number;
+  holdings: Record<string, Holding>; // Key: politicianId
+  tradeHistory: TradeOrder[];
+}
+
 export interface CommentItem {
   id: string;
   politicianId: string;
   userName: string;
   userAvatar: string;
   content: string;
-  holdingStatus?: 'BUYER' | 'SELLER' | 'HOLDER' | 'OBSERVER';
+  holdingStatus: 'HOLDER' | 'OBSERVER';
   likes: number;
   timestamp: string;
-}
-
-export interface UserProfile {
-  name: string;
-  avatar: string;
-  balance: number;      // 보유 사이버머니 (Point)
-  initialBalance: number; // 초기 지급 포인트 (1,000,000 P)
-  holdings: Record<string, Holding>; // politicianId -> Holding
-  tradeHistory: TradeOrder[];
-}
-
-export interface LeaderboardUser {
-  rank: number;
-  name: string;
-  avatar: string;
-  totalAsset: number;
-  returnRate: number;
-  badge: string;
 }

@@ -1,4 +1,23 @@
-import { CommentItem, LeaderboardUser } from '../types';
+import { CommentItem } from '../types';
+
+export interface LeaderboardUser {
+  rank: number;
+  name: string;
+  avatar: string;
+  pressName: string;
+  badge?: string;
+  returnRate: number;
+  totalAsset: number;
+  isCurrentUser?: boolean;
+}
+
+export const INITIAL_LEADERBOARD: LeaderboardUser[] = [
+  { rank: 1, name: '정치분석통', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80', pressName: '조선일보', badge: '조선일보 기자', returnRate: 48.5, totalAsset: 148500 },
+  { rank: 2, name: '여의도취재반장', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80', pressName: 'KBS', badge: 'KBS 기자', returnRate: 35.2, totalAsset: 135200 },
+  { rank: 3, name: '시사포커스', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80', pressName: 'MBC', badge: 'MBC 기자', returnRate: 28.9, totalAsset: 128900 },
+  { rank: 4, name: '국회입법분석가', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80', pressName: 'SBS', badge: 'SBS 기자', returnRate: 19.4, totalAsset: 119400 },
+  { rank: 5, name: '민심펄스탐다원', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=80', pressName: 'JTBC', badge: 'JTBC 기자', returnRate: 12.1, totalAsset: 112100 },
+];
 
 export const INITIAL_COMMENTS: CommentItem[] = [
   {
@@ -7,7 +26,7 @@ export const INITIAL_COMMENTS: CommentItem[] = [
     userName: '여의도개미',
     userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
     content: '민생 법안 관련 뉴스 나오고 오늘 상승세 강하네요. 풀매수 완료했습니다!',
-    holdingStatus: 'BUYER',
+    holdingStatus: 'HOLDER',
     likes: 12,
     timestamp: '5분 전',
   },
@@ -27,7 +46,7 @@ export const INITIAL_COMMENTS: CommentItem[] = [
     userName: '청년투자자',
     userAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80',
     content: '이준석 의원 오늘 거래량 급증 장난 아니네요. 14,000P 돌파 🚀',
-    holdingStatus: 'BUYER',
+    holdingStatus: 'HOLDER',
     likes: 24,
     timestamp: '2분 전',
   },
@@ -39,49 +58,6 @@ export const INITIAL_COMMENTS: CommentItem[] = [
     content: '단기 조정 받는 중인데 지금 가격대가 분할 매수 적기인 것 같습니다.',
     holdingStatus: 'HOLDER',
     likes: 5,
-    timestamp: '30분 전',
-  },
-];
-
-export const INITIAL_LEADERBOARD: LeaderboardUser[] = [
-  {
-    rank: 1,
-    name: '정치버핏',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-    totalAsset: 3450000,
-    returnRate: 245.0,
-    badge: '👑 여의도 신',
-  },
-  {
-    rank: 2,
-    name: '스캘핑킹',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-    totalAsset: 2890000,
-    returnRate: 189.0,
-    badge: '⚡ 초단타 마스터',
-  },
-  {
-    rank: 3,
-    name: '국회분석가',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
-    totalAsset: 2410000,
-    returnRate: 141.0,
-    badge: '📊 정밀 가치투자자',
-  },
-  {
-    rank: 4,
-    name: '여야균형투자자',
-    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80',
-    totalAsset: 1980000,
-    returnRate: 98.0,
-    badge: '⚖️ 밸런스 마스터',
-  },
-  {
-    rank: 5,
-    name: '민심센서',
-    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80',
-    totalAsset: 1650000,
-    returnRate: 65.0,
-    badge: '🎯 펄스 트레이더',
+    timestamp: '20분 전',
   },
 ];
