@@ -9,10 +9,13 @@ interface HeroAssetSpotlightProps {
 
 export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDetail }) => {
   const { totalAsset, holdingsValue, netPnL, returnRate, isPositive, user } = usePortfolioStats();
-  const holdingsCount = Object.values(user.holdings).filter(h => h.shares > 0).length;
+  
+  const holdings = user?.holdings || {};
+  const holdingsCount = Object.values(holdings).filter(h => h && h.shares > 0).length;
+  const userBalance = user?.balance || 0;
 
   // Calculate Asset Allocation Percentages
-  const cashPct = totalAsset > 0 ? Math.round((user.balance / totalAsset) * 100) : 100;
+  const cashPct = totalAsset > 0 ? Math.round((userBalance / totalAsset) * 100) : 100;
   const stockPct = totalAsset > 0 ? 100 - cashPct : 0;
 
   return (
@@ -39,6 +42,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
         </div>
 
         <button
+          type="button"
           onClick={onOpenDetail}
           className="bg-slate-800/80 hover:bg-slate-800 text-blue-400 hover:text-white border border-slate-700/80 hover:border-blue-500/50 text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-md flex items-center space-x-1.5"
         >
@@ -93,39 +97,35 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
           <div
             className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-l-full transition-all duration-500"
             style={{ width: `${cashPct}%` }}
-            title={`보유 현금: ${formatPoints(user.balance)} (${cashPct}%)`}
+            title={`보유 현금: ${formatPoints(userBalance)} (${cashPct}%)`}
           />
           <div
             className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-r-full transition-all duration-500"
             style={{ width: `${stockPct}%` }}
-            title={`POLI주식: ${formatPoints(holdingsValue)} (${stockPct}%)`}
+            title={`보유 주식: ${formatPoints(holdingsValue)} (${stockPct}%)`}
           />
         </div>
       </div>
 
-      {/* Balance Summary Cards */}
-      <div className="relative z-10 grid grid-cols-2 gap-3 font-mono text-xs">
-        <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-          <div className="space-y-0.5">
-            <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
-              <DollarSign className="w-3 h-3 text-amber-400" />
-              보유 가상 현금
-            </span>
-            <div className="font-extrabold text-amber-400 text-sm">
-              {formatPoints(user.balance)}
-            </div>
+      {/* Bottom Summary Cards */}
+      <div className="relative z-10 grid grid-cols-2 gap-3 font-mono text-xs pt-1">
+        <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-0.5">
+          <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
+            <DollarSign className="w-3 h-3 text-amber-400" />
+            보유 가상 현금
+          </span>
+          <div className="text-sm font-extrabold text-amber-400">
+            {formatPoints(userBalance)}
           </div>
         </div>
 
-        <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-          <div className="space-y-0.5">
-            <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
-              <PieChart className="w-3 h-3 text-indigo-400" />
-              보유 주식 ({holdingsCount}종목)
-            </span>
-            <div className="font-extrabold text-white text-sm">
-              {formatPoints(holdingsValue)}
-            </div>
+        <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-0.5">
+          <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
+            <PieChart className="w-3 h-3 text-indigo-400" />
+            보유 주식 ({holdingsCount}종목)
+          </span>
+          <div className="text-sm font-extrabold text-white">
+            {formatPoints(holdingsValue)}
           </div>
         </div>
       </div>

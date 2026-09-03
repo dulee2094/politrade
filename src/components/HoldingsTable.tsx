@@ -4,12 +4,15 @@ import { TrendingUp, TrendingDown, ArrowRight, Layers } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../config/constants';
 import { formatPoints, formatPercent } from '../core/utils/formatters';
 import { PartyBadge } from '../shared/ui/PartyBadge';
+import { PoliticianAvatar } from '../shared/ui/PoliticianAvatar';
 
 export const HoldingsTable: React.FC = () => {
   const { user, politicians, setSelectedPoliticianId, setActiveTab } = useStore();
 
-  const holdingsList = Object.values(user.holdings)
-    .filter(h => h.shares > 0)
+  const holdingsMap = user?.holdings || {};
+
+  const holdingsList = Object.values(holdingsMap)
+    .filter(h => h && h.shares > 0)
     .map(holding => {
       const pol = politicians.find(p => p.id === holding.politicianId);
       if (!pol) return null;
@@ -41,6 +44,7 @@ export const HoldingsTable: React.FC = () => {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => setActiveTab('market')}
           className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20"
         >
@@ -61,7 +65,7 @@ export const HoldingsTable: React.FC = () => {
               {holdingsList.length} 종목
             </span>
           </h2>
-          <p className="text-xs text-slate-400">AMM 실시간 시세 기준 {BRAND_STOCK_NAME} 평가손익</p>
+          <p className="text-xs text-slate-400">실시간 시세 기준 {BRAND_STOCK_NAME} 평가손익</p>
         </div>
       </div>
 
@@ -92,10 +96,11 @@ export const HoldingsTable: React.FC = () => {
                 >
                   <td className="py-3.5 px-4">
                     <div className="flex items-center space-x-3">
-                      <img
+                      <PoliticianAvatar
                         src={pol.imageUrl}
-                        alt={pol.name}
-                        className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-700"
+                        name={pol.name}
+                        party={pol.party}
+                        className="w-10 h-10 rounded-xl"
                       />
                       <div>
                         <div className="flex items-center space-x-2">
@@ -119,29 +124,29 @@ export const HoldingsTable: React.FC = () => {
                     {formatPoints(pol.currentPrice)}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-100">
+                  <td className="py-3.5 px-4 text-right font-mono font-bold text-amber-400">
                     {formatPoints(currentValue)}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-mono font-bold">
-                    <div className={isProfit ? 'text-emerald-400' : 'text-rose-400'}>
-                      <div>{isProfit ? '+' : ''}{formatPoints(pnlPoints)}</div>
-                      <div className="text-[11px] font-normal opacity-90 flex items-center justify-end gap-0.5">
-                        {isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        <span>{formatPercent(pnlPct)}</span>
-                      </div>
+                  <td className="py-3.5 px-4 text-right font-mono">
+                    <div className={`font-bold ${isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {isProfit ? '+' : ''}{formatPoints(pnlPoints)}
+                    </div>
+                    <div className={`text-[10px] ${isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      ({formatPercent(pnlPct)})
                     </div>
                   </td>
 
                   <td className="py-3.5 px-4 text-center">
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedPoliticianId(pol.id);
                       }}
-                      className="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/40 text-xs px-3 py-1.5 rounded-lg transition-all font-semibold"
+                      className="bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white px-3 py-1 rounded-lg border border-blue-500/40 text-xs font-bold transition-all"
                     >
-                      매매 / 차트
+                      거래하기
                     </button>
                   </td>
                 </tr>

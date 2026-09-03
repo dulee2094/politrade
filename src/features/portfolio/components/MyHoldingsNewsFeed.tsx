@@ -6,8 +6,10 @@ import { PartyBadge } from '../../../shared/ui/PartyBadge';
 export const MyHoldingsNewsFeed: React.FC = () => {
   const { user, politicians, setSelectedPoliticianId } = useStore();
 
-  const holdingsList = Object.values(user.holdings)
-    .filter(h => h.shares > 0)
+  const holdingsMap = user?.holdings || {};
+
+  const holdingsList = Object.values(holdingsMap)
+    .filter(h => h && h.shares > 0)
     .map(h => politicians.find(p => p.id === h.politicianId))
     .filter(Boolean);
 
@@ -21,7 +23,7 @@ export const MyHoldingsNewsFeed: React.FC = () => {
 
   // Combine news from all owned politicians
   const allHoldingsNews = holdingsList.flatMap(pol => {
-    if (!pol) return [];
+    if (!pol || !pol.news) return [];
     return pol.news.map(n => ({
       ...n,
       politicianId: pol.id,
@@ -61,9 +63,11 @@ export const MyHoldingsNewsFeed: React.FC = () => {
               {item.title}
             </h4>
 
-            <div className="flex items-center justify-between pt-1 text-[10px] text-slate-400">
+            <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono pt-1 border-t border-slate-700/40">
               <span>{item.source}</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-400" />
+              <span className="text-blue-400 flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform font-sans">
+                관련 주식 매매 <ArrowUpRight className="w-3 h-3" />
+              </span>
             </div>
           </div>
         ))}

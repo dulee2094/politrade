@@ -37,13 +37,13 @@ interface StoreContextType {
   resetAllCache: () => void;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'politrade_user_v13';
-const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v13';
+const LOCAL_STORAGE_KEY_USER = 'politrade_user_v14';
+const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v14';
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Always force fresh politicians data on version bump v13
+  // Always force fresh politicians data on version bump v14
   const [politicians, setPoliticians] = useState<Politician[]>(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY_POLS);
     if (saved) {
@@ -75,7 +75,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     let initialUser: ExtendedUserProfile;
     if (saved) {
       try { 
-        initialUser = JSON.parse(saved); 
+        const parsed = JSON.parse(saved);
+        initialUser = {
+          ...parsed,
+          holdings: parsed.holdings || {},
+          tradeHistory: parsed.tradeHistory || [],
+        };
       } catch (e) {
         initialUser = {
           name: '여의도취재반장',
@@ -113,7 +118,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Live Trade-Triggered Briefing State
   const [briefing, setBriefing] = useState<DailyMarketBriefing>(() => 
-    generateMarketBriefing(politicians, user.tradeHistory[0])
+    generateMarketBriefing(politicians, (user.tradeHistory || [])[0])
   );
 
   // Automatic monthly allowance check on mount
@@ -199,7 +204,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       };
 
       setUser(prevUser => {
-        const existingHolding: Holding = prevUser.holdings[politicianId] || {
+        const userHoldings = prevUser.holdings || {};
+        const existingHolding: Holding = userHoldings[politicianId] || {
           politicianId,
           shares: 0,
           avgPrice: 0,
@@ -214,7 +220,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           ...prevUser,
           balance: prevUser.balance - totalCost,
           holdings: {
-            ...prevUser.holdings,
+            ...userHoldings,
             [politicianId]: {
               politicianId,
               shares: newTotalShares,
@@ -222,7 +228,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               totalInvested: newTotalInvested,
             },
           },
-          tradeHistory: [newOrder, ...prevUser.tradeHistory],
+          tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
         };
       });
 
@@ -288,7 +294,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     setUser(prevUser => {
-      const existingHolding: Holding = prevUser.holdings[politicianId] || {
+      const userHoldings = prevUser.holdings || {};
+      const existingHolding: Holding = userHoldings[politicianId] || {
         politicianId,
         shares: 0,
         avgPrice: 0,
@@ -303,7 +310,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ...prevUser,
         balance: prevUser.balance - totalCost,
         holdings: {
-          ...prevUser.holdings,
+          ...userHoldings,
           [politicianId]: {
             politicianId,
             shares: newTotalShares,
@@ -311,7 +318,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             totalInvested: newTotalInvested,
           },
         },
-        tradeHistory: [newOrder, ...prevUser.tradeHistory],
+        tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
       };
     });
 
@@ -337,7 +344,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const targetPol = getPoliticianById(politicianId);
     if (!targetPol) return { success: false, message: '정치인 정보를 찾을 수 없습니다.' };
 
-    const userHolding = user.holdings[politicianId];
+    const userHoldings = user.holdings || {};
+    const userHolding = userHoldings[politicianId];
     if (!userHolding || userHolding.shares < shares) {
       return { success: false, message: '매도 가능한 보유 주식이 부족합니다.' };
     }
@@ -382,7 +390,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       setUser(prevUser => {
         const remainingShares = userHolding.shares - shares;
-        const updatedHoldings = { ...prevUser.holdings };
+        const updatedHoldings = { ...(prevUser.holdings || {}) };
 
         if (remainingShares === 0) {
           delete updatedHoldings[politicianId];
@@ -399,7 +407,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           ...prevUser,
           balance: prevUser.balance + totalRefund,
           holdings: updatedHoldings,
-          tradeHistory: [newOrder, ...prevUser.tradeHistory],
+          tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
         };
       });
 
@@ -455,7 +463,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     setUser(prevUser => {
       const remainingShares = userHolding.shares - shares;
-      const updatedHoldings = { ...prevUser.holdings };
+      const updatedHoldings = { ...(prevUser.holdings || {}) };
 
       if (remainingShares === 0) {
         delete updatedHoldings[politicianId];
@@ -472,7 +480,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ...prevUser,
         balance: prevUser.balance + totalRefund,
         holdings: updatedHoldings,
-        tradeHistory: [newOrder, ...prevUser.tradeHistory],
+        tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
       };
     });
 
@@ -487,7 +495,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const addComment = (politicianId: string, content: string) => {
     if (!content.trim()) return;
-    const isHolder = user.holdings[politicianId] && user.holdings[politicianId].shares > 0;
+    const userHoldings = user.holdings || {};
+    const isHolder = userHoldings[politicianId] && userHoldings[politicianId].shares > 0;
     
     const newComment: CommentItem = {
       id: 'cmt_' + Date.now(),
