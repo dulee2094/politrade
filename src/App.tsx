@@ -29,14 +29,14 @@ const DashboardHome: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
-      {/* Left Column: Briefing + Hero Spotlight Asset + Top 3 Gainers + Live News (7/12 Width) */}
+      {/* Left Column: Hero Spotlight Asset (#1 TOP!) + Briefing (#2) + Top 3 Gainers + Live News (7/12 Width) */}
       <div className="lg:col-span-7 space-y-6">
         
-        {/* 1. Real-time Market Briefing Card */}
-        <DailyMarketBriefingCard briefing={briefing} />
-
-        {/* 2. Hero Neon Asset Spotlight Card */}
+        {/* 1. Hero Neon Asset Spotlight Card (Placed at the Very Top!) */}
         <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
+
+        {/* 2. Real-time Market Briefing Card (Placed Directly Below Asset Dashboard) */}
+        <DailyMarketBriefingCard briefing={briefing} />
 
         {/* 3. Today's Top 3 Gainers Cards */}
         <div className="space-y-3">
