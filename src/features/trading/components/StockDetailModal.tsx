@@ -3,6 +3,7 @@ import { useStore } from '../../../context/StoreContext';
 import { useTradingForm } from '../hooks/useTradingForm';
 import { TradingChart } from './TradingChart';
 import { OrderBookWidget } from './OrderBookWidget';
+import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { X, TrendingUp, TrendingDown, Lock } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
@@ -37,16 +38,26 @@ export const StockDetailModal: React.FC = () => {
   const currentQuote = tradeType === 'BUY' ? buyQuote : sellQuote;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden my-auto p-6 space-y-6">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto"
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedPoliticianId(null);
+      }}
+    >
+      <div 
+        className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden my-auto p-6 space-y-6"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center space-x-4">
-            <img
+            <PoliticianAvatar
               src={politician.imageUrl}
-              alt={politician.name}
-              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-blue-500/40 shadow-lg"
+              name={politician.name}
+              party={politician.party}
+              className="w-14 h-14 rounded-2xl"
             />
             <div>
               <div className="flex items-center space-x-2">
@@ -70,7 +81,11 @@ export const StockDetailModal: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setSelectedPoliticianId(null)}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedPoliticianId(null);
+            }}
             className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/60 hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -123,6 +138,7 @@ export const StockDetailModal: React.FC = () => {
             {/* Sub Tabs */}
             <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
               <button
+                type="button"
                 onClick={() => setActiveSubTab('chart')}
                 className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
                   activeSubTab === 'chart' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
@@ -131,6 +147,7 @@ export const StockDetailModal: React.FC = () => {
                 주가 추이 차트
               </button>
               <button
+                type="button"
                 onClick={() => setActiveSubTab('news')}
                 className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
                   activeSubTab === 'news' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
@@ -180,6 +197,7 @@ export const StockDetailModal: React.FC = () => {
               {/* Order Type Switch */}
               <div className="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-slate-700">
                 <button
+                  type="button"
                   onClick={() => setTradeType('BUY')}
                   className={`py-2 text-xs font-extrabold rounded-lg transition-all ${
                     tradeType === 'BUY'
@@ -190,6 +208,7 @@ export const StockDetailModal: React.FC = () => {
                   {isIPO ? '공모 매수' : '매수 (Buy)'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setTradeType('SELL')}
                   className={`py-2 text-xs font-extrabold rounded-lg transition-all ${
                     tradeType === 'SELL'
@@ -248,6 +267,7 @@ export const StockDetailModal: React.FC = () => {
 
             {/* Execute Order Button (Locked during Off-Hours) */}
             <button
+              type="button"
               onClick={handleExecuteOrder}
               disabled={!mStatus.isOpen}
               className={`w-full py-3.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center justify-center space-x-1 ${

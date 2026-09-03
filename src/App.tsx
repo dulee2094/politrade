@@ -5,6 +5,7 @@ import { LandingMain } from './features/landing/components/LandingMain';
 import { HeroAssetSpotlight } from './features/portfolio/components/HeroAssetSpotlight';
 import { FullPortfolioDetail } from './features/portfolio/components/FullPortfolioDetail';
 import { CompactMarketGrid } from './features/market/components/CompactMarketGrid';
+import { DailyMarketBriefingCard } from './features/market/components/DailyMarketBriefingCard';
 import { MarketBoard } from './components/MarketBoard';
 import { BoardMain } from './features/board/components/BoardMain';
 import { PollWidget } from './features/board/components/PollWidget';
@@ -13,12 +14,13 @@ import { Leaderboard } from './components/Leaderboard';
 import { StockDetailModal } from './features/trading/components/StockDetailModal';
 import { SignUpModal } from './features/auth/components/SignUpModal';
 import { PressBadge } from './features/auth/components/PressBadge';
+import { PoliticianAvatar } from './shared/ui/PoliticianAvatar';
 import { NewsFeedList } from './features/news/components/NewsFeedList';
 import { ShieldAlert, Sparkles, TrendingUp, Calendar, Newspaper, ArrowRight } from 'lucide-react';
 import { formatPoints, formatPercent } from './core/utils/formatters';
 
 const DashboardHome: React.FC = () => {
-  const { politicians, setSelectedPoliticianId, setActiveTab } = useStore();
+  const { politicians, briefing, setSelectedPoliticianId, setActiveTab } = useStore();
   const { poll, votePoll } = useBoardPosts();
 
   const topGainers = [...politicians].sort((a, b) => b.change24h - a.change24h).slice(0, 3);
@@ -27,13 +29,16 @@ const DashboardHome: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
-      {/* Left Column: Hero Spotlight Asset + Top 3 Gainers + Live News (7/12 Width) */}
+      {/* Left Column: Briefing + Hero Spotlight Asset + Top 3 Gainers + Live News (7/12 Width) */}
       <div className="lg:col-span-7 space-y-6">
         
-        {/* 1. Hero Neon Asset Spotlight Card */}
+        {/* 1. Real-time Market Briefing Card */}
+        <DailyMarketBriefingCard briefing={briefing} />
+
+        {/* 2. Hero Neon Asset Spotlight Card */}
         <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
 
-        {/* 2. Today's Top 3 Gainers Cards */}
+        {/* 3. Today's Top 3 Gainers Cards */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -58,7 +63,12 @@ const DashboardHome: React.FC = () => {
                 className="bg-slate-900/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-800 hover:border-blue-500/40 transition-all cursor-pointer space-y-2 group shadow-md"
               >
                 <div className="flex items-center space-x-3">
-                  <img src={pol.imageUrl} alt={pol.name} className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-700" />
+                  <PoliticianAvatar
+                    src={pol.imageUrl}
+                    name={pol.name}
+                    party={pol.party}
+                    className="w-10 h-10 rounded-xl"
+                  />
                   <div>
                     <span className="font-extrabold text-sm text-white group-hover:text-blue-400">{pol.name}</span>
                     <div className="text-[10px] text-slate-400">{pol.party}</div>
@@ -77,7 +87,7 @@ const DashboardHome: React.FC = () => {
           </div>
         </div>
 
-        {/* 3. News Feed List */}
+        {/* 4. News Feed List */}
         <NewsFeedList news={sampleNews} />
 
       </div>
@@ -213,7 +223,7 @@ const MainContent: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-slate-500 font-mono">
-            Dynamic 2-Column Grid v11.0 • AMM Engine
+            Dynamic 2-Column Grid v13.0 • OrderBook Engine
           </div>
         </div>
       </footer>

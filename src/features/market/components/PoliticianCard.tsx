@@ -1,6 +1,7 @@
 import React from 'react';
 import { Politician } from '../../../types';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
+import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { TrendingUp, TrendingDown, Flame } from 'lucide-react';
 import { formatPoints, formatPercent, formatVolume } from '../../../core/utils/formatters';
 
@@ -22,10 +23,11 @@ export const PoliticianCard: React.FC<PoliticianCardProps> = ({ politician: pol,
       <div className="space-y-3">
         <div className="flex items-start justify-between">
           <div className="relative">
-            <img
+            <PoliticianAvatar
               src={pol.imageUrl}
-              alt={pol.name}
-              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-700 group-hover:ring-blue-500 transition-all shadow-md"
+              name={pol.name}
+              party={pol.party}
+              className="w-14 h-14 rounded-2xl"
             />
             {pol.change24h > 10 && (
               <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow">
@@ -95,6 +97,7 @@ export const PoliticianCard: React.FC<PoliticianCardProps> = ({ politician: pol,
       )}
 
       <button
+        type="button"
         className="w-full bg-blue-600/20 group-hover:bg-blue-600 text-blue-300 group-hover:text-white font-extrabold text-xs py-2.5 rounded-xl border border-blue-500/30 transition-all text-center"
       >
         {isIPO ? 'Phase 1 공모 청약하기' : '차트보기 / 호가 매매'}

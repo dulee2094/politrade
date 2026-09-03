@@ -24,7 +24,7 @@ export const MarketStatusBadge: React.FC = () => {
         <Lock className="w-3.5 h-3.5 text-rose-400 shrink-0" />
       )}
 
-      <span className="font-sans font-bold">{status.statusText}</span>
+      <span className="font-sans font-bold">{status.message}</span>
       <span className="opacity-80 border-l border-slate-700 pl-2 ml-1 text-[11px] hidden sm:inline">
         {status.countdownText}
       </span>

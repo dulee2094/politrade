@@ -1,25 +1,25 @@
 import { LimitOrder, OrderBookSnapshot, OrderBookLevel } from './orderbookTypes';
 
 export const INITIAL_IPO_PRICE = 10000;
-export const INITIAL_IPO_TARGET_SHARES = 1000;
+export const INITIAL_IPO_TARGET_SHARES = 10; // 10 shares for quick testing!
 
 export function generateMockOrderBook(currentPrice: number): OrderBookSnapshot {
   const basePrice = Math.max(1000, currentPrice);
   
   const asks: OrderBookLevel[] = [
-    { price: basePrice + 400, shares: 120, totalPoints: (basePrice + 400) * 120 },
-    { price: basePrice + 300, shares: 85, totalPoints: (basePrice + 300) * 85 },
-    { price: basePrice + 200, shares: 60, totalPoints: (basePrice + 200) * 60 },
-    { price: basePrice + 100, shares: 45, totalPoints: (basePrice + 100) * 45 },
-    { price: basePrice + 50, shares: 20, totalPoints: (basePrice + 50) * 20 },
+    { price: basePrice + 400, shares: 12, totalPoints: (basePrice + 400) * 12 },
+    { price: basePrice + 300, shares: 8, totalPoints: (basePrice + 300) * 8 },
+    { price: basePrice + 200, shares: 6, totalPoints: (basePrice + 200) * 6 },
+    { price: basePrice + 100, shares: 4, totalPoints: (basePrice + 100) * 4 },
+    { price: basePrice + 50, shares: 2, totalPoints: (basePrice + 50) * 2 },
   ];
 
   const bids: OrderBookLevel[] = [
-    { price: basePrice - 50, shares: 30, totalPoints: (basePrice - 50) * 30 },
-    { price: basePrice - 100, shares: 55, totalPoints: (basePrice - 100) * 55 },
-    { price: basePrice - 200, shares: 90, totalPoints: (basePrice - 200) * 90 },
-    { price: basePrice - 300, shares: 110, totalPoints: (basePrice - 300) * 110 },
-    { price: basePrice - 400, shares: 150, totalPoints: (basePrice - 400) * 150 },
+    { price: basePrice - 50, shares: 3, totalPoints: (basePrice - 50) * 3 },
+    { price: basePrice - 100, shares: 5, totalPoints: (basePrice - 100) * 5 },
+    { price: basePrice - 200, shares: 9, totalPoints: (basePrice - 200) * 9 },
+    { price: basePrice - 300, shares: 11, totalPoints: (basePrice - 300) * 11 },
+    { price: basePrice - 400, shares: 15, totalPoints: (basePrice - 400) * 15 },
   ];
 
   return { asks, bids };

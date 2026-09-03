@@ -1,71 +1,52 @@
-/**
- * FEATURE FLAG: Set to true if you want to bypass trading hours during development/testing.
- * Set to false for actual 12:00 ~ 14:00 daily trading window enforcement.
- */
-export const ALLOW_TRADING_24H_TEST = false;
+export const REGULAR_MARKET_START_HOUR = 12; // 12:00
+export const REGULAR_MARKET_END_HOUR = 14;   // 14:00
+
+// Test Bypass Switch: set to true to allow 24H trading for testing
+export const ALLOW_TRADING_24H_TEST = true;
 
 export interface MarketStatus {
   isOpen: boolean;
-  statusText: string;
+  message: string;
+  nextOpeningText: string;
   countdownText: string;
-  nextOpenTimeStr: string;
 }
 
-/**
- * Check if current time is within daily trading window (12:00:00 ~ 13:59:59)
- */
 export function getMarketStatus(date: Date = new Date()): MarketStatus {
-  if (ALLOW_TRADING_24H_TEST) {
-    return {
-      isOpen: true,
-      statusText: '🟢 정규장 진행 중 (24시간 테스트 모드)',
-      countdownText: '테스트 모드 활성화됨',
-      nextOpenTimeStr: '매일 12:00 ~ 14:00',
-    };
-  }
-
   const hours = date.getHours();
   const minutes = date.getMinutes();
   const seconds = date.getSeconds();
 
-  // 12:00:00 <= time < 14:00:00
-  const isOpen = hours >= 12 && hours < 14;
+  const isWithinRegularHours = hours >= REGULAR_MARKET_START_HOUR && hours < REGULAR_MARKET_END_HOUR;
+  const isOpen = ALLOW_TRADING_24H_TEST || isWithinRegularHours;
 
-  if (isOpen) {
-    // Remaining time in trading session (until 14:00:00)
-    const endMinutes = 59 - minutes;
-    const endSeconds = 59 - seconds;
-    const remMinsStr = String(endMinutes).padStart(2, '0');
-    const remSecsStr = String(endSeconds).padStart(2, '0');
+  let nextOpen = new Date(date);
+  if (hours >= REGULAR_MARKET_END_HOUR) {
+    nextOpen.setDate(nextOpen.getDate() + 1);
+  }
+  nextOpen.setHours(REGULAR_MARKET_START_HOUR, 0, 0, 0);
 
+  const diffMs = nextOpen.getTime() - date.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+  const countdownText = `다음 개장(12:00)까지 ${String(diffHours).padStart(2, '0')}시간 ${String(diffMinutes).padStart(2, '0')}분 ${String(diffSeconds).padStart(2, '0')}초`;
+
+  if (isWithinRegularHours) {
     return {
       isOpen: true,
-      statusText: '🟢 POLI주식 정규장 진행 중 (12:00 ~ 14:00)',
-      countdownText: `마감까지 0${13 - hours}시간 ${remMinsStr}분 ${remSecsStr}초`,
-      nextOpenTimeStr: '매일 12:00 ~ 14:00',
+      message: '🟢 POLI주식 정규장 개장 중 (12:00 ~ 14:00)',
+      nextOpeningText: '오늘 14:00 장 마감 예정',
+      countdownText: '14:00 정규장 운용 중',
     };
   }
 
-  // Off-hours calculation (next 12:00)
-  let targetDate = new Date(date);
-  if (hours >= 14) {
-    targetDate.setDate(targetDate.getDate() + 1);
-  }
-  targetDate.setHours(12, 0, 0, 0);
-
-  const diffMs = targetDate.getTime() - date.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  const diffSecs = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-  const hStr = String(diffHours).padStart(2, '0');
-  const mStr = String(diffMins).padStart(2, '0');
-  const sStr = String(diffSecs).padStart(2, '0');
-
   return {
-    isOpen: false,
-    statusText: '🔴 장 마감 (정규장: 매일 12:00 ~ 14:00)',
-    countdownText: `다음 개장(12:00)까지 ${hStr}시간 ${mStr}분 ${sStr}초`,
-    nextOpenTimeStr: '매일 12:00 ~ 14:00',
+    isOpen: ALLOW_TRADING_24H_TEST ? true : false,
+    message: ALLOW_TRADING_24H_TEST
+      ? '🔴 정규장 마감 (⚡ 테스트 모드: 24시간 매매 가능)'
+      : '🔴 POLI주식 장 마감 (정규장: 매일 12:00 ~ 14:00)',
+    nextOpeningText: '다음 개장: 매일 12:00',
+    countdownText,
   };
 }

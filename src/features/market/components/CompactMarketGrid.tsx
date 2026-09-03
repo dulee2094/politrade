@@ -1,10 +1,11 @@
 import React from 'react';
 import { useStore } from '../../../context/StoreContext';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
+import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { MarketStatusBadge } from '../../../shared/ui/MarketStatusBadge';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
 import { BRAND_STOCK_NAME } from '../../../config/constants';
-import { TrendingUp, TrendingDown, BarChart2, Flame } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart2 } from 'lucide-react';
 
 export const CompactMarketGrid: React.FC = () => {
   const { politicians, setSelectedPoliticianId } = useStore();
@@ -19,7 +20,7 @@ export const CompactMarketGrid: React.FC = () => {
             <BarChart2 className="w-4 h-4 text-blue-400" />
             <span>{BRAND_STOCK_NAME} 실시간 전광판</span>
           </h3>
-          <p className="text-[11px] text-slate-400">10인 의원 AMM 수급 시세 현황</p>
+          <p className="text-[11px] text-slate-400">10인 의원 호가 체결 현황</p>
         </div>
 
         <MarketStatusBadge />
@@ -37,10 +38,11 @@ export const CompactMarketGrid: React.FC = () => {
               className="bg-slate-800/80 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700/60 hover:border-blue-500/50 transition-all cursor-pointer space-y-1.5 group shadow-sm"
             >
               <div className="flex items-center space-x-2">
-                <img
+                <PoliticianAvatar
                   src={pol.imageUrl}
-                  alt={pol.name}
-                  className="w-8 h-8 rounded-lg object-cover ring-1 ring-slate-700 shrink-0"
+                  name={pol.name}
+                  party={pol.party}
+                  className="w-8 h-8 rounded-lg"
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
