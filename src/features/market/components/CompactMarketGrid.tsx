@@ -26,8 +26,8 @@ export const CompactMarketGrid: React.FC = () => {
         <MarketStatusBadge />
       </div>
 
-      {/* 2-Column Dense Grid of 10 Politicians */}
-      <div className="grid grid-cols-2 gap-2.5 max-h-[520px] overflow-y-auto pr-1">
+      {/* Responsive 5-Column Grid of 10 Politicians */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {politicians.map((pol) => {
           const isUp = pol.change24h >= 0;
 
@@ -35,26 +35,24 @@ export const CompactMarketGrid: React.FC = () => {
             <div
               key={pol.id}
               onClick={() => setSelectedPoliticianId(pol.id)}
-              className="bg-slate-800/80 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700/60 hover:border-blue-500/50 transition-all cursor-pointer space-y-1.5 group shadow-sm"
+              className="bg-slate-800/80 hover:bg-slate-800 p-3 rounded-2xl border border-slate-700/60 hover:border-blue-500/50 transition-all duration-200 cursor-pointer space-y-2 group shadow-sm hover:-translate-y-0.5"
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2.5">
                 <PoliticianAvatar
                   src={pol.imageUrl}
                   name={pol.name}
                   party={pol.party}
-                  className="w-8 h-8 rounded-lg"
+                  className="w-10 h-10 rounded-xl"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-xs text-white group-hover:text-blue-400 transition-colors truncate">
-                      {pol.name}
-                    </span>
-                  </div>
-                  <div className="text-[9px] text-slate-400 truncate">{pol.district}</div>
+                  <span className="font-extrabold text-xs text-white group-hover:text-blue-400 transition-colors block truncate">
+                    {pol.name}
+                  </span>
+                  <div className="text-[10px] text-slate-400 truncate">{pol.district}</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between font-mono pt-1 border-t border-slate-700/40 text-[11px]">
+              <div className="flex items-center justify-between font-mono pt-1.5 border-t border-slate-700/50 text-xs">
                 <span className="font-extrabold text-slate-200">{formatPoints(pol.currentPrice)}</span>
                 <div className={`flex items-center font-bold text-[10px] ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {isUp ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}

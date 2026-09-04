@@ -12,7 +12,10 @@ interface TradingChartProps {
 export const TradingChart: React.FC<TradingChartProps> = ({ data, isUp, high24h, low24h }) => {
   const [hoveredPoint, setHoveredPoint] = useState<PricePoint | null>(null);
 
-  const points = data && data.length > 0 ? data : [
+  const rawPoints = Array.isArray(data) && data.length > 0 ? data : [];
+  const validPoints = rawPoints.filter(p => p && typeof p.price === 'number' && !isNaN(p.price));
+
+  const points = validPoints.length > 0 ? validPoints : [
     { time: '09:00', price: 10000, volume: 100 },
     { time: '11:00', price: 10000, volume: 100 },
     { time: '13:00', price: 10000, volume: 100 },
@@ -23,7 +26,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({ data, isUp, high24h,
   const prices = points.map(p => p.price);
   const minPrice = Math.min(...prices) * 0.98;
   const maxPrice = Math.max(...prices) * 1.02;
-  const priceRange = maxPrice - minPrice || 1;
+  const priceRange = (maxPrice - minPrice) || 1;
 
   const width = 500;
   const height = 180;
@@ -37,12 +40,14 @@ export const TradingChart: React.FC<TradingChartProps> = ({ data, isUp, high24h,
     return { x, y, pt };
   });
 
-  // Construct SVG Path String (Cubic Bezier curve or Polyline)
+  // Construct SVG Path String
   const linePath = coordinates.reduce((acc, coord, idx) => {
     return idx === 0 ? `M ${coord.x} ${coord.y}` : `${acc} L ${coord.x} ${coord.y}`;
   }, '');
 
-  const areaPath = `${linePath} L ${coordinates[coordinates.length - 1].x} ${height - paddingY} L ${coordinates[0].x} ${height - paddingY} Z`;
+  const firstCoord = coordinates[0] || { x: paddingX, y: height - paddingY };
+  const lastCoord = coordinates[coordinates.length - 1] || { x: width - paddingX, y: height - paddingY };
+  const areaPath = `${linePath} L ${lastCoord.x} ${height - paddingY} L ${firstCoord.x} ${height - paddingY} Z`;
 
   const strokeColor = isUp ? '#10b981' : '#f43f5e';
   const fillColorStart = isUp ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.4)';

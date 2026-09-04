@@ -6,7 +6,11 @@ import { PartyBadge } from '../../../shared/ui/PartyBadge';
 import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight, Wallet, CheckCircle2, TrendingUp, AlertTriangle } from 'lucide-react';
 import { formatPoints } from '../../../core/utils/formatters';
 
-export const WeeklyPulseReportCard: React.FC = () => {
+interface WeeklyPulseReportCardProps {
+  onOpenDetail?: () => void;
+}
+
+export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ onOpenDetail }) => {
   const {
     hasVotedToday,
     submitDailyVote,
@@ -54,19 +58,32 @@ export const WeeklyPulseReportCard: React.FC = () => {
           </div>
         </div>
 
-        {/* Daily Vote Trigger Button */}
-        <button
-          type="button"
-          onClick={() => setIsVoteModalOpen(true)}
-          className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center space-x-2 shrink-0 ${
-            hasVotedToday
-              ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
-              : 'bg-gradient-to-r from-amber-500 via-indigo-600 to-blue-600 hover:from-amber-400 hover:to-blue-500 text-white shadow-amber-500/20'
-          }`}
-        >
-          <Vote className="w-4 h-4 text-amber-300" />
-          <span>{hasVotedToday ? '오늘 투표 완료 (수정하기)' : `오늘의 Best/Worst 3인 투표하기 (+${DAILY_VOTE_REWARD}P)`}</span>
-        </button>
+        <div className="flex items-center space-x-2 shrink-0">
+          {onOpenDetail && (
+            <button
+              type="button"
+              onClick={onOpenDetail}
+              className="px-3.5 py-2.5 rounded-xl font-extrabold text-xs transition-all bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-500/40 flex items-center space-x-1.5"
+            >
+              <span>상세 리포트</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Daily Vote Trigger Button */}
+          <button
+            type="button"
+            onClick={() => setIsVoteModalOpen(true)}
+            className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center space-x-2 ${
+              hasVotedToday
+                ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
+                : 'bg-gradient-to-r from-amber-500 via-indigo-600 to-blue-600 hover:from-amber-400 hover:to-blue-500 text-white shadow-amber-500/20'
+            }`}
+          >
+            <Vote className="w-4 h-4 text-amber-300" />
+            <span>{hasVotedToday ? '오늘 투표 완료 (수정하기)' : `오늘의 Best/Worst 3인 투표하기 (+${DAILY_VOTE_REWARD}P)`}</span>
+          </button>
+        </div>
       </div>
 
       {/* Weekly Best 3 vs Worst 3 Dual Grid */}

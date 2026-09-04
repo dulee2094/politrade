@@ -51,9 +51,9 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician }) 
   }
 
   // Phase 2: Order Book Matrix
-  const orderBook = politician.orderBook || { asks: [], bids: [] };
-  const asks = orderBook.asks || [];
-  const bids = orderBook.bids || [];
+  const orderBook = politician?.orderBook || { asks: [], bids: [] };
+  const asks = Array.isArray(orderBook.asks) ? orderBook.asks.filter(a => a && typeof a.price === 'number') : [];
+  const bids = Array.isArray(orderBook.bids) ? orderBook.bids.filter(b => b && typeof b.price === 'number') : [];
 
   return (
     <div className="bg-slate-900/90 p-4 rounded-2xl border border-slate-700/80 space-y-3 font-mono text-xs">

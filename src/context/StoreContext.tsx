@@ -53,17 +53,43 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return INITIAL_POLITICIANS.map(initPol => {
           const cached = parsed.find(p => p.id === initPol.id);
           if (!cached) return initPol;
+
+          const validOrderBook = (cached.orderBook && Array.isArray(cached.orderBook.asks) && Array.isArray(cached.orderBook.bids))
+            ? cached.orderBook
+            : initPol.orderBook;
+
+          const validPriceHistory = (Array.isArray(cached.priceHistory) && cached.priceHistory.length > 0)
+            ? cached.priceHistory
+            : initPol.priceHistory;
+
+          const validNews = Array.isArray(cached.news)
+            ? cached.news
+            : initPol.news;
+
           return {
+            ...initPol,
             ...cached,
             imageUrl: initPol.imageUrl,
             name: initPol.name,
             party: initPol.party,
             district: initPol.district,
             title: initPol.title,
+            bio: cached.bio || initPol.bio,
             phase: cached.phase || initPol.phase,
-            ipoSoldShares: cached.ipoSoldShares ?? initPol.ipoSoldShares,
-            ipoTargetShares: INITIAL_IPO_TARGET_SHARES, // 10 shares for quick testing!
-            orderBook: cached.orderBook || initPol.orderBook,
+            ipoSoldShares: typeof cached.ipoSoldShares === 'number' ? cached.ipoSoldShares : initPol.ipoSoldShares,
+            ipoTargetShares: INITIAL_IPO_TARGET_SHARES,
+            orderBook: validOrderBook,
+            priceHistory: validPriceHistory,
+            news: validNews,
+            reserveMoney: typeof cached.reserveMoney === 'number' ? cached.reserveMoney : initPol.reserveMoney,
+            reserveShares: typeof cached.reserveShares === 'number' ? cached.reserveShares : initPol.reserveShares,
+            currentPrice: typeof cached.currentPrice === 'number' ? cached.currentPrice : initPol.currentPrice,
+            previousClose: typeof cached.previousClose === 'number' ? cached.previousClose : initPol.previousClose,
+            change24h: typeof cached.change24h === 'number' ? cached.change24h : initPol.change24h,
+            high24h: typeof cached.high24h === 'number' ? cached.high24h : initPol.high24h,
+            low24h: typeof cached.low24h === 'number' ? cached.low24h : initPol.low24h,
+            volume24h: typeof cached.volume24h === 'number' ? cached.volume24h : initPol.volume24h,
+            totalVolume: typeof cached.totalVolume === 'number' ? cached.totalVolume : initPol.totalVolume,
           };
         });
       } catch (e) { /* fallback */ }

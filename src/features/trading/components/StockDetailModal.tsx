@@ -19,7 +19,11 @@ export const StockDetailModal: React.FC = () => {
   if (!politician) return null;
 
   const mStatus = getMarketStatus();
-  const isUp = (politician.change24h || 0) >= 0;
+  const change24h = typeof politician.change24h === 'number' ? politician.change24h : 0;
+  const currentPrice = typeof politician.currentPrice === 'number' ? politician.currentPrice : 10000;
+  const high24h = typeof politician.high24h === 'number' ? politician.high24h : currentPrice;
+  const low24h = typeof politician.low24h === 'number' ? politician.low24h : currentPrice;
+  const isUp = change24h >= 0;
   const userHoldingsMap = user?.holdings || {};
   const userHolding = userHoldingsMap[politician.id];
   const userShares = userHolding ? userHolding.shares : 0;
@@ -37,8 +41,8 @@ export const StockDetailModal: React.FC = () => {
   } = useTradingForm(politician);
 
   const currentQuote = tradeType === 'BUY' ? buyQuote : sellQuote;
-  const newsList = politician.news || [];
-  const priceHistoryData = politician.priceHistory || [];
+  const newsList = Array.isArray(politician.news) ? politician.news : [];
+  const priceHistoryData = Array.isArray(politician.priceHistory) ? politician.priceHistory : [];
 
   return (
     <div 
@@ -165,8 +169,8 @@ export const StockDetailModal: React.FC = () => {
               <TradingChart
                 data={priceHistoryData}
                 isUp={isUp}
-                high24h={politician.high24h || politician.currentPrice || 10000}
-                low24h={politician.low24h || politician.currentPrice || 10000}
+                high24h={high24h}
+                low24h={low24h}
               />
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
