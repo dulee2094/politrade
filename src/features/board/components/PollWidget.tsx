@@ -13,7 +13,7 @@ export const PollWidget: React.FC<PollWidgetProps> = ({ poll, onVote }) => {
   const hasVoted = Boolean(poll.userVotedOptionId);
 
   return (
-    <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-5 rounded-2xl border border-indigo-500/30 shadow-xl space-y-4">
+    <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-5 rounded-2xl border border-indigo-500/30 shadow-xl space-y-4 h-full flex flex-col justify-between">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center">

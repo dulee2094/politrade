@@ -46,7 +46,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
   const sampleNews = politicians[0]?.news || [];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       
       {/* ================================================================ */}
       {/* 1. 알림 & 시스템 센터 (Notification & System Center) */}
@@ -97,17 +97,77 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
       </div>
 
       {/* ================================================================ */}
-      {/* 2. 내 보유자산 현황 카드 (My Asset & Portfolio Spotlight Card) */}
+      {/* 2. ROW 1: 2-Column Grid (마이 자산 대시보드 + 주간 민심 펄스) */}
       {/* ================================================================ */}
-      <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
+        <WeeklyPulseReportCard onOpenDetail={onOpenWeeklyPulse} />
+      </div>
 
       {/* ================================================================ */}
-      {/* 3. 주간 베스트/워스트 투표 현황 카드 (Weekly Sentiment Pulse Card) */}
+      {/* 3. ROW 2: 2-Column Grid (급상승 TOP3 & 시장 브리핑 + 민심 광장 투표) */}
       {/* ================================================================ */}
-      <WeeklyPulseReportCard onOpenDetail={onOpenWeeklyPulse} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Left Col (7/12): Top 3 Gainers Spotlight + Daily Market Briefing */}
+        <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
+          <div className="bg-slate-900/90 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>오늘의 인기도 급상승 TOP 3 종목</span>
+              </h4>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {topGainers.map((pol, idx) => (
+                <div
+                  key={pol.id}
+                  onClick={() => setSelectedPoliticianId(pol.id)}
+                  className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-blue-500/50 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2.5">
+                      <PoliticianAvatar
+                        src={pol.imageUrl}
+                        name={pol.name}
+                        party={pol.party}
+                        className="w-9 h-9 rounded-xl"
+                      />
+                      <div>
+                        <span className="font-extrabold text-xs text-white group-hover:text-blue-400 transition-colors">{pol.name}</span>
+                        <div className="text-[10px] text-slate-400">{pol.party}</div>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
+                      idx === 0 ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30' : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      TOP {idx + 1}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between font-mono pt-2 border-t border-slate-700/50 text-xs">
+                    <span className="font-extrabold text-white text-[11px]">{formatPoints(pol.currentPrice)}</span>
+                    <div className="font-bold text-emerald-400 flex items-center gap-0.5 text-[11px]">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>{formatPercent(pol.change24h)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DailyMarketBriefingCard briefing={briefing} />
+        </div>
+
+        {/* Right Col (5/12): Poll Widget */}
+        <div className="lg:col-span-5 flex flex-col justify-between">
+          <PollWidget poll={poll} onVote={votePoll} />
+        </div>
+      </div>
 
       {/* ================================================================ */}
-      {/* 4. POLI주식 실시간 매매 현황 카드 (Live POLI Stock Trading Card) */}
+      {/* 4. ROW 3: POLI주식 실시간 매매 현황 카드 (CompactMarketGrid) */}
       {/* ================================================================ */}
       <div className="bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
         
@@ -138,68 +198,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
           </button>
         </div>
 
-        {/* Top 3 Gainers Cards Spotlight */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>오늘의 인기도 급상승 TOP 3 종목</span>
-            </h4>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {topGainers.map((pol, idx) => (
-              <div
-                key={pol.id}
-                onClick={() => setSelectedPoliticianId(pol.id)}
-                className="bg-slate-800/80 hover:bg-slate-800 p-4 rounded-2xl border border-slate-700/60 hover:border-blue-500/50 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <PoliticianAvatar
-                      src={pol.imageUrl}
-                      name={pol.name}
-                      party={pol.party}
-                      className="w-10 h-10 rounded-xl"
-                    />
-                    <div>
-                      <span className="font-extrabold text-sm text-white group-hover:text-blue-400 transition-colors">{pol.name}</span>
-                      <div className="text-[10px] text-slate-400">{pol.party} • {pol.district}</div>
-                    </div>
-                  </div>
-                  <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
-                    idx === 0 ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30' : 'bg-slate-800 text-slate-400'
-                  }`}>
-                    TOP {idx + 1}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between font-mono pt-2 border-t border-slate-700/50 text-xs">
-                  <span className="font-extrabold text-white">{formatPoints(pol.currentPrice)}</span>
-                  <div className="font-bold text-emerald-400 flex items-center gap-0.5">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span>{formatPercent(pol.change24h)}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* 10 Politician Responsive Stock Grid */}
-        <div className="pt-2">
-          <CompactMarketGrid />
-        </div>
-
-        {/* Market Briefing & Poll Widget Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
-          <div className="lg:col-span-7">
-            <DailyMarketBriefingCard briefing={briefing} />
-          </div>
-          <div className="lg:col-span-5">
-            <PollWidget poll={poll} onVote={votePoll} />
-          </div>
-        </div>
+        <CompactMarketGrid />
 
       </div>
 

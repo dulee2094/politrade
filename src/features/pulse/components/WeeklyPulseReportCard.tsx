@@ -37,7 +37,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-950 p-6 rounded-3xl border border-amber-500/30 shadow-2xl space-y-6">
+    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-950 p-6 rounded-3xl border border-amber-500/30 shadow-2xl space-y-6 h-full flex flex-col justify-between">
       {/* Background Accent Glow */}
       <div className="absolute -top-16 -left-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -87,7 +87,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
       </div>
 
       {/* Weekly Best 3 vs Worst 3 Dual Grid */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="relative z-10 grid grid-cols-1 xl:grid-cols-2 gap-4">
         
         {/* Weekly BEST 3 Box */}
         <div className="bg-slate-900/90 p-4 rounded-2xl border border-emerald-500/30 space-y-3 shadow-md">
