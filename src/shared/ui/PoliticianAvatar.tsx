@@ -49,8 +49,8 @@ export const PoliticianAvatar: React.FC<PoliticianAvatarProps> = ({
     <img
       src={src}
       alt={name}
+      loading="eager"
       referrerPolicy="no-referrer"
-      crossOrigin="anonymous"
       onError={() => setHasError(true)}
       className={`${className} object-cover ring-2 ring-slate-700/80 shadow-md shrink-0`}
     />

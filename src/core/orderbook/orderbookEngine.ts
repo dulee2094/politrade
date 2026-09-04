@@ -4,7 +4,7 @@ export const INITIAL_IPO_PRICE = 10000;
 export const INITIAL_IPO_TARGET_SHARES = 10; // 10 shares for quick testing!
 
 export function generateMockOrderBook(currentPrice: number): OrderBookSnapshot {
-  const basePrice = Math.max(1000, currentPrice);
+  const basePrice = Math.max(1000, currentPrice || 10000);
   
   const asks: OrderBookLevel[] = [
     { price: basePrice + 400, shares: 12, totalPoints: (basePrice + 400) * 12 },
@@ -40,14 +40,15 @@ export function matchOrderBook(
   let totalCostOrRefund = 0;
   let executedShares = 0;
 
-  const newAsks = [...orderBook.asks];
-  const newBids = [...orderBook.bids];
+  const safeOrderBook = orderBook || generateMockOrderBook(targetPrice);
+  const newAsks = Array.isArray(safeOrderBook.asks) ? safeOrderBook.asks.map(a => ({ ...a })) : generateMockOrderBook(targetPrice).asks;
+  const newBids = Array.isArray(safeOrderBook.bids) ? safeOrderBook.bids.map(b => ({ ...b })) : generateMockOrderBook(targetPrice).bids;
 
   if (orderType === 'BUY') {
     // Match against Asks (lowest ask first)
     for (let i = newAsks.length - 1; i >= 0; i--) {
       const ask = newAsks[i];
-      if (ask.price <= targetPrice && remainingSharesToFill > 0) {
+      if (ask && ask.price <= targetPrice && remainingSharesToFill > 0) {
         const fillQty = Math.min(remainingSharesToFill, ask.shares);
         executedShares += fillQty;
         totalCostOrRefund += fillQty * ask.price;
@@ -60,7 +61,7 @@ export function matchOrderBook(
     // Match against Bids (highest bid first)
     for (let i = 0; i < newBids.length; i++) {
       const bid = newBids[i];
-      if (bid.price >= targetPrice && remainingSharesToFill > 0) {
+      if (bid && bid.price >= targetPrice && remainingSharesToFill > 0) {
         const fillQty = Math.min(remainingSharesToFill, bid.shares);
         executedShares += fillQty;
         totalCostOrRefund += fillQty * bid.price;
@@ -72,8 +73,8 @@ export function matchOrderBook(
   }
 
   // Filter out emptied levels
-  const filteredAsks = newAsks.filter(a => a.shares > 0);
-  const filteredBids = newBids.filter(b => b.shares > 0);
+  const filteredAsks = newAsks.filter(a => a && a.shares > 0);
+  const filteredBids = newBids.filter(b => b && b.shares > 0);
 
   const avgExecutedPrice = executedShares > 0 ? Math.round(totalCostOrRefund / executedShares) : targetPrice;
 

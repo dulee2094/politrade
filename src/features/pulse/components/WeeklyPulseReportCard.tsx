@@ -3,7 +3,8 @@ import { usePulseVoting } from '../hooks/usePulseVoting';
 import { DailyBestWorstVoteModal } from './DailyBestWorstVoteModal';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
-import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight } from 'lucide-react';
+import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight, Wallet, CheckCircle2, TrendingUp, AlertTriangle } from 'lucide-react';
+import { formatPoints } from '../../../core/utils/formatters';
 
 export const WeeklyPulseReportCard: React.FC = () => {
   const {
@@ -11,11 +12,25 @@ export const WeeklyPulseReportCard: React.FC = () => {
     submitDailyVote,
     likeReview,
     weeklySummary,
+    userSettlement,
+    hasSettledThisWeek,
+    executeWeeklySettlement,
     DAILY_VOTE_REWARD,
     BEST_REVIEW_REWARD,
   } = usePulseVoting();
 
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
+  const [settlementFeedback, setSettlementFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleClaimSettlement = () => {
+    setSettlementFeedback(null);
+    const res = executeWeeklySettlement();
+    if (res.success) {
+      setSettlementFeedback({ type: 'success', message: res.message });
+    } else {
+      setSettlementFeedback({ type: 'error', message: res.message });
+    }
+  };
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-950 p-6 rounded-3xl border border-amber-500/30 shadow-2xl space-y-6">
@@ -35,7 +50,7 @@ export const WeeklyPulseReportCard: React.FC = () => {
                 WEEKLY PULSE
               </span>
             </h3>
-            <p className="text-xs text-slate-400">7일간의 누적 민심 투표 결과 및 베스트 한줄평</p>
+            <p className="text-xs text-slate-400">7일간의 누적 민심 투표 결과 & 주주 배당금(+1,000P/주) 및 감액(-1,000P/주)</p>
           </div>
         </div>
 
@@ -64,7 +79,9 @@ export const WeeklyPulseReportCard: React.FC = () => {
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               <span>🏆 이번 주 주간 BEST 3 의원</span>
             </div>
-            <span className="text-[10px] text-emerald-400 font-mono">7일 긍정표 집계</span>
+            <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
+              보유 주주 1주당 +1,000 P 배당!
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -82,8 +99,9 @@ export const WeeklyPulseReportCard: React.FC = () => {
                     <div className="text-[10px] text-slate-400">{pol.party}</div>
                   </div>
                 </div>
-                <div className="font-mono font-bold text-emerald-400 text-xs">
-                  {pol.voteCount}표
+                <div className="text-right">
+                  <div className="font-mono font-bold text-emerald-400 text-xs">{pol.voteCount}표</div>
+                  <div className="text-[9px] text-emerald-300 font-mono">+1,000P/주</div>
                 </div>
               </div>
             ))}
@@ -97,7 +115,9 @@ export const WeeklyPulseReportCard: React.FC = () => {
               <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
               <span>⚠️ 이번 주 주간 WORST 3 의원</span>
             </div>
-            <span className="text-[10px] text-rose-400 font-mono">7일 부정표 집계</span>
+            <span className="text-[10px] text-rose-400 font-mono font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">
+              보유 주주 1주당 -1,000 P 감액!
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -113,14 +133,83 @@ export const WeeklyPulseReportCard: React.FC = () => {
                     <div className="text-[10px] text-slate-400">{pol.party}</div>
                   </div>
                 </div>
-                <div className="font-mono font-bold text-rose-400 text-xs">
-                  {pol.voteCount}표
+                <div className="text-right">
+                  <div className="font-mono font-bold text-rose-400 text-xs">{pol.voteCount}표</div>
+                  <div className="text-[9px] text-rose-300 font-mono">-1,000P/주</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
+      </div>
+
+      {/* User's Personal Weekly Dividend & Penalty Settlement Dashboard Box */}
+      <div className="relative z-10 bg-slate-900/90 p-4.5 rounded-2xl border border-indigo-500/40 space-y-3 font-mono shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-xl bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 flex items-center justify-center shrink-0 font-sans">
+              <Wallet className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white font-sans flex items-center gap-2">
+                <span>내 보유 주식 주간 예상 배당금 & 감액 정산</span>
+                {hasSettledThisWeek && (
+                  <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    이번 주 정산 완료
+                  </span>
+                )}
+              </h4>
+              <p className="text-[11px] text-slate-400 font-sans">주간 Best3/Worst3 의원의 POLI주식 보유 수량에 따라 자동 배당/감액 정산됩니다.</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleClaimSettlement}
+            disabled={hasSettledThisWeek}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all shadow-md flex items-center space-x-1.5 shrink-0 font-sans ${
+              hasSettledThisWeek
+                ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
+                : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/20'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{hasSettledThisWeek ? '이번 주 정산 완료' : '주간 배당금/감액 정산하기'}</span>
+          </button>
+        </div>
+
+        {/* Settlement Breakdown Summary Items */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60 flex items-center justify-between">
+            <span className="text-slate-400 font-sans">예상 Best 배당금</span>
+            <span className="font-extrabold text-emerald-400">+{formatPoints(userSettlement.totalDividend)}</span>
+          </div>
+
+          <div className="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60 flex items-center justify-between">
+            <span className="text-slate-400 font-sans">예상 Worst 손실 감액</span>
+            <span className="font-extrabold text-rose-400">-{formatPoints(userSettlement.totalPenalty)}</span>
+          </div>
+
+          <div className="bg-slate-800/60 p-2.5 rounded-xl border border-indigo-500/30 flex items-center justify-between bg-indigo-950/40">
+            <span className="text-slate-300 font-sans font-bold">최종 순 정산액</span>
+            <span className={`font-black text-sm ${userSettlement.netAmount >= 0 ? 'text-amber-300' : 'text-rose-400'}`}>
+              {userSettlement.netAmount >= 0 ? '+' : ''}{formatPoints(userSettlement.netAmount)}
+            </span>
+          </div>
+        </div>
+
+        {/* Settlement Feedback Message Toast */}
+        {settlementFeedback && (
+          <div className={`p-3 rounded-xl border text-xs font-bold font-sans flex items-center space-x-2 ${
+            settlementFeedback.type === 'error'
+              ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
+              : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+          }`}>
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>{settlementFeedback.message}</span>
+          </div>
+        )}
       </div>
 
       {/* Best Reviews Gallery Section */}

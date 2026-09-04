@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../../../context/StoreContext';
 import { PulseVoteRecord, WeeklyPulseSummary, PoliticianVoteCount } from '../types/pulseTypes';
+import { calculateWeeklySettlement, WeeklySettlementResult } from '../utils/pulseSettlement';
 
 const LOCAL_STORAGE_PULSE_KEY = 'politrade_pulse_votes_v1';
+const LOCAL_STORAGE_SETTLED_KEY = 'politrade_pulse_settled_v1';
 const DAILY_VOTE_REWARD = 100;
 const BEST_REVIEW_REWARD = 2000;
 
@@ -27,7 +29,7 @@ export function usePulseVoting() {
         userName: '여의도취재반장',
         userAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
         date: todayStr,
-        bestPoliticianIds: ['POL01', 'POL03', 'POL04'],
+        bestPoliticianIds: ['POL03', 'POL01', 'POL04'],
         worstPoliticianIds: ['POL02', 'POL05', 'POL07'],
         oneLineReview: '우원식 국회의장의 상임위 중재안과 이준석 의원의 반도체 특구 법안이 실질적 민생 도움이 됨!',
         likes: 24,
@@ -69,9 +71,19 @@ export function usePulseVoting() {
     ];
   });
 
+  const [settledDate, setSettledDate] = useState<string | null>(() => {
+    return localStorage.getItem(LOCAL_STORAGE_SETTLED_KEY);
+  });
+
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_PULSE_KEY, JSON.stringify(votes));
   }, [votes]);
+
+  useEffect(() => {
+    if (settledDate) {
+      localStorage.setItem(LOCAL_STORAGE_SETTLED_KEY, settledDate);
+    }
+  }, [settledDate]);
 
   // Check if current user voted today
   const hasVotedToday = votes.some(v => v.userId === (user?.verifiedEmail || user?.name || 'user') && v.date === todayStr);
@@ -174,6 +186,37 @@ export function usePulseVoting() {
   };
 
   const weeklySummary = calculateWeeklySummary();
+  const userSettlement: WeeklySettlementResult = calculateWeeklySettlement(user?.holdings || {}, weeklySummary);
+
+  const hasSettledThisWeek = settledDate === todayStr;
+
+  const executeWeeklySettlement = (): { success: boolean; message: string } => {
+    if (userSettlement.netAmount === 0 && userSettlement.breakdown.length === 0) {
+      return {
+        success: false,
+        message: '현재 주간 Best 3 / Worst 3 해당 의원의 주식을 보유하고 있지 않습니다.',
+      };
+    }
+
+    if (hasSettledThisWeek) {
+      return {
+        success: false,
+        message: '이번 주 주간 배당금 및 감액 정산이 이미 완료되었습니다.',
+      };
+    }
+
+    if (awardUserPoints) {
+      awardUserPoints(userSettlement.netAmount);
+    }
+
+    setSettledDate(todayStr);
+
+    const sign = userSettlement.netAmount >= 0 ? '+' : '';
+    return {
+      success: true,
+      message: `🎉 [주간 정산 완료] Best3 배당금 (+${userSettlement.totalDividend.toLocaleString()}P) 및 Worst3 감액 (-${userSettlement.totalPenalty.toLocaleString()}P) 정산으로 순 ${sign}${userSettlement.netAmount.toLocaleString()} P가 잔고에 반영되었습니다!`,
+    };
+  };
 
   return {
     votes,
@@ -181,6 +224,9 @@ export function usePulseVoting() {
     submitDailyVote,
     likeReview,
     weeklySummary,
+    userSettlement,
+    hasSettledThisWeek,
+    executeWeeklySettlement,
     DAILY_VOTE_REWARD,
     BEST_REVIEW_REWARD,
   };
