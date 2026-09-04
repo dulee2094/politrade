@@ -34,16 +34,17 @@ interface StoreContextType {
   addComment: (politicianId: string, content: string) => void;
   getPoliticianById: (id: string) => Politician | undefined;
   updatePressVerification: (data: { isVerified: boolean; email: string; mediaName: string; verifiedAt: string }, nickname: string) => void;
+  awardUserPoints: (amount: number) => void;
   resetAllCache: () => void;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'politrade_user_v15';
-const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v15';
+const LOCAL_STORAGE_KEY_USER = 'politrade_user_v16';
+const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v16';
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Always force fresh politicians data on version bump v14
+  // Always force fresh politicians data on version bump v16
   const [politicians, setPoliticians] = useState<Politician[]>(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY_POLS);
     if (saved) {
@@ -139,6 +140,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [politicians]);
 
   const getPoliticianById = (id: string) => politicians.find(p => p.id === id);
+
+  const awardUserPoints = (amount: number) => {
+    setUser(prev => ({
+      ...prev,
+      balance: (prev.balance || 0) + amount,
+    }));
+  };
 
   const buyStock = (politicianId: string, shares: number) => {
     // Check Market Hours Enforcement (24H Test Bypass enabled)
@@ -548,6 +556,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         addComment,
         getPoliticianById,
         updatePressVerification,
+        awardUserPoints,
         resetAllCache,
       }}
     >

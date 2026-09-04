@@ -4,6 +4,8 @@ import { PostCardItem } from './PostCardItem';
 import { PollWidget } from './PollWidget';
 import { CreatePostModal } from './CreatePostModal';
 import { PostDetailModal } from './PostDetailModal';
+import { WeeklyPulseReportCard } from '../../pulse/components/WeeklyPulseReportCard';
+import { OneLineReviewFeed } from '../../pulse/components/OneLineReviewFeed';
 import { MessageSquare, Search, PenTool } from 'lucide-react';
 import { BoardCategory } from '../types/board.types';
 
@@ -49,94 +51,83 @@ export const BoardMain: React.FC = () => {
               REPORTER FORUM
             </span>
           </h2>
-          <p className="text-xs text-slate-400">현직 기자의 심층 분석과 국회의원 의정 활동 토론 공간</p>
+          <p className="text-xs text-slate-400">인증 닉네임 기반의 자율 토론 및 주간 여론조사 펄스 피드</p>
         </div>
 
         <button
+          type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center space-x-2 shrink-0"
+          className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20 shrink-0"
         >
           <PenTool className="w-4 h-4" />
-          <span>새 의견 작성하기</span>
+          <span>새 기사 / 게시글 작성</span>
         </button>
       </div>
 
-      {/* Weekly Poll Widget */}
-      <PollWidget poll={poll} onVote={votePoll} />
+      {/* 1. Weekly Pulse Report Card */}
+      <WeeklyPulseReportCard />
 
-      {/* Category Tabs & Search Bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* 2. One Line Review Live Feed */}
+      <OneLineReviewFeed />
+
+      {/* 3. Main Board Layout: Posts List (Left) vs Weekly Poll (Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Category Tabs */}
-        <div className="flex items-center space-x-1 bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs overflow-x-auto">
-          {categories.map(c => (
-            <button
-              key={c.value}
-              onClick={() => setActiveCategory(c.value)}
-              className={`px-3 py-1.5 rounded-lg transition-all font-bold whitespace-nowrap ${
-                activeCategory === c.value
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
+        {/* Left Column: Posts List */}
+        <div className="lg:col-span-8 space-y-4">
+          
+          {/* Controls Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700/60">
+            {/* Category Chips */}
+            <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0">
+              {categories.map(c => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => setActiveCategory(c.value)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                    activeCategory === c.value
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white bg-slate-900/60'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Search Input */}
+            <div className="relative sm:w-48">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="제목/작성자 검색..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Posts Cards Grid */}
+          <div className="space-y-3">
+            {posts.map(post => (
+              <PostCardItem
+                key={post.id}
+                post={post}
+                onClick={() => setSelectedPostId(post.id)}
+                onLike={() => likePost(post.id)}
+              />
+            ))}
+          </div>
+
         </div>
 
-        {/* Search & Sort Controls */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 sm:w-56">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="게시글/작성자 검색..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <div className="flex items-center space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-700 text-xs">
-            <button
-              onClick={() => setSortBy('latest')}
-              className={`px-2 py-1 rounded-lg ${sortBy === 'latest' ? 'bg-slate-700 text-white font-bold' : 'text-slate-400'}`}
-            >
-              최신순
-            </button>
-            <button
-              onClick={() => setSortBy('likes')}
-              className={`px-2 py-1 rounded-lg ${sortBy === 'likes' ? 'bg-slate-700 text-white font-bold' : 'text-slate-400'}`}
-            >
-              추천순
-            </button>
-          </div>
+        {/* Right Column: Weekly Sentiment Poll */}
+        <div className="lg:col-span-4">
+          <PollWidget poll={poll} onVote={votePoll} />
         </div>
 
-      </div>
-
-      {/* Post Cards Feed List */}
-      <div className="space-y-3">
-        {posts.length === 0 ? (
-          <div className="bg-slate-800/40 p-8 rounded-2xl text-center text-slate-500 text-xs border border-slate-800 space-y-2">
-            <p>검색 조건에 해당되는 게시글이 없습니다.</p>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="text-blue-400 font-bold hover:underline"
-            >
-              첫 번째 의견을 작성해 보세요!
-            </button>
-          </div>
-        ) : (
-          posts.map(post => (
-            <PostCardItem
-              key={post.id}
-              post={post}
-              onClick={id => setSelectedPostId(id)}
-              onLike={id => likePost(id)}
-            />
-          ))
-        )}
       </div>
 
       {/* Modals */}

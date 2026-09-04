@@ -6,6 +6,7 @@ import { HeroAssetSpotlight } from './features/portfolio/components/HeroAssetSpo
 import { FullPortfolioDetail } from './features/portfolio/components/FullPortfolioDetail';
 import { CompactMarketGrid } from './features/market/components/CompactMarketGrid';
 import { DailyMarketBriefingCard } from './features/market/components/DailyMarketBriefingCard';
+import { WeeklyPulseReportCard } from './features/pulse/components/WeeklyPulseReportCard';
 import { MarketBoard } from './components/MarketBoard';
 import { BoardMain } from './features/board/components/BoardMain';
 import { PollWidget } from './features/board/components/PollWidget';
@@ -29,16 +30,19 @@ const DashboardHome: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
-      {/* Left Column: Hero Spotlight Asset (#1 TOP!) + Briefing (#2) + Top 3 Gainers + Live News (7/12 Width) */}
+      {/* Left Column: Hero Spotlight Asset (#1 TOP!) + Weekly Pulse (#2) + Briefing (#3) + Top 3 Gainers (7/12 Width) */}
       <div className="lg:col-span-7 space-y-6">
         
         {/* 1. Hero Neon Asset Spotlight Card (Placed at the Very Top!) */}
         <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
 
-        {/* 2. Real-time Market Briefing Card (Placed Directly Below Asset Dashboard) */}
+        {/* 2. Weekly Best 3 / Worst 3 Sentiment Pulse Report Card */}
+        <WeeklyPulseReportCard />
+
+        {/* 3. Real-time Market Briefing Card */}
         <DailyMarketBriefingCard briefing={briefing} />
 
-        {/* 3. Today's Top 3 Gainers Cards */}
+        {/* 4. Today's Top 3 Gainers Cards */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -87,7 +91,7 @@ const DashboardHome: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. News Feed List */}
+        {/* 5. News Feed List */}
         <NewsFeedList news={sampleNews} />
 
       </div>
@@ -223,7 +227,7 @@ const MainContent: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-slate-500 font-mono">
-            Dynamic 2-Column Grid v13.0 • OrderBook Engine
+            Dynamic 2-Column Grid v16.0 • OrderBook & Pulse Engine
           </div>
         </div>
       </footer>
