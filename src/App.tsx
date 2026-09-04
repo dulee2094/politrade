@@ -49,7 +49,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
     <div className="space-y-6 max-w-7xl mx-auto">
       
       {/* ================================================================ */}
-      {/* 1. 알림 & 시스템 센터 (Notification & System Center) */}
+      {/* 1. 알림 & 시스템 센터 (Notification & System Center) - 1열 Full Width */}
       {/* ================================================================ */}
       <div className="space-y-3">
         {allowanceNotice && (
@@ -97,19 +97,24 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
       </div>
 
       {/* ================================================================ */}
-      {/* 2. ROW 1: 2-Column Grid (마이 자산 대시보드 + 주간 민심 펄스) */}
+      {/* 2. 내 보유자산 현황 카드 (My Asset Spotlight) - 1열 Full Width */}
       {/* ================================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-        <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
-        <WeeklyPulseReportCard onOpenDetail={onOpenWeeklyPulse} />
-      </div>
+      <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
 
       {/* ================================================================ */}
-      {/* 3. ROW 2: 2-Column Grid (급상승 TOP3 & 시장 브리핑 + 민심 광장 투표) */}
+      {/* 3. 2-COLUMN GRID: 민심 펄스 (좌) vs 주식 매매/시장 이슈 (우) */}
       {/* ================================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Left Col (7/12): Top 3 Gainers Spotlight + Daily Market Briefing */}
-        <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* Left Column (6/12): Weekly Pulse Report Card */}
+        <div className="lg:col-span-6">
+          <WeeklyPulseReportCard onOpenDetail={onOpenWeeklyPulse} />
+        </div>
+
+        {/* Right Column (6/12): Market Top 3 + Briefing + Poll Widget */}
+        <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
+          
+          {/* Top 3 Gainers Spotlight */}
           <div className="bg-slate-900/90 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -157,17 +162,18 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
             </div>
           </div>
 
+          {/* Daily Market Briefing */}
           <DailyMarketBriefingCard briefing={briefing} />
+
+          {/* Poll Widget */}
+          <PollWidget poll={poll} onVote={votePoll} />
+
         </div>
 
-        {/* Right Col (5/12): Poll Widget */}
-        <div className="lg:col-span-5 flex flex-col justify-between">
-          <PollWidget poll={poll} onVote={votePoll} />
-        </div>
       </div>
 
       {/* ================================================================ */}
-      {/* 4. ROW 3: POLI주식 실시간 매매 현황 카드 (CompactMarketGrid) */}
+      {/* 4. POLI주식 실시간 매매 현황 카드 (CompactMarketGrid) - 1열 Full Width */}
       {/* ================================================================ */}
       <div className="bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
         

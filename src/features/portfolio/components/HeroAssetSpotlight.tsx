@@ -19,7 +19,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
   const stockPct = totalAsset > 0 ? 100 - cashPct : 0;
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 p-6 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-5 h-full flex flex-col justify-between">
+    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 p-6 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-5">
       {/* Background Glow Accents */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
