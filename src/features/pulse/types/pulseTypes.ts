@@ -17,13 +17,21 @@ export interface PoliticianVoteCount {
   party: string;
   imageUrl: string;
   voteCount: number;
+  isQuorumMet?: boolean;
+}
+
+export interface DailyVoterTrend {
+  day: string;
+  count: number;
 }
 
 export interface WeeklyPulseSummary {
   startDate: string;
   endDate: string;
   totalVotesCount: number;
+  totalUsersCount: number;
   bestTop3: PoliticianVoteCount[];
   worstTop3: PoliticianVoteCount[];
   bestReviews: PulseVoteRecord[];
+  dailyVoterCounts: DailyVoterTrend[];
 }

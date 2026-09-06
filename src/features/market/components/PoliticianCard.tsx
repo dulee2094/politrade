@@ -63,12 +63,12 @@ export const PoliticianCard: React.FC<PoliticianCardProps> = ({ politician: pol,
         <div className="bg-slate-900/80 rounded-xl p-3 border border-indigo-500/30 space-y-1 font-mono">
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-slate-400">공모 청약가</span>
-            <span className="font-bold text-amber-400">10,000 P (고정)</span>
+            <span className="font-bold text-amber-400">100,000 P (고정)</span>
           </div>
           <div className="space-y-1 pt-1">
             <div className="flex items-center justify-between text-[10px] text-slate-300">
               <span>공모 달성률</span>
-              <span>{ipoPct}% ({pol.ipoSoldShares}/1000주)</span>
+              <span>{ipoPct}% ({pol.ipoSoldShares}/{pol.ipoTargetShares || 10}주)</span>
             </div>
             <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
               <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${ipoPct}%` }} />

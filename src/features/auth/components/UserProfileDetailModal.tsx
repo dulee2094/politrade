@@ -77,7 +77,7 @@ export const UserProfileDetailModal: React.FC<UserProfileDetailModalProps> = ({ 
               월간 자동 정기 지원금
             </span>
             <div className="text-2xl font-black text-emerald-400 font-mono">
-              100,000 P / 매월
+              50,000 P / 매월
             </div>
             <p className="text-[11px] text-slate-400">매월 1일 자정 시스템 자동 지급</p>
           </div>
@@ -97,7 +97,7 @@ export const UserProfileDetailModal: React.FC<UserProfileDetailModalProps> = ({ 
             </li>
             <li className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>매월 초 10만P 정기 매매 지원금 100% 무상 지급</span>
+              <span>매월 초 5만P 정기 매매 지원금 100% 무상 지급</span>
             </li>
             <li className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
@@ -105,7 +105,7 @@ export const UserProfileDetailModal: React.FC<UserProfileDetailModalProps> = ({ 
             </li>
             <li className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-              <span>민심 토론방 베스트 한줄평 작성 및 포상금(+2,000P) 획득 자격</span>
+              <span>민심 토론방 베스트 한줄평 작성 및 포상금(+10,000P) 획득 자격</span>
             </li>
           </ul>
         </div>

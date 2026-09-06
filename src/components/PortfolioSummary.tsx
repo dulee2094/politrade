@@ -49,7 +49,7 @@ export const PortfolioSummary: React.FC = () => {
             </div>
           </div>
           <p className="text-xs text-slate-400">
-            초기 지급 자산 <span className="font-mono text-slate-300">100,000 P</span> 대비 실시간 평가 손익
+            초기 지급 자산 <span className="font-mono text-slate-300">300,000 P</span> 대비 실시간 평가 손익
           </p>
         </div>
 

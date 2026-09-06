@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePortfolioStats } from '../hooks/usePortfolioStats';
+import { usePulseVoting } from '../../pulse/hooks/usePulseVoting';
 import { useStore } from '../../../context/StoreContext';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { 
@@ -13,7 +14,12 @@ import {
   Layers,
   ShieldCheck,
   Zap,
-  ShoppingBag
+  ShoppingBag,
+  Vote,
+  Heart,
+  Calendar,
+  Gift,
+  Coins
 } from 'lucide-react';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
 
@@ -24,11 +30,16 @@ interface HeroAssetSpotlightProps {
 export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDetail }) => {
   const { totalAsset, holdingsValue, netPnL, returnRate, isPositive, user } = usePortfolioStats();
   const { politicians, setSelectedPoliticianId } = useStore();
+  const { hasVotedToday, votes, DAILY_VOTE_REWARD, BEST_REVIEW_REWARD } = usePulseVoting();
 
   const holdings = user?.holdings || {};
   const userBalance = user?.balance || 0;
   const tradeHistory = user?.tradeHistory || [];
   const tradeCount = tradeHistory.length;
+
+  // User's best review likes count
+  const myReviews = votes.filter(v => v.userName === user?.name || v.userId === (user?.verifiedEmail || user?.name));
+  const myTotalLikes = myReviews.reduce((sum, r) => sum + (r.likes || 0), 0);
 
   // Active Holdings List
   const activeHoldingsList = Object.values(holdings)
@@ -69,6 +80,13 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
     traderBadgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
   }
 
+  // 3-Month Asset Trend Data
+  const assetHistory3M = [
+    { month: '6월', asset: 300000, label: '초기지원금' },
+    { month: '7월', asset: 350000, label: '+16%' },
+    { month: '8월 (현재)', asset: totalAsset, label: formatPercent(returnRate) },
+  ];
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950/50 via-slate-900 to-indigo-950/70 p-5 sm:p-6 rounded-3xl border-2 border-emerald-500/50 shadow-2xl shadow-emerald-500/10 space-y-5">
       {/* Background Glow Accents */}
@@ -88,7 +106,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
                 <Sparkles className="w-3 h-3" /> MY PORTFOLIO
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">실시간 가상 평가 자산 및 보유 종목 입체 분석 리포트</p>
+            <p className="text-xs text-slate-300 mt-0.5">실시간 가상 평가 자산, 민심 펄스 현황 및 3개월 성과 통합 리포트</p>
           </div>
         </div>
 
@@ -107,7 +125,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
         </div>
       </div>
 
-      {/* 3-Column Responsive Grid Dashboard */}
+      {/* Row 1: 3-Column Responsive Grid Dashboard */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4">
         
         {/* Panel 1: Net Worth & ROI KPI (4/12) */}
@@ -116,7 +134,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
             <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
               <span>총 평가 자산 (Net Worth)</span>
               <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                초기 10만P 대비
+                초기 30만P 대비
               </span>
             </div>
             <div className="text-3xl font-black text-white font-mono tracking-tight pt-1">
@@ -190,7 +208,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
                 정기 지원금
               </span>
-              <span className="text-[11px] font-bold text-emerald-300 pt-1 font-sans">매월 1일 10만P</span>
+              <span className="text-[11px] font-bold text-emerald-300 pt-1 font-sans">매월 1일 5만P</span>
             </div>
           </div>
         </div>
@@ -274,6 +292,117 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
               )}
             </div>
           )}
+        </div>
+
+      </div>
+
+      {/* Row 2: NEW 2-Column Grid (Left: Pulse Activity Overview / Right: 3-Month Asset Trend & Income Breakdown) */}
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1">
+        
+        {/* Left Sub-Panel: 🗳️ 민심 펄스 참여 & 한줄평 현황 개요 (6/12) */}
+        <div className="lg:col-span-6 bg-slate-900/90 p-4.5 rounded-2xl border border-amber-500/40 space-y-3 shadow-xl backdrop-blur-sm">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <h4 className="text-xs font-extrabold text-white flex items-center gap-2">
+              <Vote className="w-4 h-4 text-amber-400" />
+              <span>🗳️ 민심 펄스 참여 & 한줄평 활동 현황</span>
+            </h4>
+            <span className="text-[10px] text-amber-300 font-mono bg-amber-950/70 px-2 py-0.5 rounded border border-amber-500/30">
+              PULSE ACTIVITY
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+            {/* Daily Vote Status */}
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1">
+              <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
+                <Vote className="w-3 h-3 text-amber-400" />
+                오늘의 펄스 투표
+              </span>
+              <div className="pt-0.5">
+                {hasVotedToday ? (
+                  <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 block font-sans text-center">
+                    ✅ 완료 (+1,000P)
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30 block font-sans text-center">
+                    🗳️ 참여 대기 (+1,000P)
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Review Likes Stats */}
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1">
+              <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
+                <Heart className="w-3 h-3 text-rose-400 fill-rose-400" />
+                한줄평 누적 공감
+              </span>
+              <div className="text-sm font-extrabold text-rose-400 pt-0.5">
+                {myTotalLikes}개 공감 수령
+              </div>
+            </div>
+
+            {/* Best Review Reward Status */}
+            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1">
+              <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
+                <Gift className="w-3 h-3 text-indigo-400" />
+                베스트 한줄평 시상
+              </span>
+              <div className="text-[11px] font-bold text-indigo-300 pt-0.5 font-sans">
+                +100,000P 월11시 지급
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Sub-Panel: 📈 최근 3개월 자산 변화 & 5대 수입 내역 (6/12) */}
+        <div className="lg:col-span-6 bg-slate-900/90 p-4.5 rounded-2xl border border-cyan-500/40 space-y-3 shadow-xl backdrop-blur-sm">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <h4 className="text-xs font-extrabold text-white flex items-center gap-2">
+              <Coins className="w-4 h-4 text-cyan-400" />
+              <span>📈 최근 3개월 자산 변화 & 5대 수입원 (Income Breakdown)</span>
+            </h4>
+            <span className="text-[10px] text-cyan-300 font-mono bg-cyan-950/70 px-2 py-0.5 rounded border border-cyan-500/30">
+              3-MONTH TREND
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+            {/* Left 3M Sparkline (5/12) */}
+            <div className="sm:col-span-5 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 space-y-1.5 font-mono">
+              <span className="text-[10px] text-slate-400 font-sans block">3개월 자산 성과</span>
+              <div className="flex items-center justify-between text-xs pt-1">
+                {assetHistory3M.map(h => (
+                  <div key={h.month} className="text-center">
+                    <span className="text-[9px] text-slate-400 block">{h.month}</span>
+                    <span className="font-bold text-white text-[11px]">{formatPoints(h.asset)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right 5 Income Category Chips (7/12) */}
+            <div className="sm:col-span-7 space-y-1.5">
+              <span className="text-[10px] text-slate-400 font-sans block">주요 5대 수입 항목</span>
+              <div className="flex flex-wrap gap-1.5 text-[10px] font-mono">
+                <span className="bg-emerald-950/80 text-emerald-300 px-2 py-1 rounded-md border border-emerald-500/30 font-sans">
+                  💵 정기 지원금 (+5만P)
+                </span>
+                <span className="bg-amber-950/80 text-amber-300 px-2 py-1 rounded-md border border-amber-500/30 font-sans">
+                  🗳️ 펄스 투표 (+1천P)
+                </span>
+                <span className="bg-indigo-950/80 text-indigo-300 px-2 py-1 rounded-md border border-indigo-500/30 font-sans">
+                  🏆 주주 배당금 (+1천P/주)
+                </span>
+                <span className="bg-purple-950/80 text-purple-300 px-2 py-1 rounded-md border border-purple-500/30 font-sans">
+                  ✨ 한줄평 포상 (+10만P)
+                </span>
+                <span className="bg-blue-950/80 text-cyan-300 px-2 py-1 rounded-md border border-cyan-500/30 font-sans">
+                  📈 매매 시세 차익
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>

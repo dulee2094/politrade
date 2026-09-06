@@ -33,7 +33,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onOpenLo
         {/* Sub Title */}
         <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
           검증된 전문가와 기자들의 심층 분석, 그리고 실시간 민심이 하나로 연결되는 정치 지지도 주가 시장. <br className="hidden sm:inline" />
-          매월 정기 지원금(10만P)으로 국회의원 지지도 및 주가를 정밀 예측하세요.
+          매월 정기 지원금(5만P)으로 국회의원 지지도 및 주가를 정밀 예측하세요.
         </p>
 
         {/* CTA Buttons */}
@@ -68,7 +68,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onOpenLo
             <ShieldCheck className="w-4 h-4 text-emerald-400" /> 이메일 도메인 검증 시스템
           </span>
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-amber-400" /> 매월 1일 10만P 자동지급
+            <Sparkles className="w-4 h-4 text-amber-400" /> 매월 1일 5만P 자동지급
           </span>
           <span className="flex items-center gap-1.5">
             <TrendingUp className="w-4 h-4 text-blue-400" /> AMM 수급 주가 체결

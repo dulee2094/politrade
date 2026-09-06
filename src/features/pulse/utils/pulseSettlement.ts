@@ -15,10 +15,14 @@ export interface WeeklySettlementResult {
   totalPenalty: number;
   netAmount: number;
   breakdown: DividendItemBreakdown[];
+  qualifiedBestCount: number;
+  qualifiedWorstCount: number;
+  isQuorumMet: boolean;
 }
 
 export const DIVIDEND_PER_SHARE = 1000;
 export const PENALTY_PER_SHARE = 1000;
+export const MIN_VOTES_REQUIRED = 31; // 30명 초과 = 최소 31표 이상
 
 export function calculateWeeklySettlement(
   holdingsMap: Record<string, Holding> = {},
@@ -28,8 +32,15 @@ export function calculateWeeklySettlement(
   let totalPenalty = 0;
   const breakdown: DividendItemBreakdown[] = [];
 
-  const bestIds = weeklySummary.bestTop3.map(b => b.politicianId);
-  const worstIds = weeklySummary.worstTop3.map(w => w.politicianId);
+  const totalUsers = weeklySummary.totalUsersCount || 50;
+  const quorum30Pct = totalUsers * 0.30;
+
+  // Filter politicians who satisfy BOTH conditions (득표수 > 30명 AND 득표수 > 전체 유저 30%)
+  const qualifiedBestPols = weeklySummary.bestTop3.filter(b => b.voteCount >= MIN_VOTES_REQUIRED && b.voteCount > quorum30Pct);
+  const qualifiedWorstPols = weeklySummary.worstTop3.filter(w => w.voteCount >= MIN_VOTES_REQUIRED && w.voteCount > quorum30Pct);
+
+  const bestIds = qualifiedBestPols.map(b => b.politicianId);
+  const worstIds = qualifiedWorstPols.map(w => w.politicianId);
 
   Object.values(holdingsMap).forEach(holding => {
     if (!holding || holding.shares <= 0) return;
@@ -39,7 +50,7 @@ export function calculateWeeklySettlement(
     const isWorst = worstIds.includes(polId);
 
     if (isBest) {
-      const bestPol = weeklySummary.bestTop3.find(b => b.politicianId === polId);
+      const bestPol = qualifiedBestPols.find(b => b.politicianId === polId);
       const polName = bestPol ? bestPol.politicianName : polId;
       const amount = holding.shares * DIVIDEND_PER_SHARE;
 
@@ -55,7 +66,7 @@ export function calculateWeeklySettlement(
     }
 
     if (isWorst) {
-      const worstPol = weeklySummary.worstTop3.find(w => w.politicianId === polId);
+      const worstPol = qualifiedWorstPols.find(w => w.politicianId === polId);
       const polName = worstPol ? worstPol.politicianName : polId;
       const amount = holding.shares * PENALTY_PER_SHARE;
 
@@ -72,11 +83,15 @@ export function calculateWeeklySettlement(
   });
 
   const netAmount = totalDividend - totalPenalty;
+  const isQuorumMet = qualifiedBestPols.length > 0 || qualifiedWorstPols.length > 0;
 
   return {
     totalDividend,
     totalPenalty,
     netAmount,
     breakdown,
+    qualifiedBestCount: qualifiedBestPols.length,
+    qualifiedWorstCount: qualifiedWorstPols.length,
+    isQuorumMet,
   };
 }

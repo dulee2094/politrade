@@ -3,7 +3,7 @@ import { usePulseVoting } from '../hooks/usePulseVoting';
 import { DailyBestWorstVoteModal } from './DailyBestWorstVoteModal';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
-import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight, Wallet, CheckCircle2, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight, Wallet, CheckCircle2, TrendingUp, AlertTriangle, Users, Calendar, Megaphone } from 'lucide-react';
 import { formatPoints } from '../../../core/utils/formatters';
 
 interface WeeklyPulseReportCardProps {
@@ -37,9 +37,23 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-amber-950/40 via-slate-900 to-purple-950/50 p-6 rounded-3xl border-2 border-amber-500/50 shadow-2xl shadow-amber-500/15 space-y-6 h-full flex flex-col justify-between">
+    <div className="relative overflow-hidden bg-gradient-to-br from-amber-950/40 via-slate-900 to-purple-950/50 p-6 rounded-3xl border-2 border-amber-500/50 shadow-2xl shadow-amber-500/15 space-y-5 h-full flex flex-col justify-between">
       {/* Background Accent Glow */}
       <div className="absolute -top-16 -left-16 w-64 h-64 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Top Pre-Notification Schedule Banner */}
+      <div className="relative z-10 bg-gradient-to-r from-amber-900/60 via-purple-900/60 to-slate-900 p-3 rounded-2xl border border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0">
+            <Megaphone className="w-3.5 h-3.5" />
+          </div>
+          <span className="font-bold text-amber-300 font-sans">주간 민심 펄스 타임라인 사전 공지:</span>
+          <span className="text-slate-200 font-mono text-[11px]">월~토 24:00 투표 마감 ➔ 월요일 10:00 발표 ➔ 월요일 11:00 통합 시상</span>
+        </div>
+        <span className="text-[10px] font-extrabold text-amber-300 bg-amber-950 px-2 py-0.5 rounded-full border border-amber-500/30 font-mono">
+          월11시 배당+포상금(+10만P) 일괄지급
+        </span>
+      </div>
 
       {/* Header Bar */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
@@ -54,7 +68,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
                 WEEKLY PULSE
               </span>
             </h3>
-            <p className="text-xs text-slate-400">7일간의 누적 민심 투표 결과 & 주주 배당금(+1,000P/주) 및 감액(-1,000P/주)</p>
+            <p className="text-xs text-slate-400">월~토 투표 ➔ 매주 월요일 10시 발표 & 11시 배당금(+1,000P/주) 및 한줄평 포상금(+100,000P) 일괄 시상</p>
           </div>
         </div>
 
@@ -81,8 +95,52 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             }`}
           >
             <Vote className="w-4 h-4 text-amber-300" />
-            <span>{hasVotedToday ? '오늘 투표 완료 (수정하기)' : `오늘의 Best/Worst 3인 투표하기 (+${DAILY_VOTE_REWARD}P)`}</span>
+            <span>{hasVotedToday ? '오늘 투표 완료 (수정하기)' : `오늘의 Best/Worst 3인 투표하기 (+1,000P)`}</span>
           </button>
+        </div>
+      </div>
+
+      {/* Daily Voter Participation Trend Widget (Mon ~ Sun) */}
+      <div className="relative z-10 bg-slate-900/80 p-3.5 rounded-2xl border border-amber-500/30 space-y-2 font-mono">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-white font-sans font-extrabold flex items-center gap-1.5">
+            <Users className="w-4 h-4 text-amber-400" />
+            <span>이번 주 요일별 전체 민심 투표 참여 현황</span>
+          </span>
+          <span className="text-[11px] text-amber-300 font-bold font-mono">
+            주간 누적 {weeklySummary.totalVotesCount}명 참여
+          </span>
+        </div>
+
+        {/* Mini Bar Chart Grid */}
+        <div className="grid grid-cols-7 gap-2 pt-1">
+          {weeklySummary.dailyVoterCounts.map((item, idx) => {
+            const maxCount = 100;
+            const heightPct = Math.min(100, Math.round((item.count / maxCount) * 100));
+            const isToday = idx === 6; // Sunday highlight
+
+            return (
+              <div key={item.day} className="flex flex-col items-center space-y-1 group">
+                <span className="text-[9px] text-slate-400 group-hover:text-amber-300 transition-colors">
+                  {item.count}명
+                </span>
+                <div className="w-full h-11 bg-slate-950 rounded-lg p-0.5 border border-slate-800 flex items-end">
+                  <div
+                    className={`w-full rounded-md transition-all duration-500 ${
+                      isToday 
+                        ? 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-md shadow-amber-500/20' 
+                        : 'bg-gradient-to-t from-indigo-900 to-indigo-600 group-hover:from-indigo-700 group-hover:to-amber-500'
+                    }`}
+                    style={{ height: `${heightPct}%` }}
+                    title={`${item.day}요일: ${item.count}명 참여`}
+                  />
+                </div>
+                <span className={`text-[10px] font-sans font-bold ${isToday ? 'text-amber-300' : 'text-slate-400'}`}>
+                  {item.day}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -170,14 +228,14 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             </div>
             <div>
               <h4 className="text-xs font-bold text-white font-sans flex items-center gap-2">
-                <span>내 보유 주식 주간 예상 배당금 & 감액 정산</span>
+                <span>월요일 11시 통합 주주 배당금 & 베스트 한줄평 포상 정산</span>
                 {hasSettledThisWeek && (
                   <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30">
                     이번 주 정산 완료
                   </span>
                 )}
               </h4>
-              <p className="text-[11px] text-slate-400 font-sans">주간 Best3/Worst3 의원의 POLI주식 보유 수량에 따라 자동 배당/감액 정산됩니다.</p>
+              <p className="text-[11px] text-slate-400 font-sans">매주 월요일 11:00 AM: 주주 배당금 정산과 베스트 한줄평 포상금(+100,000P)이 일괄 입출금됩니다.</p>
             </div>
           </div>
 
@@ -192,7 +250,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{hasSettledThisWeek ? '이번 주 정산 완료' : '주간 배당금/감액 정산하기'}</span>
+            <span>{hasSettledThisWeek ? '이번 주 정산 완료' : '월요일 11시 통합 정산/시상하기'}</span>
           </button>
         </div>
 
@@ -234,7 +292,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
         <div className="flex items-center justify-between">
           <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
             <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>✨ 금주의 베스트 한줄평 (선정자 +{BEST_REVIEW_REWARD} P 추가 지급!)</span>
+            <span>✨ 금주의 베스트 한줄평 (선정자 +{BEST_REVIEW_REWARD.toLocaleString()} P 월요일 11시 시상!)</span>
           </h4>
           <span className="text-[10px] text-slate-400 font-mono">유저 공감 득표 랭킹</span>
         </div>
@@ -258,8 +316,8 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 font-mono text-[11px]">
-                <span className="bg-indigo-600/30 text-indigo-300 text-[9px] px-2 py-0.5 rounded-md font-sans">
-                  🎁 포상 후보 (+2,000P)
+                <span className="bg-indigo-600/30 text-indigo-300 text-[9px] px-2 py-0.5 rounded-md font-sans font-bold">
+                  🎁 월11시 포상 (+100,000P)
                 </span>
                 <button
                   type="button"

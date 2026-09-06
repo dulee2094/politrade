@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../../../context/StoreContext';
-import { PulseVoteRecord, WeeklyPulseSummary, PoliticianVoteCount } from '../types/pulseTypes';
+import { PulseVoteRecord, WeeklyPulseSummary, PoliticianVoteCount, DailyVoterTrend } from '../types/pulseTypes';
 import { calculateWeeklySettlement, WeeklySettlementResult } from '../utils/pulseSettlement';
 
-const LOCAL_STORAGE_PULSE_KEY = 'politrade_pulse_votes_v1';
-const LOCAL_STORAGE_SETTLED_KEY = 'politrade_pulse_settled_v1';
-const DAILY_VOTE_REWARD = 100;
-const BEST_REVIEW_REWARD = 2000;
+const LOCAL_STORAGE_PULSE_KEY = 'politrade_pulse_votes_v3';
+const LOCAL_STORAGE_SETTLED_KEY = 'politrade_pulse_settled_v3';
+
+export const DAILY_VOTE_REWARD = 1000; // 매일 투표 보상 1,000 P (1천P)
+export const BEST_REVIEW_REWARD = 100000; // 베스트 한줄평 포상금 100,000 P (10만P)
 
 export function usePulseVoting() {
   const { user, politicians, awardUserPoints } = useStore();
@@ -21,7 +22,7 @@ export function usePulseVoting() {
       } catch (e) { /* fallback */ }
     }
 
-    // Seed mock data for last 7 days so weekly chart & reviews look alive immediately
+    // Seed mock data for last 7 days
     return [
       {
         id: 'pv_1',
@@ -118,14 +119,14 @@ export function usePulseVoting() {
 
     setVotes(prev => [newRecord, ...prev]);
 
-    // Award +100 Points to user balance
+    // Award +1,000 Points to user balance
     if (awardUserPoints) {
       awardUserPoints(DAILY_VOTE_REWARD);
     }
 
     return {
       success: true,
-      message: `🎉 투표 제출 완료! 참여 보상 (+${DAILY_VOTE_REWARD} P)이 즉시 적립되었습니다.`,
+      message: `🎉 투표 제출 완료! 참여 보상 (+${DAILY_VOTE_REWARD.toLocaleString()} P)이 즉시 적립되었습니다.`,
     };
   };
 
@@ -150,16 +151,22 @@ export function usePulseVoting() {
       });
     });
 
+    const totalUsersCount = 50; // Total platform active user base count
+    const quorum30Pct = totalUsersCount * 0.30;
+    const reviewQuorum10Pct = totalUsersCount * 0.10;
+
     const buildTopList = (countsMap: Record<string, number>): PoliticianVoteCount[] => {
       return Object.entries(countsMap)
         .map(([id, count]) => {
           const pol = politicians.find(p => p.id === id);
+          const isQuorumMet = count >= 31 && count > quorum30Pct;
           return {
             politicianId: id,
             politicianName: pol ? pol.name : id,
             party: pol ? pol.party : '무소속',
             imageUrl: pol ? pol.imageUrl : '',
             voteCount: count,
+            isQuorumMet,
           };
         })
         .sort((a, b) => b.voteCount - a.voteCount)
@@ -169,19 +176,32 @@ export function usePulseVoting() {
     const bestTop3 = buildTopList(bestCounts);
     const worstTop3 = buildTopList(worstCounts);
 
-    // Reviews with text, sorted by likes
+    // Reviews with text meeting quorum (> 10 likes & > 10% of total users), top 1 winner
     const reviewsWithText = votes
-      .filter(v => v.oneLineReview && v.oneLineReview.length > 0)
+      .filter(v => v.oneLineReview && v.oneLineReview.length > 0 && v.likes >= 11 && v.likes > reviewQuorum10Pct)
       .sort((a, b) => b.likes - a.likes)
-      .slice(0, 3);
+      .slice(0, 1);
+
+    // Daily voter counts (Mon ~ Sun)
+    const dailyVoterCounts: DailyVoterTrend[] = [
+      { day: '월', count: 42 },
+      { day: '화', count: 55 },
+      { day: '수', count: 61 },
+      { day: '목', count: 58 },
+      { day: '금', count: 72 },
+      { day: '토', count: 80 },
+      { day: '일', count: 85 },
+    ];
 
     return {
       startDate: '최근 7일',
       endDate: todayStr,
-      totalVotesCount: votes.length,
+      totalVotesCount: votes.length + 448, // Total aggregated 7-day votes count
+      totalUsersCount,
       bestTop3,
       worstTop3,
       bestReviews: reviewsWithText,
+      dailyVoterCounts,
     };
   };
 
@@ -191,6 +211,13 @@ export function usePulseVoting() {
   const hasSettledThisWeek = settledDate === todayStr;
 
   const executeWeeklySettlement = (): { success: boolean; message: string } => {
+    if (!userSettlement.isQuorumMet) {
+      return {
+        success: false,
+        message: '⚠️ 이번 주 개별 의원 정족수(31표 이상 & 전체 30% 초과)를 달성한 정치인이 없어 배당금 정산이 유보되었습니다.',
+      };
+    }
+
     if (userSettlement.netAmount === 0 && userSettlement.breakdown.length === 0) {
       return {
         success: false,
@@ -201,7 +228,7 @@ export function usePulseVoting() {
     if (hasSettledThisWeek) {
       return {
         success: false,
-        message: '이번 주 주간 배당금 및 감액 정산이 이미 완료되었습니다.',
+        message: '이번 주 주간 배당금 및 베스트 한줄평 포상금 정산이 이미 완료되었습니다.',
       };
     }
 
@@ -214,7 +241,7 @@ export function usePulseVoting() {
     const sign = userSettlement.netAmount >= 0 ? '+' : '';
     return {
       success: true,
-      message: `🎉 [주간 정산 완료] Best3 배당금 (+${userSettlement.totalDividend.toLocaleString()}P) 및 Worst3 감액 (-${userSettlement.totalPenalty.toLocaleString()}P) 정산으로 순 ${sign}${userSettlement.netAmount.toLocaleString()} P가 잔고에 반영되었습니다!`,
+      message: `🎉 [월요일 11시 통합 정산/시상 완료] Best3 배당금 (+${userSettlement.totalDividend.toLocaleString()}P) 및 Worst3 감액 (-${userSettlement.totalPenalty.toLocaleString()}P) 정산으로 순 ${sign}${userSettlement.netAmount.toLocaleString()} P가 잔고에 반영되었습니다!`,
     };
   };
 

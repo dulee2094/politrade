@@ -1,6 +1,6 @@
 import { ExtendedUserProfile } from '../../context/StoreContext';
 
-export const MONTHLY_ALLOWANCE_AMOUNT = 100000; // 100,000 P 매월 초 정기 지원금
+export const MONTHLY_ALLOWANCE_AMOUNT = 50000; // 50,000 P 매월 초 정기 지원금 (5만 포인트)
 
 export interface MonthlyAllowanceResult {
   granted: boolean;

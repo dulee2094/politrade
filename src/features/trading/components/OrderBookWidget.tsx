@@ -25,7 +25,7 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician }) 
             </span>
             <span className="text-xs font-bold text-white">공모가 정액 청약 단계</span>
           </div>
-          <span className="text-xs font-mono text-amber-400 font-bold">공모가 10,000 P / 주</span>
+          <span className="text-xs font-mono text-amber-400 font-bold">공모가 100,000 P / 주</span>
         </div>
 
         {/* Progress Bar */}

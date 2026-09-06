@@ -1,10 +1,10 @@
 import { LimitOrder, OrderBookSnapshot, OrderBookLevel } from './orderbookTypes';
 
-export const INITIAL_IPO_PRICE = 10000;
+export const INITIAL_IPO_PRICE = 100000;
 export const INITIAL_IPO_TARGET_SHARES = 10; // 10 shares for quick testing!
 
 export function generateMockOrderBook(currentPrice: number): OrderBookSnapshot {
-  const basePrice = Math.max(1000, currentPrice || 10000);
+  const basePrice = Math.max(1000, currentPrice || 100000);
   
   const asks: OrderBookLevel[] = [
     { price: basePrice + 400, shares: 12, totalPoints: (basePrice + 400) * 12 },

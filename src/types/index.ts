@@ -23,9 +23,9 @@ export interface Politician {
   ipoTargetShares: number;  // 1,000 shares
   orderBook?: OrderBookSnapshot;
 
-  // AMM Reserves
-  reserveMoney: number;  // R_money (가상 유동성 포인트)
-  reserveShares: number; // R_shares (가상 유동성 주식 수량)
+  // AMM Reserves (Optional)
+  reserveMoney?: number;
+  reserveShares?: number;
   
   // Dynamic Stats
   currentPrice: number;

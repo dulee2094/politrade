@@ -38,8 +38,8 @@ interface StoreContextType {
   resetAllCache: () => void;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'politrade_user_v19';
-const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v19';
+const LOCAL_STORAGE_KEY_USER = 'politrade_user_v21';
+const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v21';
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
@@ -81,8 +81,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             orderBook: validOrderBook,
             priceHistory: validPriceHistory,
             news: validNews,
-            reserveMoney: typeof cached.reserveMoney === 'number' ? cached.reserveMoney : initPol.reserveMoney,
-            reserveShares: typeof cached.reserveShares === 'number' ? cached.reserveShares : initPol.reserveShares,
             currentPrice: typeof cached.currentPrice === 'number' ? cached.currentPrice : initPol.currentPrice,
             previousClose: typeof cached.previousClose === 'number' ? cached.previousClose : initPol.previousClose,
             change24h: typeof cached.change24h === 'number' ? cached.change24h : initPol.change24h,
@@ -112,8 +110,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         initialUser = {
           name: '여의도취재반장',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-          balance: 100000,
-          initialBalance: 100000,
+          balance: 300000,
+          initialBalance: 300000,
           holdings: {},
           tradeHistory: [],
           isReporterVerified: true,
@@ -125,8 +123,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       initialUser = {
         name: '여의도취재반장',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-        balance: 100000,
-        initialBalance: 100000,
+        balance: 300000,
+        initialBalance: 300000,
         holdings: {},
         tradeHistory: [],
         isReporterVerified: true,

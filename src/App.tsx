@@ -80,7 +80,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
                 <PressBadge mediaName={user.pressName || 'KBS'} />
               </div>
               <p className="text-[11px] text-slate-300 mt-0.5">
-                닉네임(<strong className="text-white">{user.name}</strong>)으로 매월 정기 지원금(10만P)으로 매매 및 민심 광장 토론에 참여하세요.
+                닉네임(<strong className="text-white">{user.name}</strong>)으로 매월 정기 지원금(5만P)으로 매매 및 민심 광장 토론에 참여하세요.
               </p>
             </div>
           </div>

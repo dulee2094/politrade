@@ -202,7 +202,7 @@ export const SignUpModal: React.FC<SignUpModalProps> = ({ isOpen, onClose }) => 
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center space-x-1"
           >
             <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>기자 인증 완료 및 서비스 시작 (+1,000,000 P)</span>
+            <span>기자 인증 완료 및 서비스 시작 (+300,000 P)</span>
           </button>
 
         </form>

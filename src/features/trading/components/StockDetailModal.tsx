@@ -127,7 +127,7 @@ export const StockDetailModal: React.FC = () => {
             <div className="grid grid-cols-3 gap-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 font-mono">
               <div>
                 <span className="text-[10px] text-slate-400 font-sans">현재가</span>
-                <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice || 10000)}</div>
+                <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice || 100000)}</div>
               </div>
 
               <div>
