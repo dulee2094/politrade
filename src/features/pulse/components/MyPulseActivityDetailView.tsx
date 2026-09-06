@@ -40,33 +40,42 @@ export const MyPulseActivityDetailView: React.FC<MyPulseActivityDetailViewProps>
     <div className="space-y-6 max-w-7xl mx-auto">
       
       {/* Navigation Header */}
-      <div className="flex items-center justify-between bg-slate-900/90 p-4 rounded-2xl border border-amber-500/40 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/40 shadow-xl backdrop-blur-md">
         <div className="flex items-center space-x-3">
-          <button
-            type="button"
-            onClick={onBackToDashboard}
-            className="p-2.5 rounded-xl bg-slate-800 hover:bg-amber-600 text-slate-300 hover:text-white transition-all border border-slate-700 flex items-center space-x-1 font-sans font-bold text-xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>대시보드로 돌아가기</span>
-          </button>
+          <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+            <Vote className="w-5 h-5" />
+          </div>
           <div>
-            <h2 className="text-base font-black text-white flex items-center gap-2">
-              <Vote className="w-5 h-5 text-amber-400" />
-              <span>민심 펄스 나의 활동 상세 리포트</span>
-            </h2>
-            <p className="text-xs text-slate-400">내가 참여한 투표 이력, 한줄평 작성 목록 및 받은 공감(Heart) 누적 현황</p>
+            <div className="flex items-center space-x-2">
+              <h2 className="text-base font-black text-white">민심 펄스 나의 활동 상세 리포트</h2>
+              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold">
+                PULSE ACTIVITY
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">내가 참여한 투표 이력, 한줄평 작성 목록 및 받은 공감(Heart) 누적 현황</p>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onOpenVoteModal}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-extrabold text-xs transition-all shadow-md flex items-center space-x-1.5 shrink-0"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-          <span>{hasVotedToday ? '오늘 투표 완료 (수정)' : '오늘의 펄스 투표하기 (+1,000P)'}</span>
-        </button>
+        <div className="flex items-center space-x-2 shrink-0">
+          <button
+            type="button"
+            onClick={onOpenVoteModal}
+            className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-extrabold text-xs transition-all shadow-md flex items-center space-x-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>{hasVotedToday ? '오늘 투표 완료 (수정)' : '오늘의 펄스 투표하기 (+1,000P)'}</span>
+          </button>
+
+          {/* Top-Right Unified Back Button */}
+          <button
+            type="button"
+            onClick={onBackToDashboard}
+            className="bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl border border-slate-600 hover:border-amber-400 shadow-md transition-all flex items-center space-x-1.5"
+          >
+            <ArrowLeft className="w-4 h-4 text-amber-400" />
+            <span>대시보드로 돌아가기</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Activity Overview Cards */}

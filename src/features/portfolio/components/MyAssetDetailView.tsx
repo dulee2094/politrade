@@ -12,7 +12,9 @@ import {
   Coins, 
   ShieldCheck, 
   Sparkles,
-  DollarSign
+  DollarSign,
+  Gift,
+  Vote
 } from 'lucide-react';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
 
@@ -47,26 +49,29 @@ export const MyAssetDetailView: React.FC<MyAssetDetailViewProps> = ({ onBackToDa
       {/* Navigation Header */}
       <div className="flex items-center justify-between bg-slate-900/90 p-4 rounded-2xl border border-emerald-500/40 shadow-xl backdrop-blur-md">
         <div className="flex items-center space-x-3">
-          <button
-            type="button"
-            onClick={onBackToDashboard}
-            className="p-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 text-slate-300 hover:text-white transition-all border border-slate-700 flex items-center space-x-1 font-sans font-bold text-xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>대시보드로 돌아가기</span>
-          </button>
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
+            <Wallet className="w-5 h-5" />
+          </div>
           <div>
-            <h2 className="text-base font-black text-white flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-emerald-400" />
-              <span>마이 자산 상세 현황 리포트</span>
-            </h2>
-            <p className="text-xs text-slate-400">가상 평가 자산 구성, 3개월 성과 트렌드 및 정기 지원금 입금 이력</p>
+            <div className="flex items-center space-x-2">
+              <h2 className="text-base font-black text-white">마이 자산 상세 현황 리포트</h2>
+              <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/40 font-mono font-bold">
+                ASSET DETAIL
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">가상 평가 자산 구성, 3개월 성과 트렌드, 5대 수입원 및 정기 지원금 이력</p>
           </div>
         </div>
 
-        <span className="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full border border-emerald-500/40 font-mono font-bold">
-          ASSET DETAIL
-        </span>
+        {/* Top-Right Unified Back Button */}
+        <button
+          type="button"
+          onClick={onBackToDashboard}
+          className="bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl border border-slate-600 hover:border-emerald-400 shadow-md transition-all flex items-center space-x-1.5 shrink-0"
+        >
+          <ArrowLeft className="w-4 h-4 text-emerald-400" />
+          <span>대시보드로 돌아가기</span>
+        </button>
       </div>
 
       {/* 1. Summary Card */}
@@ -154,7 +159,50 @@ export const MyAssetDetailView: React.FC<MyAssetDetailViewProps> = ({ onBackToDa
 
       </div>
 
-      {/* 3. Monthly Allowance Log List */}
+      {/* 3. Income Breakdown Category Chips Section */}
+      <div className="bg-slate-900/90 p-6 rounded-3xl border border-cyan-500/40 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+            <Coins className="w-4 h-4 text-cyan-400" />
+            <span>💰 Politrade 5대 수입원 구조 (Income Breakdown)</span>
+          </h3>
+          <span className="text-xs font-mono text-cyan-300">포인트 획득 방식 안내</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 text-xs">
+          <div className="bg-emerald-950/60 p-3.5 rounded-2xl border border-emerald-500/30 space-y-1">
+            <span className="text-emerald-300 font-extrabold block">💵 정기 지원금</span>
+            <span className="text-white font-mono font-bold block text-sm">+50,000 P</span>
+            <span className="text-[10px] text-slate-400 block">매월 1일 자동 지급</span>
+          </div>
+
+          <div className="bg-amber-950/60 p-3.5 rounded-2xl border border-amber-500/30 space-y-1">
+            <span className="text-amber-300 font-extrabold block">🗳️ 펄스 투표</span>
+            <span className="text-white font-mono font-bold block text-sm">+1,000 P</span>
+            <span className="text-[10px] text-slate-400 block">매일 1회 투표 즉시 적립</span>
+          </div>
+
+          <div className="bg-indigo-950/60 p-3.5 rounded-2xl border border-indigo-500/30 space-y-1">
+            <span className="text-indigo-300 font-extrabold block">🏆 주주 배당금</span>
+            <span className="text-white font-mono font-bold block text-sm">+1,000 P / 주</span>
+            <span className="text-[10px] text-slate-400 block">월11시 Best3 주주 지급</span>
+          </div>
+
+          <div className="bg-purple-950/60 p-3.5 rounded-2xl border border-purple-500/30 space-y-1">
+            <span className="text-purple-300 font-extrabold block">✨ 한줄평 포상</span>
+            <span className="text-white font-mono font-bold block text-sm">+100,000 P</span>
+            <span className="text-[10px] text-slate-400 block">월11시 최다공감 1등 시상</span>
+          </div>
+
+          <div className="bg-blue-950/60 p-3.5 rounded-2xl border border-blue-500/30 space-y-1">
+            <span className="text-cyan-300 font-extrabold block">📈 매매 차익</span>
+            <span className="text-white font-mono font-bold block text-sm">실시간 변동</span>
+            <span className="text-[10px] text-slate-400 block">주가 매수/매도 시세 차익</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Monthly Allowance Log List */}
       <div className="bg-slate-900/90 p-6 rounded-3xl border border-slate-700/80 space-y-4 shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <h3 className="text-sm font-extrabold text-white flex items-center gap-2">

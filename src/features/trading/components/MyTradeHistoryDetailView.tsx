@@ -42,26 +42,29 @@ export const MyTradeHistoryDetailView: React.FC<MyTradeHistoryDetailViewProps> =
       {/* Navigation Header */}
       <div className="flex items-center justify-between bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/40 shadow-xl backdrop-blur-md">
         <div className="flex items-center space-x-3">
-          <button
-            type="button"
-            onClick={onBackToDashboard}
-            className="p-2.5 rounded-xl bg-slate-800 hover:bg-cyan-600 text-slate-300 hover:text-white transition-all border border-slate-700 flex items-center space-x-1 font-sans font-bold text-xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>대시보드로 돌아가기</span>
-          </button>
+          <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center shrink-0">
+            <Activity className="w-5 h-5" />
+          </div>
           <div>
-            <h2 className="text-base font-black text-white flex items-center gap-2">
-              <Activity className="w-5 h-5 text-cyan-400" />
-              <span>주식 보유 & 매매 거래 체결 상세 리포트</span>
-            </h2>
-            <p className="text-xs text-slate-400">보유 종목 실시간 손익 평가, 평균 매수 단가 및 누적 체결 내역</p>
+            <div className="flex items-center space-x-2">
+              <h2 className="text-base font-black text-white">주식 보유 & 매매 거래 체결 상세 리포트</h2>
+              <span className="bg-cyan-500/20 text-cyan-300 text-[10px] px-2 py-0.5 rounded-full border border-cyan-500/40 font-mono font-bold">
+                TRADE & HOLDINGS
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">보유 종목 실시간 손익 평가, 평균 매수 단가 및 누적 체결 내역</p>
           </div>
         </div>
 
-        <span className="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full border border-cyan-500/40 font-mono font-bold">
-          TRADE & HOLDINGS
-        </span>
+        {/* Top-Right Unified Back Button */}
+        <button
+          type="button"
+          onClick={onBackToDashboard}
+          className="bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl border border-slate-600 hover:border-cyan-400 shadow-md transition-all flex items-center space-x-1.5 shrink-0"
+        >
+          <ArrowLeft className="w-4 h-4 text-cyan-400" />
+          <span>대시보드로 돌아가기</span>
+        </button>
       </div>
 
       {/* 1. Full Holdings Table View */}
