@@ -4,6 +4,9 @@ import { Header } from './components/Header';
 import { LandingMain } from './features/landing/components/LandingMain';
 import { HeroAssetSpotlight } from './features/portfolio/components/HeroAssetSpotlight';
 import { FullPortfolioDetail } from './features/portfolio/components/FullPortfolioDetail';
+import { MyAssetDetailView } from './features/portfolio/components/MyAssetDetailView';
+import { MyPulseActivityDetailView } from './features/pulse/components/MyPulseActivityDetailView';
+import { MyTradeHistoryDetailView } from './features/trading/components/MyTradeHistoryDetailView';
 import { CompactMarketGrid } from './features/market/components/CompactMarketGrid';
 import { DailyMarketBriefingCard } from './features/market/components/DailyMarketBriefingCard';
 import { WeeklyPulseReportCard } from './features/pulse/components/WeeklyPulseReportCard';
@@ -27,29 +30,38 @@ import { formatPoints, formatPercent } from './core/utils/formatters';
 interface DashboardHomeProps {
   onOpenUserProfile: () => void;
   onOpenWeeklyPulse: () => void;
+  onOpenAssetDetail: () => void;
+  onOpenPulseActivityDetail: () => void;
+  onOpenTradeDetail: () => void;
+  onOpenVoteModal: () => void;
 }
 
-const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpenWeeklyPulse }) => {
+const DashboardHome: React.FC<DashboardHomeProps> = ({ 
+  onOpenUserProfile, 
+  onOpenWeeklyPulse,
+  onOpenAssetDetail,
+  onOpenPulseActivityDetail,
+  onOpenTradeDetail,
+  onOpenVoteModal
+}) => {
   const { 
     politicians, 
     briefing, 
     setSelectedPoliticianId, 
     setActiveTab, 
     user,
-    setIsSignUpModalOpen,
     allowanceNotice,
     setAllowanceNotice
   } = useStore();
   const { poll, votePoll } = useBoardPosts();
 
   const topGainers = [...politicians].sort((a, b) => b.change24h - a.change24h).slice(0, 3);
-  const sampleNews = politicians[0]?.news || [];
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       
       {/* ================================================================ */}
-      {/* 1. 알림 & 시스템 센터 (Notification & System Center) - 1열 Full Width */}
+      {/* 1. 알림 & 시스템 센터 (Notification & System Center) */}
       {/* ================================================================ */}
       <div className="space-y-3">
         {allowanceNotice && (
@@ -97,9 +109,15 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
       </div>
 
       {/* ================================================================ */}
-      {/* 2. 내 보유자산 현황 카드 (My Asset Spotlight) - 1열 Full Width */}
+      {/* 2. 내 보유자산 현황 카드 (My Asset Spotlight Overview) */}
       {/* ================================================================ */}
-      <HeroAssetSpotlight onOpenDetail={() => setActiveTab('market')} />
+      <HeroAssetSpotlight 
+        onOpenAssetDetail={onOpenAssetDetail}
+        onOpenPulseActivityDetail={onOpenPulseActivityDetail}
+        onOpenTradeDetail={onOpenTradeDetail}
+        onOpenVoteModal={onOpenVoteModal}
+        onGoToMarket={() => setActiveTab('market')}
+      />
 
       {/* ================================================================ */}
       {/* 3. 2-COLUMN GRID: 민심 펄스 (좌) vs 주식 매매/시장 이슈 (우) */}
@@ -178,21 +196,15 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
       <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950/50 to-slate-950 p-6 rounded-3xl border-2 border-blue-500/50 shadow-2xl shadow-blue-500/15 space-y-6">
         <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         
-        {/* Market Section Header */}
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-500/20 pb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-                <span>POLI주식 실시간 매매 현황</span>
-                <span className="bg-blue-500/20 text-blue-300 text-[10px] px-2.5 py-0.5 rounded-full border border-blue-500/40 font-mono font-bold">
-                  LIVE TRADING BOARD
-                </span>
-              </h3>
-              <p className="text-xs text-slate-300">실시간 10인 국회의원 호가 체결 및 인기도 수급 모니터링</p>
-            </div>
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <h3 className="text-base font-black text-white flex items-center gap-2">
+              <span>국회의원 POLI주식 실시간 매매 시장 (Market Overview)</span>
+              <span className="bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded-full border border-blue-500/30 font-mono">
+                10 SEATS
+              </span>
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">실시간 주가 수급 체결 현황 및 주식 즉시 매매</p>
           </div>
 
           <button
@@ -220,7 +232,6 @@ const MainContent: React.FC = () => {
   const { 
     activeTab, 
     setActiveTab,
-    user, 
     isSignUpModalOpen, 
     setIsSignUpModalOpen,
   } = useStore();
@@ -229,8 +240,14 @@ const MainContent: React.FC = () => {
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const [isWeeklyPulseModalOpen, setIsWeeklyPulseModalOpen] = useState(false);
   const [isDailyVoteModalOpen, setIsDailyVoteModalOpen] = useState(false);
+  const [activeDetailView, setActiveDetailView] = useState<'asset' | 'pulse_activity' | 'trade_history' | null>(null);
 
   const { submitDailyVote, DAILY_VOTE_REWARD } = usePulseVoting();
+
+  const handleTabChange = (tab: 'dashboard' | 'market' | 'board' | 'leaderboard') => {
+    setActiveDetailView(null);
+    setActiveTab(tab);
+  };
 
   if (currentView === 'landing') {
     return (
@@ -253,17 +270,40 @@ const MainContent: React.FC = () => {
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6 flex-1">
 
-        {/* Dynamic 4 Hero Sections Dashboard Home */}
+        {/* Dashboard Active Tab & Separate Detail Views */}
         {activeTab === 'dashboard' && (
-          <DashboardHome
-            onOpenUserProfile={() => setIsUserProfileModalOpen(true)}
-            onOpenWeeklyPulse={() => setIsWeeklyPulseModalOpen(true)}
-          />
+          <>
+            {activeDetailView === 'asset' && (
+              <MyAssetDetailView onBackToDashboard={() => setActiveDetailView(null)} />
+            )}
+
+            {activeDetailView === 'pulse_activity' && (
+              <MyPulseActivityDetailView 
+                onBackToDashboard={() => setActiveDetailView(null)} 
+                onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
+              />
+            )}
+
+            {activeDetailView === 'trade_history' && (
+              <MyTradeHistoryDetailView onBackToDashboard={() => setActiveDetailView(null)} />
+            )}
+
+            {activeDetailView === null && (
+              <DashboardHome
+                onOpenUserProfile={() => setIsUserProfileModalOpen(true)}
+                onOpenWeeklyPulse={() => setIsWeeklyPulseModalOpen(true)}
+                onOpenAssetDetail={() => setActiveDetailView('asset')}
+                onOpenPulseActivityDetail={() => setActiveDetailView('pulse_activity')}
+                onOpenTradeDetail={() => setActiveDetailView('trade_history')}
+                onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
+              />
+            )}
+          </>
         )}
 
         {/* My Dedicated Portfolio View */}
         {activeTab === 'market' && (
-          <FullPortfolioDetail onBackToHome={() => setActiveTab('dashboard')} />
+          <FullPortfolioDetail onBackToHome={() => handleTabChange('dashboard')} />
         )}
 
         {/* Community Board */}
@@ -316,7 +356,7 @@ const MainContent: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-slate-500 font-mono">
-            Dynamic 2-Column Grid v16.0 • OrderBook & Pulse Engine
+            Clean Modular Views v21.0 • Standalone Detail Architecture
           </div>
         </div>
       </footer>

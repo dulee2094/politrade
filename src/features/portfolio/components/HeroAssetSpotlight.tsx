@@ -19,15 +19,27 @@ import {
   Heart,
   Calendar,
   Gift,
-  Coins
+  Coins,
+  MessageSquare,
+  ArrowRight
 } from 'lucide-react';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
 
 interface HeroAssetSpotlightProps {
-  onOpenDetail: () => void;
+  onOpenAssetDetail?: () => void;
+  onOpenPulseActivityDetail?: () => void;
+  onOpenTradeDetail?: () => void;
+  onOpenVoteModal?: () => void;
+  onGoToMarket?: () => void;
 }
 
-export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDetail }) => {
+export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ 
+  onOpenAssetDetail,
+  onOpenPulseActivityDetail,
+  onOpenTradeDetail,
+  onOpenVoteModal,
+  onGoToMarket
+}) => {
   const { totalAsset, holdingsValue, netPnL, returnRate, isPositive, user } = usePortfolioStats();
   const { politicians, setSelectedPoliticianId } = useStore();
   const { hasVotedToday, votes, DAILY_VOTE_REWARD, BEST_REVIEW_REWARD } = usePulseVoting();
@@ -101,27 +113,43 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-base font-black text-white tracking-wide">마이 자산 대시보드</h2>
+              <h2 className="text-base font-black text-white tracking-wide">마이 자산 대시보드 (Overview)</h2>
               <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-mono font-bold flex items-center gap-1">
                 <Sparkles className="w-3 h-3" /> MY PORTFOLIO
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">실시간 가상 평가 자산, 민심 펄스 현황 및 3개월 성과 통합 리포트</p>
+            <p className="text-xs text-slate-300 mt-0.5">실시간 가상 평가 자산, 민심 펄스 현황 및 주식 보유 통합 리포트</p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className={`text-xs font-extrabold px-2.5 py-1 rounded-xl border font-mono ${traderBadgeColor}`}>
             {traderBadgeText}
           </span>
-          <button
-            type="button"
-            onClick={onOpenDetail}
-            className="bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-500/40 hover:border-emerald-400 text-xs font-extrabold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center space-x-1.5 shrink-0"
-          >
-            <span>상세 잔고 & 분석</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+
+          {/* Quick Action Button: Go to Market */}
+          {onGoToMarket && (
+            <button
+              type="button"
+              onClick={onGoToMarket}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow-md flex items-center space-x-1 border border-indigo-400/30"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>📈 주식 매매하러 가기</span>
+            </button>
+          )}
+
+          {/* Detailed View Link */}
+          {onOpenAssetDetail && (
+            <button
+              type="button"
+              onClick={onOpenAssetDetail}
+              className="bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-500/40 hover:border-emerald-400 text-xs font-extrabold px-3.5 py-2 rounded-xl transition-all shadow-md flex items-center space-x-1 shrink-0"
+            >
+              <span>자산 상세 현황 보기</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -133,9 +161,14 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
               <span>총 평가 자산 (Net Worth)</span>
-              <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                초기 30만P 대비
-              </span>
+              <button
+                type="button"
+                onClick={onOpenAssetDetail}
+                className="text-[10px] text-emerald-400 hover:text-emerald-300 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 flex items-center gap-0.5"
+              >
+                <span>초기 30만P 대비</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
             </div>
             <div className="text-3xl font-black text-white font-mono tracking-tight pt-1">
               {formatPoints(totalAsset)}
@@ -166,7 +199,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-white font-bold flex items-center gap-1.5 font-sans">
                 <PieChart className="w-4 h-4 text-indigo-400" />
-                자산 포트폴리오 구성 비중
+                자산 구성 비중
               </span>
               <div className="flex items-center space-x-2 text-[11px]">
                 <span className="text-amber-400 font-bold">현금 {cashPct}%</span>
@@ -187,28 +220,40 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
                 />
               </div>
               <div className="flex justify-between text-[10px] text-slate-400 font-mono">
-                <span>보유 현금 {formatPoints(userBalance)}</span>
-                <span>주식 평가액 {formatPoints(holdingsValue)}</span>
+                <span>현금 {formatPoints(userBalance)}</span>
+                <span>주식 {formatPoints(holdingsValue)}</span>
               </div>
             </div>
           </div>
 
           {/* Activity Quick Stats Grid */}
           <div className="grid grid-cols-2 gap-2.5 text-xs font-mono pt-1">
-            <div className="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div 
+              onClick={onOpenTradeDetail}
+              className="bg-slate-950/80 hover:bg-slate-850 p-2.5 rounded-xl border border-slate-800 hover:border-indigo-500/50 transition-all cursor-pointer flex flex-col justify-between group"
+            >
               <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
                 <Activity className="w-3 h-3 text-indigo-400" />
                 누적 매매 거래
               </span>
-              <span className="text-sm font-extrabold text-white pt-1">{tradeCount}회 체결</span>
+              <span className="text-xs font-extrabold text-white group-hover:text-indigo-300 transition-colors pt-1 flex items-center justify-between">
+                <span>{tradeCount}회 체결</span>
+                <ChevronRight className="w-3 h-3 text-slate-500" />
+              </span>
             </div>
 
-            <div className="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div 
+              onClick={onOpenAssetDetail}
+              className="bg-slate-950/80 hover:bg-slate-850 p-2.5 rounded-xl border border-slate-800 hover:border-emerald-500/50 transition-all cursor-pointer flex flex-col justify-between group"
+            >
               <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
                 정기 지원금
               </span>
-              <span className="text-[11px] font-bold text-emerald-300 pt-1 font-sans">매월 1일 5만P</span>
+              <span className="text-[11px] font-bold text-emerald-300 group-hover:text-white transition-colors pt-1 font-sans flex items-center justify-between">
+                <span>매월 5만P</span>
+                <ChevronRight className="w-3 h-3 text-slate-500" />
+              </span>
             </div>
           </div>
         </div>
@@ -223,6 +268,17 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
                 {holdingsCount}종목
               </span>
             </span>
+
+            {onOpenTradeDetail && (
+              <button
+                type="button"
+                onClick={onOpenTradeDetail}
+                className="text-[10px] text-cyan-400 hover:text-white font-sans font-bold flex items-center gap-0.5"
+              >
+                <span>거래 상세 보기</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
           {holdingsCount > 0 ? (
@@ -296,7 +352,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
 
       </div>
 
-      {/* Row 2: NEW 2-Column Grid (Left: Pulse Activity Overview / Right: 3-Month Asset Trend & Income Breakdown) */}
+      {/* Row 2: 2-Column Grid (Left: Pulse Activity Overview / Right: 3-Month Asset Trend & Income Breakdown) */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1">
         
         {/* Left Sub-Panel: 🗳️ 민심 펄스 참여 & 한줄평 현황 개요 (6/12) */}
@@ -306,17 +362,29 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
               <Vote className="w-4 h-4 text-amber-400" />
               <span>🗳️ 민심 펄스 참여 & 한줄평 활동 현황</span>
             </h4>
-            <span className="text-[10px] text-amber-300 font-mono bg-amber-950/70 px-2 py-0.5 rounded border border-amber-500/30">
-              PULSE ACTIVITY
-            </span>
+
+              <button
+                type="button"
+                onClick={onOpenPulseActivityDetail}
+                className="text-[10px] text-amber-300 hover:text-white font-sans font-bold bg-amber-950/70 hover:bg-amber-900 px-2.5 py-1 rounded-md border border-amber-500/30 flex items-center gap-0.5 transition-all"
+              >
+                <span>펄스활동 상세</span>
+                <ChevronRight className="w-3 h-3 text-amber-300" />
+              </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-            {/* Daily Vote Status */}
-            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1">
-              <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
-                <Vote className="w-3 h-3 text-amber-400" />
-                오늘의 펄스 투표
+            {/* Daily Vote Status & Quick Action Button */}
+            <div 
+              onClick={onOpenVoteModal}
+              className="bg-slate-950/80 hover:bg-slate-850 p-3 rounded-xl border border-slate-800 hover:border-amber-500/50 transition-all cursor-pointer space-y-1 group"
+            >
+              <span className="text-[10px] text-slate-400 font-sans flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Vote className="w-3 h-3 text-amber-400" />
+                  오늘의 펄스 투표
+                </span>
+                <ChevronRight className="w-3 h-3 text-slate-500 group-hover:text-amber-300" />
               </span>
               <div className="pt-0.5">
                 {hasVotedToday ? (
@@ -324,31 +392,43 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
                     ✅ 완료 (+1,000P)
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30 block font-sans text-center">
-                    🗳️ 참여 대기 (+1,000P)
+                  <span className="text-[11px] font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30 block font-sans text-center group-hover:bg-amber-500 group-hover:text-slate-950 transition-all">
+                    🗳️ 펄스 투표하기 (+1,000P)
                   </span>
                 )}
               </div>
             </div>
 
             {/* Review Likes Stats */}
-            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1">
-              <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
-                <Heart className="w-3 h-3 text-rose-400 fill-rose-400" />
-                한줄평 누적 공감
+            <div 
+              onClick={onOpenPulseActivityDetail}
+              className="bg-slate-950/80 hover:bg-slate-850 p-3 rounded-xl border border-slate-800 hover:border-rose-500/50 transition-all cursor-pointer space-y-1 group"
+            >
+              <span className="text-[10px] text-slate-400 font-sans flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Heart className="w-3 h-3 text-rose-400 fill-rose-400" />
+                  한줄평 누적 공감
+                </span>
+                <ChevronRight className="w-3 h-3 text-slate-500 group-hover:text-rose-400" />
               </span>
-              <div className="text-sm font-extrabold text-rose-400 pt-0.5">
+              <div className="text-sm font-extrabold text-rose-400 group-hover:text-rose-300 transition-colors pt-0.5">
                 {myTotalLikes}개 공감 수령
               </div>
             </div>
 
             {/* Best Review Reward Status */}
-            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800 space-y-1">
-              <span className="text-[10px] text-slate-400 font-sans flex items-center gap-1">
-                <Gift className="w-3 h-3 text-indigo-400" />
-                베스트 한줄평 시상
+            <div 
+              onClick={onOpenPulseActivityDetail}
+              className="bg-slate-950/80 hover:bg-slate-850 p-3 rounded-xl border border-slate-800 hover:border-indigo-500/50 transition-all cursor-pointer space-y-1 group"
+            >
+              <span className="text-[10px] text-slate-400 font-sans flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Gift className="w-3 h-3 text-indigo-400" />
+                  베스트 한줄평 시상
+                </span>
+                <ChevronRight className="w-3 h-3 text-slate-500 group-hover:text-indigo-300" />
               </span>
-              <div className="text-[11px] font-bold text-indigo-300 pt-0.5 font-sans">
+              <div className="text-[11px] font-bold text-indigo-300 group-hover:text-white transition-colors pt-0.5 font-sans">
                 +100,000P 월11시 지급
               </div>
             </div>
@@ -360,11 +440,17 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({ onOpenDe
           <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
             <h4 className="text-xs font-extrabold text-white flex items-center gap-2">
               <Coins className="w-4 h-4 text-cyan-400" />
-              <span>📈 최근 3개월 자산 변화 & 5대 수입원 (Income Breakdown)</span>
+              <span>📈 최근 3개월 자산 변화 & 5대 수입원</span>
             </h4>
-            <span className="text-[10px] text-cyan-300 font-mono bg-cyan-950/70 px-2 py-0.5 rounded border border-cyan-500/30">
-              3-MONTH TREND
-            </span>
+
+              <button
+                type="button"
+                onClick={onOpenAssetDetail}
+                className="text-[10px] text-cyan-300 hover:text-white font-sans font-bold bg-cyan-950/70 hover:bg-cyan-900 px-2.5 py-1 rounded-md border border-cyan-500/30 flex items-center gap-0.5 transition-all"
+              >
+                <span>자산 통계 상세</span>
+                <ChevronRight className="w-3 h-3 text-cyan-300" />
+              </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
