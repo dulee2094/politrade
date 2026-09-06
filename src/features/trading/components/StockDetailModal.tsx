@@ -283,8 +283,8 @@ export const StockDetailModal: React.FC = () => {
                 !mStatus.isOpen
                   ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
                   : tradeType === 'BUY'
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/20'
-                  : 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white shadow-rose-500/20'
+                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
+                  : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-500/20'
               }`}
             >
               {!mStatus.isOpen ? (

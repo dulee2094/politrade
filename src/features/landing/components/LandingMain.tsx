@@ -35,7 +35,7 @@ export const LandingMain: React.FC<LandingMainProps> = ({ onEnterApp }) => {
             </button>
             <button
               onClick={() => setIsSignUpModalOpen(true)}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-blue-500/20 flex items-center space-x-1"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-indigo-500/20 flex items-center space-x-1"
             >
               <UserPlus className="w-4 h-4" />
               <span>{BRAND_STOCK_NAME} 시작하기</span>

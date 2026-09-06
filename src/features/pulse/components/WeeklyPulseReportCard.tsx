@@ -8,9 +8,10 @@ import { formatPoints } from '../../../core/utils/formatters';
 
 interface WeeklyPulseReportCardProps {
   onOpenDetail?: () => void;
+  onOpenReviewsDetail?: () => void;
 }
 
-export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ onOpenDetail }) => {
+export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ onOpenDetail, onOpenReviewsDetail }) => {
   const {
     hasVotedToday,
     submitDailyVote,
@@ -37,12 +38,10 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-amber-950/40 via-slate-900 to-purple-950/50 p-6 rounded-3xl border-2 border-amber-500/50 shadow-2xl shadow-amber-500/15 space-y-5 h-full flex flex-col justify-between">
-      {/* Background Accent Glow */}
-      <div className="absolute -top-16 -left-16 w-64 h-64 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5 h-full flex flex-col justify-between">
 
       {/* Top Pre-Notification Schedule Banner */}
-      <div className="relative z-10 bg-gradient-to-r from-amber-900/60 via-purple-900/60 to-slate-900 p-3 rounded-2xl border border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+      <div className="relative z-10 bg-slate-950 p-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
         <div className="flex items-center space-x-2">
           <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0">
             <Megaphone className="w-3.5 h-3.5" />
@@ -58,8 +57,8 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
       {/* Header Bar */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <Award className="w-5 h-5 text-amber-300" />
+          <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg">
+            <Award className="w-5 h-5 text-slate-950" />
           </div>
           <div>
             <h3 className="text-base font-black text-white flex items-center gap-2">
@@ -91,10 +90,10 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center space-x-2 ${
               hasVotedToday
                 ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
-                : 'bg-gradient-to-r from-amber-500 via-indigo-600 to-blue-600 hover:from-amber-400 hover:to-blue-500 text-white shadow-amber-500/20'
+                : 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-amber-500/20'
             }`}
           >
-            <Vote className="w-4 h-4 text-amber-300" />
+            <Vote className="w-4 h-4 text-slate-950" />
             <span>{hasVotedToday ? '오늘 투표 완료 (수정하기)' : `오늘의 Best/Worst 3인 투표하기 (+1,000P)`}</span>
           </button>
         </div>
@@ -128,8 +127,8 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
                   <div
                     className={`w-full rounded-md transition-all duration-500 ${
                       isToday 
-                        ? 'bg-gradient-to-t from-amber-600 to-amber-400 shadow-md shadow-amber-500/20' 
-                        : 'bg-gradient-to-t from-indigo-900 to-indigo-600 group-hover:from-indigo-700 group-hover:to-amber-500'
+                        ? 'bg-amber-500 shadow-md shadow-amber-500/20' 
+                        : 'bg-indigo-600 group-hover:bg-indigo-500'
                     }`}
                     style={{ height: `${heightPct}%` }}
                     title={`${item.day}요일: ${item.count}명 참여`}
@@ -152,7 +151,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
           <div className="flex items-center justify-between border-b border-slate-800 pb-2">
             <div className="flex items-center space-x-2 font-bold text-xs text-white">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-              <span>🏆 이번 주 주간 BEST 3 의원</span>
+              <span>🏆 지난 주 최종 BEST 3 의원</span>
             </div>
             <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
               보유 주주 1주당 +1,000 P 배당!
@@ -188,7 +187,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
           <div className="flex items-center justify-between border-b border-slate-800 pb-2">
             <div className="flex items-center space-x-2 font-bold text-xs text-white">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-              <span>⚠️ 이번 주 주간 WORST 3 의원</span>
+              <span>⚠️ 지난 주 최종 WORST 3 의원</span>
             </div>
             <span className="text-[10px] text-rose-400 font-mono font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">
               보유 주주 1주당 -1,000 P 감액!
@@ -246,7 +245,7 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all shadow-md flex items-center space-x-1.5 shrink-0 font-sans ${
               hasSettledThisWeek
                 ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/20'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold shadow-indigo-500/20'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -287,49 +286,60 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
         )}
       </div>
 
-      {/* Best Reviews Gallery Section */}
-      <div className="relative z-10 space-y-3 pt-2 border-t border-slate-800">
-        <div className="flex items-center justify-between">
+      {/* Bottom One-Line Review Ranking Spotlight */}
+      <div className="relative z-10 bg-slate-900/80 p-4 rounded-2xl border border-indigo-500/30 space-y-3 shadow-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
           <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
             <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>✨ 금주의 베스트 한줄평 (선정자 +{BEST_REVIEW_REWARD.toLocaleString()} P 월요일 11시 시상!)</span>
+            <span>✨ 금주의 베스트 한줄평 실시간 득표 순위 TOP 3</span>
           </h4>
-          <span className="text-[10px] text-slate-400 font-mono">유저 공감 득표 랭킹</span>
+
+          {onOpenReviewsDetail && (
+            <button
+              type="button"
+              onClick={onOpenReviewsDetail}
+              className="text-xs text-amber-300 hover:text-white font-extrabold flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg border border-amber-500/30 transition-all shrink-0"
+            >
+              <span>전체 한줄평 득표 현황 및 투표하기</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {weeklySummary.bestReviews.map((rev, idx) => (
-            <div key={rev.id} className="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800 space-y-2 flex flex-col justify-between shadow-sm">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="bg-amber-500/20 text-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-amber-500/30 font-mono">
-                      TOP {idx + 1}
-                    </span>
-                    <span className="text-xs font-extrabold text-white">{rev.userName}</span>
-                  </div>
-                  <span className="text-[10px] text-slate-500">{rev.createdAt}</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed font-sans line-clamp-2">
-                  "{rev.oneLineReview}"
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 font-mono text-[11px]">
-                <span className="bg-indigo-600/30 text-indigo-300 text-[9px] px-2 py-0.5 rounded-md font-sans font-bold">
-                  🎁 월11시 포상 (+100,000P)
-                </span>
-                <button
-                  type="button"
-                  onClick={() => likeReview(rev.id)}
-                  className="flex items-center space-x-1 text-slate-400 hover:text-rose-400 transition-colors bg-slate-800 px-2 py-1 rounded-md border border-slate-700"
-                >
-                  <Heart className="w-3 h-3 text-rose-400 fill-rose-400" />
-                  <span>{rev.likes}</span>
-                </button>
-              </div>
+          {weeklySummary.bestReviews.length === 0 ? (
+            <div className="md:col-span-3 text-center py-4 text-slate-500 text-xs font-bold">
+              아직 이번 주 등록된 한줄평이 없습니다. 첫 한줄평을 남겨보세요!
             </div>
-          ))}
+          ) : (
+            weeklySummary.bestReviews.map((rev, idx) => (
+              <div key={rev.id} className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 space-y-2 flex flex-col justify-between shadow-sm">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="bg-amber-500/20 text-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-amber-500/30 font-mono">
+                        TOP {idx + 1}
+                      </span>
+                      <span className="text-xs font-extrabold text-white truncate max-w-[100px]">{rev.userName}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-mono">{rev.createdAt}</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans line-clamp-2 italic">
+                    "{rev.oneLineReview}"
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 font-mono text-[11px]">
+                  <span className="bg-indigo-600/30 text-indigo-300 text-[9px] px-2 py-0.5 rounded-md font-sans font-bold">
+                    🎁 1위 시상 (+10만P)
+                  </span>
+                  <span className="text-amber-400 font-bold text-xs flex items-center gap-1">
+                    <Heart className="w-3 h-3 text-rose-400 fill-rose-400" /> {rev.likes}표
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

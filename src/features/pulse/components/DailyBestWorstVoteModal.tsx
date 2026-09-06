@@ -93,7 +93,7 @@ export const DailyBestWorstVoteModal: React.FC<DailyBestWorstVoteModalProps> = (
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 text-white flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg">
               <Award className="w-5 h-5" />
             </div>
             <div>
@@ -223,9 +223,9 @@ export const DailyBestWorstVoteModal: React.FC<DailyBestWorstVoteModalProps> = (
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-amber-500 via-indigo-600 to-blue-600 hover:from-amber-400 hover:to-blue-500 text-white font-black text-xs py-3.5 rounded-xl transition-all shadow-xl shadow-indigo-500/20 flex items-center justify-center space-x-2"
+            className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-3.5 rounded-xl transition-all shadow-xl shadow-amber-500/20 flex items-center justify-center space-x-2"
           >
-            <Gift className="w-4 h-4 text-amber-300" />
+            <Gift className="w-4 h-4 text-slate-950" />
             <span>오늘의 Best/Worst 3인 투표 제출하기 (+{rewardAmount} P 지급)</span>
           </button>
 

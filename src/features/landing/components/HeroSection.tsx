@@ -25,7 +25,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onOpenLo
         {/* Main Title */}
         <h1 className="text-3xl sm:text-5xl font-black text-white leading-tight tracking-tight">
           실시간 민심 펄스와 공적 이슈가 살아있는 <br className="hidden sm:inline" />
-          <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
+          <span className="text-indigo-400">
             {BRAND_STOCK_NAME} 거래 플랫폼
           </span>
         </h1>
@@ -40,7 +40,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onOpenLo
         <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 pt-4">
           <button
             onClick={onOpenSignUp}
-            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-sm px-6 py-3.5 rounded-xl transition-all shadow-xl shadow-blue-500/20 flex items-center justify-center space-x-2"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-sm px-6 py-3.5 rounded-xl transition-all shadow-xl shadow-indigo-500/20 flex items-center justify-center space-x-2"
           >
             <span>🚀 {BRAND_STOCK_NAME} 시작하기 (회원가입)</span>
           </button>

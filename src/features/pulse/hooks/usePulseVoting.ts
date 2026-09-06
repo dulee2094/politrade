@@ -72,8 +72,20 @@ export function usePulseVoting() {
     ];
   });
 
+  const LOCAL_STORAGE_LIKED_KEY = 'politrade_pulse_liked_reviews_v2';
+
   const [settledDate, setSettledDate] = useState<string | null>(() => {
     return localStorage.getItem(LOCAL_STORAGE_SETTLED_KEY);
+  });
+
+  const [userLikedReviewIds, setUserLikedReviewIds] = useState<string[]>(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_LIKED_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) { /* fallback */ }
+    }
+    return [];
   });
 
   useEffect(() => {
@@ -85,6 +97,10 @@ export function usePulseVoting() {
       localStorage.setItem(LOCAL_STORAGE_SETTLED_KEY, settledDate);
     }
   }, [settledDate]);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_LIKED_KEY, JSON.stringify(userLikedReviewIds));
+  }, [userLikedReviewIds]);
 
   // Check if current user voted today
   const hasVotedToday = votes.some(v => v.userId === (user?.verifiedEmail || user?.name || 'user') && v.date === todayStr);
@@ -130,11 +146,24 @@ export function usePulseVoting() {
     };
   };
 
-  // Like a review
-  const likeReview = (reviewId: string) => {
+  // Like a review (1 vote per review limit)
+  const likeReview = (reviewId: string): { success: boolean; message: string } => {
+    if (userLikedReviewIds.includes(reviewId)) {
+      return {
+        success: false,
+        message: '이미 공감(투표)을 마친 한줄평입니다. 각 한줄평당 1회만 투표 가능합니다.',
+      };
+    }
+
     setVotes(prev =>
       prev.map(v => (v.id === reviewId ? { ...v, likes: v.likes + 1 } : v))
     );
+    setUserLikedReviewIds(prev => [...prev, reviewId]);
+
+    return {
+      success: true,
+      message: '👍 해당 한줄평에 공감 투표를 완료하였습니다!',
+    };
   };
 
   // Calculate 7-Day Cumulative Weekly Summary
@@ -250,6 +279,7 @@ export function usePulseVoting() {
     hasVotedToday,
     submitDailyVote,
     likeReview,
+    userLikedReviewIds,
     weeklySummary,
     userSettlement,
     hasSettledThisWeek,

@@ -37,7 +37,7 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician }) 
           
           <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-amber-400 rounded-full transition-all duration-500"
+              className="h-full bg-indigo-500 rounded-full transition-all duration-500"
               style={{ width: `${ipoPct}%` }}
             />
           </div>

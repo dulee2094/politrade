@@ -9,14 +9,12 @@ interface DailyMarketBriefingCardProps {
 
 export const DailyMarketBriefingCard: React.FC<DailyMarketBriefingCardProps> = ({ briefing }) => {
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950/70 to-slate-950 p-5 rounded-3xl border border-indigo-500/40 shadow-2xl space-y-4">
-      {/* Background Glow */}
-      <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
 
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
+          <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
             <BarChart3 className="w-4 h-4" />
           </div>
           <div>

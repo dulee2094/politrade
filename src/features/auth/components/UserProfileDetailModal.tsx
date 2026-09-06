@@ -60,7 +60,7 @@ export const UserProfileDetailModal: React.FC<UserProfileDetailModalProps> = ({ 
 
         {/* User Balance & Allowance Info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-blue-950/60 to-slate-900 p-4 rounded-2xl border border-blue-500/30 space-y-1">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
             <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
               <Wallet className="w-3.5 h-3.5 text-amber-400" />
               현재 보유 가상머니
@@ -71,7 +71,7 @@ export const UserProfileDetailModal: React.FC<UserProfileDetailModalProps> = ({ 
             <p className="text-[11px] text-slate-400">자유로운 매매 및 민심 토론 지원 포인트</p>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-950/60 to-slate-900 p-4 rounded-2xl border border-emerald-500/30 space-y-1">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
             <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-emerald-400" />
               월간 자동 정기 지원금

@@ -23,6 +23,7 @@ import { NewsFeedList } from './features/news/components/NewsFeedList';
 import { UserProfileDetailModal } from './features/auth/components/UserProfileDetailModal';
 import { WeeklyPulseDetailModal } from './features/pulse/components/WeeklyPulseDetailModal';
 import { DailyBestWorstVoteModal } from './features/pulse/components/DailyBestWorstVoteModal';
+import { WeeklyOneLineReviewsDetailView } from './features/pulse/components/WeeklyOneLineReviewsDetailView';
 import { usePulseVoting } from './features/pulse/hooks/usePulseVoting';
 import { ShieldAlert, Sparkles, TrendingUp, Calendar, Newspaper, ArrowRight } from 'lucide-react';
 import { formatPoints, formatPercent } from './core/utils/formatters';
@@ -34,6 +35,7 @@ interface DashboardHomeProps {
   onOpenPulseActivityDetail: () => void;
   onOpenTradeDetail: () => void;
   onOpenVoteModal: () => void;
+  onOpenReviewsDetail: () => void;
 }
 
 const DashboardHome: React.FC<DashboardHomeProps> = ({ 
@@ -42,7 +44,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   onOpenAssetDetail,
   onOpenPulseActivityDetail,
   onOpenTradeDetail,
-  onOpenVoteModal
+  onOpenVoteModal,
+  onOpenReviewsDetail
 }) => {
   const { 
     politicians, 
@@ -65,9 +68,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ================================================================ */}
       <div className="space-y-3">
         {allowanceNotice && (
-          <div className="bg-gradient-to-r from-blue-900/80 via-emerald-900/80 to-slate-900 p-4 rounded-2xl border border-emerald-500/40 flex items-center justify-between shadow-xl">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-indigo-500/40 flex items-center justify-between shadow-xl">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
                 <Calendar className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-white">{allowanceNotice}</span>
@@ -81,7 +84,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
           </div>
         )}
 
-        <div className="bg-gradient-to-r from-blue-900/50 via-indigo-900/50 to-slate-900/80 p-4 rounded-2xl border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+        <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
           <div className="flex items-center space-x-3">
             <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center shrink-0">
               <Newspaper className="w-5 h-5" />
@@ -126,14 +129,17 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
         
         {/* Left Column (6/12): Weekly Pulse Report Card */}
         <div className="lg:col-span-6">
-          <WeeklyPulseReportCard onOpenDetail={onOpenWeeklyPulse} />
+          <WeeklyPulseReportCard 
+            onOpenDetail={onOpenWeeklyPulse}
+            onOpenReviewsDetail={onOpenReviewsDetail}
+          />
         </div>
 
         {/* Right Column (6/12): Market Top 3 + Briefing + Poll Widget */}
         <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
           
           {/* Top 3 Gainers Spotlight */}
-          <div className="bg-gradient-to-br from-slate-900 via-purple-950/30 to-slate-900 p-5 rounded-3xl border-2 border-purple-500/40 shadow-xl shadow-purple-500/10 space-y-4">
+          <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-amber-400" />
@@ -193,7 +199,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ================================================================ */}
       {/* 4. POLI주식 실시간 매매 현황 카드 (CompactMarketGrid) - 1열 Full Width */}
       {/* ================================================================ */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950/50 to-slate-950 p-6 rounded-3xl border-2 border-blue-500/50 shadow-2xl shadow-blue-500/15 space-y-6">
+      <div className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
         <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
@@ -240,7 +246,7 @@ const MainContent: React.FC = () => {
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const [isWeeklyPulseModalOpen, setIsWeeklyPulseModalOpen] = useState(false);
   const [isDailyVoteModalOpen, setIsDailyVoteModalOpen] = useState(false);
-  const [activeDetailView, setActiveDetailView] = useState<'asset' | 'pulse_activity' | 'trade_history' | null>(null);
+  const [activeDetailView, setActiveDetailView] = useState<'asset' | 'pulse_activity' | 'trade_history' | 'reviews_detail' | null>(null);
 
   const { submitDailyVote, DAILY_VOTE_REWARD } = usePulseVoting();
 
@@ -288,6 +294,13 @@ const MainContent: React.FC = () => {
               <MyTradeHistoryDetailView onBackToDashboard={() => setActiveDetailView(null)} />
             )}
 
+            {activeDetailView === 'reviews_detail' && (
+              <WeeklyOneLineReviewsDetailView 
+                onBackToDashboard={() => setActiveDetailView(null)} 
+                onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
+              />
+            )}
+
             {activeDetailView === null && (
               <DashboardHome
                 onOpenUserProfile={() => setIsUserProfileModalOpen(true)}
@@ -296,6 +309,7 @@ const MainContent: React.FC = () => {
                 onOpenPulseActivityDetail={() => setActiveDetailView('pulse_activity')}
                 onOpenTradeDetail={() => setActiveDetailView('trade_history')}
                 onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
+                onOpenReviewsDetail={() => setActiveDetailView('reviews_detail')}
               />
             )}
           </>

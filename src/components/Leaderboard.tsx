@@ -26,7 +26,7 @@ export const Leaderboard: React.FC = () => {
     <div className="space-y-6 max-w-5xl mx-auto">
       
       {/* Banner */}
-      <div className="bg-gradient-to-r from-blue-900/80 via-indigo-900/80 to-slate-900 p-6 rounded-2xl border border-indigo-500/30 shadow-xl space-y-2 relative overflow-hidden">
+      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-2 relative overflow-hidden">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center">
             <Trophy className="w-6 h-6" />

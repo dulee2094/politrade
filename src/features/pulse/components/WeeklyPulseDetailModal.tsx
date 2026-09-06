@@ -53,8 +53,8 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-4 shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <Award className="w-6 h-6 text-amber-300" />
+            <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg">
+              <Award className="w-6 h-6 text-slate-950" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
@@ -82,7 +82,7 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
         <div className="flex-1 overflow-y-auto space-y-6 pr-1">
           
           {/* Quick Vote Banner CTA */}
-          <div className="bg-gradient-to-r from-amber-950/60 via-indigo-950/60 to-slate-900 p-4 rounded-2xl border border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
             <div>
               <h4 className="text-sm font-extrabold text-white flex items-center gap-1.5">
                 <Vote className="w-4 h-4 text-amber-400" />
@@ -97,7 +97,7 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
                 onClose();
                 onOpenVoteModal();
               }}
-              className="bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-lg shrink-0"
+              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-lg shrink-0"
             >
               {hasVotedToday ? '투표 내역 수정하기' : `오늘 투표 참여하기 (+${DAILY_VOTE_REWARD}P)`}
             </button>
@@ -111,7 +111,7 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span className="font-extrabold text-xs text-white flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  🏆 이번 주 주간 BEST 3 의원
+                  🏆 지난 주 최종 BEST 3 의원
                 </span>
                 <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
                   +1,000 P / 주 배당
@@ -147,7 +147,7 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span className="font-extrabold text-xs text-white flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-                  ⚠️ 이번 주 주간 WORST 3 의원
+                  ⚠️ 지난 주 최종 WORST 3 의원
                 </span>
                 <span className="text-[10px] text-rose-400 font-mono font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">
                   -1,000 P / 주 감액
@@ -205,7 +205,7 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
                 className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-lg flex items-center space-x-1.5 shrink-0 ${
                   hasSettledThisWeek
                     ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-500/20'
+                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20'
                 }`}
               >
                 <Sparkles className="w-4 h-4" />

@@ -95,11 +95,11 @@ export const MyAssetDetailView: React.FC<MyAssetDetailViewProps> = ({ onBackToDa
             <div className="space-y-1.5">
               <div className="h-5 w-full bg-slate-950 rounded-full overflow-hidden flex p-1 border border-slate-700 shadow-inner">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-l-full transition-all duration-500"
+                  className="h-full bg-amber-500 rounded-l-full transition-all duration-500"
                   style={{ width: `${cashPct}%` }}
                 />
                 <div
-                  className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 rounded-r-full transition-all duration-500"
+                  className="h-full bg-indigo-600 rounded-r-full transition-all duration-500"
                   style={{ width: `${stockPct}%` }}
                 />
               </div>

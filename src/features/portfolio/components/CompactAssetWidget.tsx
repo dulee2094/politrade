@@ -14,7 +14,7 @@ export const CompactAssetWidget: React.FC<CompactAssetWidgetProps> = ({ onClick 
   return (
     <div
       onClick={onClick}
-      className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-5 rounded-2xl border border-indigo-500/30 hover:border-indigo-500/60 transition-all cursor-pointer shadow-xl group space-y-3"
+      className="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all cursor-pointer shadow-xl group space-y-3"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">

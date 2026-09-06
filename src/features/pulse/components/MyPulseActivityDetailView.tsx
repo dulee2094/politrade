@@ -60,9 +60,9 @@ export const MyPulseActivityDetailView: React.FC<MyPulseActivityDetailViewProps>
           <button
             type="button"
             onClick={onOpenVoteModal}
-            className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-extrabold text-xs transition-all shadow-md flex items-center space-x-1.5"
+            className="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition-all shadow-md flex items-center space-x-1.5"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-3.5 h-3.5 text-slate-950" />
             <span>{hasVotedToday ? '오늘 투표 완료 (수정)' : '오늘의 펄스 투표하기 (+1,000P)'}</span>
           </button>
 
