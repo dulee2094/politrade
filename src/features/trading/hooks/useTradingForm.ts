@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useStore } from '../../../context/StoreContext';
-import { calculateBuyQuote, calculateSellQuote } from '../../../core/amm/ammEngine';
 import { matchOrderBook, generateMockOrderBook, INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
 import { Politician } from '../../../types';
 
-export function useTradingForm(politician: Politician) {
+export function useTradingForm(politician?: Politician) {
   const { user, buyStock, sellStock } = useStore();
 
   const [tradeType, setTradeType] = useState<'BUY' | 'SELL'>('BUY');
@@ -12,10 +11,11 @@ export function useTradingForm(politician: Politician) {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const userHoldingsMap = user?.holdings || {};
-  const userHolding = userHoldingsMap[politician?.id || ''] || { shares: 0, avgPrice: 0, totalInvested: 0 };
+  const userHolding = (politician?.id && userHoldingsMap[politician.id]) || { shares: 0, avgPrice: 0, totalInvested: 0 };
   const sharesNum = Math.max(1, parseInt(sharesInput, 10) || 1);
 
   const isIPO = politician?.phase === 'IPO';
+  const spotPrice = politician?.currentPrice || 10000;
 
   // Default Quotes
   let buyQuote = {
@@ -37,45 +37,47 @@ export function useTradingForm(politician: Politician) {
   };
 
   try {
-    if (isIPO) {
-      buyQuote = {
-        totalCost: sharesNum * INITIAL_IPO_PRICE,
-        avgPrice: INITIAL_IPO_PRICE,
-        spotPrice: INITIAL_IPO_PRICE,
-        slippage: 0,
-        priceImpact: 0,
-        newSpotPrice: INITIAL_IPO_PRICE,
-      };
-      sellQuote = {
-        totalRefund: sharesNum * INITIAL_IPO_PRICE,
-        avgPrice: INITIAL_IPO_PRICE,
-        spotPrice: INITIAL_IPO_PRICE,
-        slippage: 0,
-        priceImpact: 0,
-        newSpotPrice: INITIAL_IPO_PRICE,
-      };
-    } else {
-      const safeOrderBook = politician?.orderBook || generateMockOrderBook(politician?.currentPrice || 10000);
-      const obMatchBuy = matchOrderBook(safeOrderBook, 'BUY', (politician?.currentPrice || 10000) + 1000, sharesNum);
-      const obMatchSell = matchOrderBook(safeOrderBook, 'SELL', Math.max(1, (politician?.currentPrice || 10000) - 1000), sharesNum);
-      
-      buyQuote = {
-        totalCost: obMatchBuy.totalCostOrRefund,
-        avgPrice: obMatchBuy.avgExecutedPrice,
-        spotPrice: politician?.currentPrice || 10000,
-        slippage: 0,
-        priceImpact: 0,
-        newSpotPrice: obMatchBuy.avgExecutedPrice,
-      };
+    if (politician) {
+      if (isIPO) {
+        buyQuote = {
+          totalCost: sharesNum * INITIAL_IPO_PRICE,
+          avgPrice: INITIAL_IPO_PRICE,
+          spotPrice: INITIAL_IPO_PRICE,
+          slippage: 0,
+          priceImpact: 0,
+          newSpotPrice: INITIAL_IPO_PRICE,
+        };
+        sellQuote = {
+          totalRefund: sharesNum * INITIAL_IPO_PRICE,
+          avgPrice: INITIAL_IPO_PRICE,
+          spotPrice: INITIAL_IPO_PRICE,
+          slippage: 0,
+          priceImpact: 0,
+          newSpotPrice: INITIAL_IPO_PRICE,
+        };
+      } else {
+        const safeOrderBook = politician.orderBook || generateMockOrderBook(spotPrice);
+        const obMatchBuy = matchOrderBook(safeOrderBook, 'BUY', spotPrice + 1000, sharesNum);
+        const obMatchSell = matchOrderBook(safeOrderBook, 'SELL', Math.max(1, spotPrice - 1000), sharesNum);
+        
+        buyQuote = {
+          totalCost: obMatchBuy ? obMatchBuy.totalCostOrRefund : sharesNum * spotPrice,
+          avgPrice: obMatchBuy ? obMatchBuy.avgExecutedPrice : spotPrice,
+          spotPrice,
+          slippage: 0,
+          priceImpact: 0,
+          newSpotPrice: obMatchBuy ? obMatchBuy.avgExecutedPrice : spotPrice,
+        };
 
-      sellQuote = {
-        totalRefund: obMatchSell.totalCostOrRefund,
-        avgPrice: obMatchSell.avgExecutedPrice,
-        spotPrice: politician?.currentPrice || 10000,
-        slippage: 0,
-        priceImpact: 0,
-        newSpotPrice: obMatchSell.avgExecutedPrice,
-      };
+        sellQuote = {
+          totalRefund: obMatchSell ? obMatchSell.totalCostOrRefund : sharesNum * spotPrice,
+          avgPrice: obMatchSell ? obMatchSell.avgExecutedPrice : spotPrice,
+          spotPrice,
+          slippage: 0,
+          priceImpact: 0,
+          newSpotPrice: obMatchSell ? obMatchSell.avgExecutedPrice : spotPrice,
+        };
+      }
     }
   } catch (e) {
     /* Safe fallback quotes */

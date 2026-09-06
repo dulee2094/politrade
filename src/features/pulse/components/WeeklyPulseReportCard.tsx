@@ -37,9 +37,9 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-950 p-6 rounded-3xl border border-amber-500/30 shadow-2xl space-y-6 h-full flex flex-col justify-between">
+    <div className="relative overflow-hidden bg-gradient-to-br from-amber-950/40 via-slate-900 to-purple-950/50 p-6 rounded-3xl border-2 border-amber-500/50 shadow-2xl shadow-amber-500/15 space-y-6 h-full flex flex-col justify-between">
       {/* Background Accent Glow */}
-      <div className="absolute -top-16 -left-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-16 -left-16 w-64 h-64 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header Bar */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">

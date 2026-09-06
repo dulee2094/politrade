@@ -11,23 +11,11 @@ import { PartyBadge } from '../../../shared/ui/PartyBadge';
 import { getMarketStatus } from '../../../core/trading/marketHours';
 
 export const StockDetailModal: React.FC = () => {
+  // 1. ALL React Hooks MUST execute unconditionally at the top level
   const { selectedPoliticianId, setSelectedPoliticianId, getPoliticianById, user } = useStore();
   const [activeSubTab, setActiveSubTab] = useState<'chart' | 'news'>('chart');
 
-  if (!selectedPoliticianId) return null;
-  const politician = getPoliticianById(selectedPoliticianId);
-  if (!politician) return null;
-
-  const mStatus = getMarketStatus();
-  const change24h = typeof politician.change24h === 'number' ? politician.change24h : 0;
-  const currentPrice = typeof politician.currentPrice === 'number' ? politician.currentPrice : 10000;
-  const high24h = typeof politician.high24h === 'number' ? politician.high24h : currentPrice;
-  const low24h = typeof politician.low24h === 'number' ? politician.low24h : currentPrice;
-  const isUp = change24h >= 0;
-  const userHoldingsMap = user?.holdings || {};
-  const userHolding = userHoldingsMap[politician.id];
-  const userShares = userHolding ? userHolding.shares : 0;
-  const isIPO = politician.phase === 'IPO';
+  const politician = selectedPoliticianId ? getPoliticianById(selectedPoliticianId) : undefined;
 
   const {
     tradeType,
@@ -39,6 +27,20 @@ export const StockDetailModal: React.FC = () => {
     handleExecuteOrder,
     feedback,
   } = useTradingForm(politician);
+
+  // 2. Early return AFTER all hooks have executed
+  if (!selectedPoliticianId || !politician) return null;
+
+  const mStatus = getMarketStatus();
+  const change24h = typeof politician.change24h === 'number' ? politician.change24h : 0;
+  const currentPrice = typeof politician.currentPrice === 'number' ? politician.currentPrice : 10000;
+  const high24h = typeof politician.high24h === 'number' ? politician.high24h : currentPrice;
+  const low24h = typeof politician.low24h === 'number' ? politician.low24h : currentPrice;
+  const isUp = change24h >= 0;
+  const userHoldingsMap = user?.holdings || {};
+  const userHolding = userHoldingsMap[politician.id];
+  const userShares = userHolding ? userHolding.shares : 0;
+  const isIPO = politician.phase === 'IPO';
 
   const currentQuote = tradeType === 'BUY' ? buyQuote : sellQuote;
   const newsList = Array.isArray(politician.news) ? politician.news : [];

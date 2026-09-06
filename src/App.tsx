@@ -115,7 +115,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
         <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
           
           {/* Top 3 Gainers Spotlight */}
-          <div className="bg-slate-900/90 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+          <div className="bg-gradient-to-br from-slate-900 via-purple-950/30 to-slate-900 p-5 rounded-3xl border-2 border-purple-500/40 shadow-xl shadow-purple-500/10 space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-amber-400" />
@@ -128,7 +128,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
                 <div
                   key={pol.id}
                   onClick={() => setSelectedPoliticianId(pol.id)}
-                  className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-blue-500/50 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1"
+                  className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-purple-400/60 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2.5">
@@ -139,7 +139,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
                         className="w-9 h-9 rounded-xl"
                       />
                       <div>
-                        <span className="font-extrabold text-xs text-white group-hover:text-blue-400 transition-colors">{pol.name}</span>
+                        <span className="font-extrabold text-xs text-white group-hover:text-purple-300 transition-colors">{pol.name}</span>
                         <div className="text-[10px] text-slate-400">{pol.party}</div>
                       </div>
                     </div>
@@ -175,22 +175,23 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
       {/* ================================================================ */}
       {/* 4. POLI주식 실시간 매매 현황 카드 (CompactMarketGrid) - 1열 Full Width */}
       {/* ================================================================ */}
-      <div className="bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950/50 to-slate-950 p-6 rounded-3xl border-2 border-blue-500/50 shadow-2xl shadow-blue-500/15 space-y-6">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         
         {/* Market Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-500/20 pb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/25">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-extrabold text-white flex items-center gap-2">
                 <span>POLI주식 실시간 매매 현황</span>
-                <span className="bg-blue-500/20 text-blue-300 text-[10px] px-2.5 py-0.5 rounded-full border border-blue-500/30 font-mono">
+                <span className="bg-blue-500/20 text-blue-300 text-[10px] px-2.5 py-0.5 rounded-full border border-blue-500/40 font-mono font-bold">
                   LIVE TRADING BOARD
                 </span>
               </h3>
-              <p className="text-xs text-slate-400">실시간 10인 국회의원 호가 체결 및 인기도 수급 모니터링</p>
+              <p className="text-xs text-slate-300">실시간 10인 국회의원 호가 체결 및 인기도 수급 모니터링</p>
             </div>
           </div>
 
@@ -205,7 +206,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ onOpenUserProfile, onOpen
         </div>
 
         {/* 10 Politician Responsive Stock Grid */}
-        <CompactMarketGrid />
+        <div className="relative z-10">
+          <CompactMarketGrid />
+        </div>
 
       </div>
 
