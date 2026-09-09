@@ -211,7 +211,7 @@ export function usePulseVoting() {
       .sort((a, b) => b.likes - a.likes)
       .slice(0, 1);
 
-    // Daily voter counts (Mon ~ Sun)
+    // Daily voter counts (Mon ~ Sat)
     const dailyVoterCounts: DailyVoterTrend[] = [
       { day: '월', count: 42 },
       { day: '화', count: 55 },
@@ -219,7 +219,6 @@ export function usePulseVoting() {
       { day: '목', count: 58 },
       { day: '금', count: 72 },
       { day: '토', count: 80 },
-      { day: '일', count: 85 },
     ];
 
     return {

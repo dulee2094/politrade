@@ -123,19 +123,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       />
 
       {/* ================================================================ */}
-      {/* 3. 2-COLUMN GRID: 민심 펄스 (좌) vs 주식 매매/시장 이슈 (우) */}
+      {/* 3. 2-COLUMN GRID: 주식 매매/시장 현황 (좌) vs 민심 펄스 현황 (우) */}
       {/* ================================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left Column (6/12): Weekly Pulse Report Card */}
-        <div className="lg:col-span-6">
-          <WeeklyPulseReportCard 
-            onOpenDetail={onOpenWeeklyPulse}
-            onOpenReviewsDetail={onOpenReviewsDetail}
-          />
-        </div>
-
-        {/* Right Column (6/12): Market Top 3 + Briefing + Poll Widget */}
+        {/* Left Column (6/12): 주식 매매 / 시장 현황 (Market Top 3 + Briefing) */}
         <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
           
           {/* Top 3 Gainers Spotlight */}
@@ -189,9 +181,17 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
           {/* Daily Market Briefing */}
           <DailyMarketBriefingCard briefing={briefing} />
 
+        </div>
+
+        {/* Right Column (6/12): 민심 펄스 현황 (Weekly Pulse Report Card + Poll Widget) */}
+        <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
+          <WeeklyPulseReportCard 
+            onOpenDetail={onOpenWeeklyPulse}
+            onOpenReviewsDetail={onOpenReviewsDetail}
+          />
+
           {/* Poll Widget */}
           <PollWidget poll={poll} onVote={votePoll} />
-
         </div>
 
       </div>
