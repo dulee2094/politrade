@@ -9,6 +9,7 @@ import { MyPulseActivityDetailView } from './features/pulse/components/MyPulseAc
 import { MyTradeHistoryDetailView } from './features/trading/components/MyTradeHistoryDetailView';
 import { CompactMarketGrid } from './features/market/components/CompactMarketGrid';
 import { DailyMarketBriefingCard } from './features/market/components/DailyMarketBriefingCard';
+import { YesterdayTopVolumeCard } from './features/market/components/YesterdayTopVolumeCard';
 import { WeeklyPulseReportCard } from './features/pulse/components/WeeklyPulseReportCard';
 import { MarketBoard } from './components/MarketBoard';
 import { BoardMain } from './features/board/components/BoardMain';
@@ -59,6 +60,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   const { poll, votePoll } = useBoardPosts();
 
   const topGainers = [...politicians].sort((a, b) => b.change24h - a.change24h).slice(0, 3);
+  const topVolumeList = [...politicians].sort((a, b) => (b.volume24h || b.totalVolume || 0) - (a.volume24h || a.totalVolume || 0)).slice(0, 3);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -127,7 +129,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ================================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left Column (6/12): 주식 매매 / 시장 현황 (Market Top 3 + Briefing) */}
+        {/* Left Column (6/12): 주식 매매 / 시장 현황 (Market Top 3 + Yesterday Top Volume + Briefing) */}
         <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
           
           {/* Top 3 Gainers Spotlight */}
@@ -177,6 +179,12 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               ))}
             </div>
           </div>
+
+          {/* Yesterday Top Volume & Turnover Card */}
+          <YesterdayTopVolumeCard 
+            topVolumeList={topVolumeList}
+            onSelectPolitician={setSelectedPoliticianId}
+          />
 
           {/* Daily Market Briefing */}
           <DailyMarketBriefingCard briefing={briefing} />
