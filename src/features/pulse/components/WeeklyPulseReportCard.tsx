@@ -3,7 +3,7 @@ import { usePulseVoting } from '../hooks/usePulseVoting';
 import { DailyBestWorstVoteModal } from './DailyBestWorstVoteModal';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
-import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight, Wallet, CheckCircle2, TrendingUp, AlertTriangle, Users, Calendar, Megaphone } from 'lucide-react';
+import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight, Wallet, CheckCircle2, TrendingUp, AlertTriangle, Calendar, Megaphone } from 'lucide-react';
 import { formatPoints } from '../../../core/utils/formatters';
 
 interface WeeklyPulseReportCardProps {
@@ -56,27 +56,31 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
 
       {/* Header Bar */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-        <div className="flex items-center space-x-3">
+        {/* Title Area */}
+        <div className="flex items-center space-x-3 min-w-0">
           <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg shrink-0">
             <Award className="w-5 h-5 text-slate-950" />
           </div>
-          <div>
-            <h3 className="text-base font-black text-white flex items-center gap-2">
-              <span>주간 민심 펄스</span>
-              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2.5 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold">
+          <div className="min-w-0">
+            <h3 className="text-base font-black text-white flex items-center gap-2 flex-wrap">
+              <span className="whitespace-nowrap">주간 민심 펄스</span>
+              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold whitespace-nowrap">
                 WEEKLY PULSE
               </span>
             </h3>
-            <p className="text-xs text-slate-400">주주 배당금(+1,000P/주) 및 한줄평 포상금(+10만P) 매주 정산</p>
+            <p className="text-xs text-slate-400 truncate sm:whitespace-normal">
+              주주 배당금(+1,000P/주) 및 한줄평 포상금(+10만P) 매주 정산
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 shrink-0">
+        {/* Buttons Area */}
+        <div className="flex items-center space-x-2 shrink-0 self-start sm:self-center">
           {onOpenDetail && (
             <button
               type="button"
               onClick={onOpenDetail}
-              className="px-3.5 py-2.5 rounded-xl font-extrabold text-xs transition-all bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-500/40 flex items-center space-x-1.5"
+              className="px-3 py-2 rounded-xl font-bold text-xs transition-all bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-500/40 flex items-center space-x-1.5 whitespace-nowrap"
             >
               <span>상세 리포트</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -87,102 +91,15 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
           <button
             type="button"
             onClick={() => setIsVoteModalOpen(true)}
-            className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center space-x-2 ${
+            className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all shadow-md flex items-center space-x-1.5 whitespace-nowrap ${
               hasVotedToday
                 ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
                 : 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-amber-500/20'
             }`}
           >
-            <Vote className="w-4 h-4 text-slate-950" />
-            <span>{hasVotedToday ? '오늘 투표 완료 (수정하기)' : `오늘의 Best/Worst 3인 투표하기 (+1,000P)`}</span>
+            <Vote className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+            <span>{hasVotedToday ? '오늘 투표 완료' : '오늘의 3인 투표 (+1,000P)'}</span>
           </button>
-        </div>
-      </div>
-
-      {/* Daily Voter Participation Trend Widget (Mon ~ Sat + Cumulative Total) */}
-      <div className="relative z-10 bg-slate-900/80 p-3.5 rounded-2xl border border-amber-500/30 space-y-2 font-mono">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-white font-sans font-extrabold flex items-center gap-1.5">
-            <Users className="w-4 h-4 text-amber-400" />
-            <span>이번 주 요일별 전체 민심 투표 참여 현황</span>
-          </span>
-          <span className="text-[11px] text-slate-400 font-sans font-medium">
-            월~토 실시간 투표 현황
-          </span>
-        </div>
-
-        {/* Mini Bar Chart Grid (6 Days Mon~Sat + 1 Cumulative Total Slot) */}
-        <div className="grid grid-cols-7 gap-2 pt-1">
-          {(() => {
-            // JS Day: 0 (Sun), 1 (Mon), 2 (Tue), 3 (Wed), 4 (Thu), 5 (Fri), 6 (Sat)
-            // Mon~Sat Map: Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6 (all completed)
-            const rawJsDay = new Date().getDay();
-            const currentDayIdx = rawJsDay === 0 ? 6 : rawJsDay - 1;
-
-            return (
-              <>
-                {weeklySummary.dailyVoterCounts.map((item, idx) => {
-                  const isToday = idx === currentDayIdx;
-                  const isFuture = idx > currentDayIdx;
-
-                  const maxCount = 100;
-                  const heightPct = Math.min(100, Math.round((item.count / maxCount) * 100));
-
-                  return (
-                    <div key={item.day} className="flex flex-col items-center space-y-1 group">
-                      <span className={`text-[9px] font-mono transition-colors ${
-                        isToday ? 'text-amber-300 font-bold' : isFuture ? 'text-slate-600' : 'text-slate-400 group-hover:text-amber-300'
-                      }`}>
-                        {isFuture ? '-' : `${item.count}명`}
-                      </span>
-
-                      <div className={`w-full h-11 bg-slate-950 rounded-lg p-0.5 border flex items-end ${
-                        isFuture ? 'border-dashed border-slate-800 bg-slate-950/40' : 'border-slate-800'
-                      }`}>
-                        {!isFuture && (
-                          <div
-                            className={`w-full rounded-md transition-all duration-500 ${
-                              isToday 
-                                ? 'bg-amber-500 shadow-md shadow-amber-500/30' 
-                                : 'bg-indigo-600 group-hover:bg-indigo-500'
-                            }`}
-                            style={{ height: `${heightPct}%` }}
-                            title={`${item.day}요일: ${item.count}명 참여`}
-                          />
-                        )}
-                      </div>
-
-                      <span className={`text-[10px] font-sans font-bold flex items-center gap-0.5 ${
-                        isToday ? 'text-amber-300 font-black' : isFuture ? 'text-slate-600' : 'text-slate-400'
-                      }`}>
-                        {item.day}
-                        {isToday && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping" />}
-                      </span>
-                    </div>
-                  );
-                })}
-
-                {/* 7th Slot: Cumulative Total Card */}
-                <div className="flex flex-col items-center space-y-1">
-                  <span className="text-[9px] font-mono font-bold text-amber-300 flex items-center gap-0.5">
-                    <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                    합계
-                  </span>
-
-                  <div className="w-full h-11 bg-gradient-to-b from-amber-500/20 to-amber-600/30 rounded-lg p-1 border border-amber-500/50 flex flex-col items-center justify-center space-y-0.5 shadow-md shadow-amber-500/10">
-                    <span className="text-xs font-black text-amber-300 font-mono leading-none">
-                      {weeklySummary.totalVotesCount}명
-                    </span>
-                    <span className="text-[8px] text-amber-400/80 font-sans font-bold">누적 참여</span>
-                  </div>
-
-                  <span className="text-[10px] font-sans font-black text-amber-300">
-                    주간 누적
-                  </span>
-                </div>
-              </>
-            );
-          })()}
         </div>
       </div>
 

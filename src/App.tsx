@@ -8,13 +8,12 @@ import { MyAssetDetailView } from './features/portfolio/components/MyAssetDetail
 import { MyPulseActivityDetailView } from './features/pulse/components/MyPulseActivityDetailView';
 import { MyTradeHistoryDetailView } from './features/trading/components/MyTradeHistoryDetailView';
 import { CompactMarketGrid } from './features/market/components/CompactMarketGrid';
-import { DailyMarketBriefingCard } from './features/market/components/DailyMarketBriefingCard';
 import { YesterdayTopVolumeCard } from './features/market/components/YesterdayTopVolumeCard';
+import { MarketTop3SpotlightCard } from './features/market/components/MarketTop3SpotlightCard';
 import { WeeklyPulseReportCard } from './features/pulse/components/WeeklyPulseReportCard';
+import { BestOneLineReviewSpotlightCard } from './features/pulse/components/BestOneLineReviewSpotlightCard';
 import { MarketBoard } from './components/MarketBoard';
 import { BoardMain } from './features/board/components/BoardMain';
-import { PollWidget } from './features/board/components/PollWidget';
-import { useBoardPosts } from './features/board/hooks/useBoardPosts';
 import { Leaderboard } from './components/Leaderboard';
 import { StockDetailModal } from './features/trading/components/StockDetailModal';
 import { SignUpModal } from './features/auth/components/SignUpModal';
@@ -50,16 +49,13 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 }) => {
   const { 
     politicians, 
-    briefing, 
     setSelectedPoliticianId, 
     setActiveTab, 
     user,
     allowanceNotice,
     setAllowanceNotice
   } = useStore();
-  const { poll, votePoll } = useBoardPosts();
 
-  const topGainers = [...politicians].sort((a, b) => b.change24h - a.change24h).slice(0, 3);
   const topVolumeList = [...politicians].sort((a, b) => (b.volume24h || b.totalVolume || 0) - (a.volume24h || a.totalVolume || 0)).slice(0, 3);
 
   return (
@@ -132,63 +128,17 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
         {/* Left Column (6/12): 주식 매매 / 시장 현황 (Market Top 3 + Yesterday Top Volume + Briefing) */}
         <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
           
-          {/* Top 3 Gainers Spotlight */}
-          <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>오늘의 인기도 급상승 TOP 3 종목</span>
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {topGainers.map((pol, idx) => (
-                <div
-                  key={pol.id}
-                  onClick={() => setSelectedPoliticianId(pol.id)}
-                  className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-purple-400/60 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2.5">
-                      <PoliticianAvatar
-                        src={pol.imageUrl}
-                        name={pol.name}
-                        party={pol.party}
-                        className="w-9 h-9 rounded-xl"
-                      />
-                      <div>
-                        <span className="font-extrabold text-xs text-white group-hover:text-purple-300 transition-colors">{pol.name}</span>
-                        <div className="text-[10px] text-slate-400">{pol.party}</div>
-                      </div>
-                    </div>
-                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
-                      idx === 0 ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30' : 'bg-slate-800 text-slate-400'
-                    }`}>
-                      TOP {idx + 1}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between font-mono pt-2 border-t border-slate-700/50 text-xs">
-                    <span className="font-extrabold text-white text-[11px]">{formatPoints(pol.currentPrice)}</span>
-                    <div className="font-bold text-emerald-400 flex items-center gap-0.5 text-[11px]">
-                      <TrendingUp className="w-3 h-3" />
-                      <span>{formatPercent(pol.change24h)}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Market Top 3 Spotlight Card (Option A: Tabbed View) */}
+          <MarketTop3SpotlightCard 
+            politicians={politicians}
+            onSelectPolitician={setSelectedPoliticianId}
+          />
 
           {/* Yesterday Top Volume & Turnover Card */}
           <YesterdayTopVolumeCard 
             topVolumeList={topVolumeList}
             onSelectPolitician={setSelectedPoliticianId}
           />
-
-          {/* Daily Market Briefing */}
-          <DailyMarketBriefingCard briefing={briefing} />
-
         </div>
 
         {/* Right Column (6/12): 민심 펄스 현황 (Weekly Pulse Report Card + Poll Widget) */}
@@ -198,8 +148,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
             onOpenReviewsDetail={onOpenReviewsDetail}
           />
 
-          {/* Poll Widget */}
-          <PollWidget poll={poll} onVote={votePoll} />
+          {/* Best One Line Review Spotlight Card */}
+          <BestOneLineReviewSpotlightCard 
+            onOpenVoteModal={onOpenVoteModal}
+            onOpenReviewsDetail={onOpenReviewsDetail}
+          />
         </div>
 
       </div>

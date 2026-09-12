@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useStore } from '../../../context/StoreContext';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
-import { ThumbsUp, ThumbsDown, X, Award, CheckCircle2, MessageSquare, Gift, Sparkles } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, X, Award, CheckCircle2, MessageSquare, Gift, Sparkles, Users } from 'lucide-react';
+import { usePulseVoting } from '../hooks/usePulseVoting';
 
 interface DailyBestWorstVoteModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export const DailyBestWorstVoteModal: React.FC<DailyBestWorstVoteModalProps> = (
   rewardAmount,
 }) => {
   const { politicians } = useStore();
+  const { weeklySummary } = usePulseVoting();
 
   const [selectedBest, setSelectedBest] = useState<string[]>([]);
   const [selectedWorst, setSelectedWorst] = useState<string[]>([]);
@@ -114,6 +116,91 @@ export const DailyBestWorstVoteModal: React.FC<DailyBestWorstVoteModalProps> = (
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Daily Voter Participation Trend Widget */}
+        <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-amber-500/30 space-y-2 font-mono">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-white font-sans font-extrabold flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-amber-400" />
+              <span>이번 주 요일별 전체 민심 투표 참여 현황</span>
+            </span>
+            <span className="text-[11px] text-slate-400 font-sans font-medium">
+              월~토 실시간 집계
+            </span>
+          </div>
+
+          {/* Mini Bar Chart Grid */}
+          <div className="grid grid-cols-7 gap-2 pt-1">
+            {(() => {
+              const rawJsDay = new Date().getDay();
+              const currentDayIdx = rawJsDay === 0 ? 6 : rawJsDay - 1;
+
+              return (
+                <>
+                  {weeklySummary.dailyVoterCounts.map((item, idx) => {
+                    const isToday = idx === currentDayIdx;
+                    const isFuture = idx > currentDayIdx;
+
+                    const maxCount = 100;
+                    const heightPct = Math.min(100, Math.round((item.count / maxCount) * 100));
+
+                    return (
+                      <div key={item.day} className="flex flex-col items-center space-y-1 group">
+                        <span className={`text-[9px] font-mono transition-colors ${
+                          isToday ? 'text-amber-300 font-bold' : isFuture ? 'text-slate-600' : 'text-slate-400 group-hover:text-amber-300'
+                        }`}>
+                          {isFuture ? '-' : `${item.count}명`}
+                        </span>
+
+                        <div className={`w-full h-10 bg-slate-900 rounded-lg p-0.5 border flex items-end ${
+                          isFuture ? 'border-dashed border-slate-800 bg-slate-900/40' : 'border-slate-800'
+                        }`}>
+                          {!isFuture && (
+                            <div
+                              className={`w-full rounded-md transition-all duration-500 ${
+                                isToday 
+                                  ? 'bg-amber-500 shadow-md shadow-amber-500/30' 
+                                  : 'bg-indigo-600 group-hover:bg-indigo-500'
+                              }`}
+                              style={{ height: `${heightPct}%` }}
+                              title={`${item.day}요일: ${item.count}명 참여`}
+                            />
+                          )}
+                        </div>
+
+                        <span className={`text-[10px] font-sans font-bold flex items-center gap-0.5 ${
+                          isToday ? 'text-amber-300 font-black' : isFuture ? 'text-slate-600' : 'text-slate-400'
+                        }`}>
+                          {item.day}
+                          {isToday && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping" />}
+                        </span>
+                      </div>
+                    );
+                  })}
+
+                  {/* 7th Slot: Cumulative Total */}
+                  <div className="flex flex-col items-center space-y-1">
+                    <span className="text-[9px] font-mono font-bold text-amber-300 flex items-center gap-0.5">
+                      <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                      합계
+                    </span>
+
+                    <div className="w-full h-10 bg-gradient-to-b from-amber-500/20 to-amber-600/30 rounded-lg p-1 border border-amber-500/50 flex flex-col items-center justify-center space-y-0.5 shadow-md shadow-amber-500/10">
+                      <span className="text-xs font-black text-amber-300 font-mono leading-none">
+                        {weeklySummary.totalVotesCount}명
+                      </span>
+                      <span className="text-[8px] text-amber-400/80 font-sans font-bold">누적 참여</span>
+                    </div>
+
+                    <span className="text-[10px] font-sans font-black text-amber-300">
+                      주간 누적
+                    </span>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
