@@ -10,6 +10,7 @@ import { MyTradeHistoryDetailView } from './features/trading/components/MyTradeH
 import { CompactMarketGrid } from './features/market/components/CompactMarketGrid';
 import { YesterdayTopVolumeCard } from './features/market/components/YesterdayTopVolumeCard';
 import { MarketTop3SpotlightCard } from './features/market/components/MarketTop3SpotlightCard';
+import { MarketGainersLosersDualCard } from './features/market/components/MarketGainersLosersDualCard';
 import { WeeklyPulseReportCard } from './features/pulse/components/WeeklyPulseReportCard';
 import { BestOneLineReviewSpotlightCard } from './features/pulse/components/BestOneLineReviewSpotlightCard';
 import { MarketBoard } from './components/MarketBoard';
@@ -125,16 +126,22 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ================================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left Column (6/12): 주식 매매 / 시장 현황 (Market Top 3 + Yesterday Top Volume + Briefing) */}
-        <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
+        {/* Left Column (6/12): 주식 매매 / 시장 현황 (시가총액 TOP3 + 급상승/급하락 TOP3 + 거래량 TOP3) */}
+        <div className="lg:col-span-6 space-y-6">
           
-          {/* Market Top 3 Spotlight Card (Option A: Tabbed View) */}
+          {/* 1. 시가총액 TOP 3 종목 카드 */}
           <MarketTop3SpotlightCard 
             politicians={politicians}
             onSelectPolitician={setSelectedPoliticianId}
           />
 
-          {/* Yesterday Top Volume & Turnover Card */}
+          {/* 2. 어제 거래 급상승 & 급하락 TOP 3 듀얼 카드 */}
+          <MarketGainersLosersDualCard
+            politicians={politicians}
+            onSelectPolitician={setSelectedPoliticianId}
+          />
+
+          {/* 3. 어제 마감 거래량 & 거래대금 TOP 3 종목 카드 */}
           <YesterdayTopVolumeCard 
             topVolumeList={topVolumeList}
             onSelectPolitician={setSelectedPoliticianId}
