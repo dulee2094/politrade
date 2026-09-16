@@ -34,15 +34,15 @@ export const BestOneLineReviewSpotlightCard: React.FC<BestOneLineReviewSpotlight
             <Trophy className="w-4 h-4 text-amber-400" />
           </div>
           <div>
-            <h4 className="text-xs font-black text-white flex items-center gap-1.5 uppercase tracking-wider">
+            <h4 className="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-1.5">
               <span>지난주 베스트 한줄평 명예의 전당</span>
             </h4>
             <p className="text-[11px] text-slate-400">최다 공감 득표 1위 선정작</p>
           </div>
         </div>
 
-        <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-full border border-amber-500/30 flex items-center gap-1 shrink-0">
-          <Sparkles className="w-3 h-3 text-amber-400" />
+        <span className="text-xs font-mono font-bold text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-full border border-amber-500/30 flex items-center gap-1 shrink-0">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span>+100,000P 시상 완료</span>
         </span>
       </div>

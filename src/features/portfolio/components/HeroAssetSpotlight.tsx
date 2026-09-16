@@ -108,20 +108,22 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
         {/* CARD 1: 💰 총 평가 자산 (Net Worth Card) (4/12) */}
         {/* ============================================================ */}
         <div className="lg:col-span-4 bg-slate-950/80 p-5 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between shadow-md">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-              <span className="flex items-center gap-1.5 text-white font-bold">
-                <Wallet className="w-4 h-4 text-indigo-400" />
-                총 평가 자산 (Net Worth)
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+              <span className="text-sm sm:text-base font-black text-white flex items-center gap-2 tracking-tight">
+                <span className="p-1 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                  <Wallet className="w-4 h-4" />
+                </span>
+                <span>총 평가 자산 <span className="text-xs text-slate-400 font-bold font-mono">(Net Worth)</span></span>
               </span>
               {onOpenAssetDetail && (
                 <button
                   type="button"
                   onClick={onOpenAssetDetail}
-                  className="text-[10px] text-indigo-300 hover:text-white font-mono font-bold bg-slate-800 px-2 py-0.5 rounded border border-slate-700 flex items-center gap-0.5"
+                  className="text-xs text-indigo-300 hover:text-white font-mono font-bold bg-slate-800/90 hover:bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 flex items-center gap-0.5 transition-colors"
                 >
                   <span>초기 30만P 대비</span>
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -153,11 +155,13 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
         {/* ============================================================ */}
         <div className="lg:col-span-4 bg-slate-950/80 p-5 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between shadow-md">
           <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+              <span className="text-sm sm:text-base font-black text-white flex items-center gap-2 tracking-tight">
+                <span className="p-1 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                  <Layers className="w-4 h-4" />
+                </span>
                 <span>보유 종목 요약</span>
-                <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-2 py-0.5 rounded-md border border-slate-700">
+                <span className="text-xs font-mono font-bold text-slate-300 bg-slate-800 px-2 py-0.5 rounded-md border border-slate-700">
                   {holdingsCount}종목
                 </span>
               </span>
@@ -166,10 +170,10 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
                 <button
                   type="button"
                   onClick={onOpenTradeDetail}
-                  className="text-[10px] text-cyan-400 hover:text-white font-sans font-bold flex items-center gap-0.5"
+                  className="text-xs text-cyan-400 hover:text-white font-sans font-bold flex items-center gap-0.5 bg-slate-800/90 hover:bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 transition-colors"
                 >
                   <span>거래 상세 보기</span>
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -240,9 +244,11 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
         {/* ============================================================ */}
         <div className="lg:col-span-4 bg-slate-950/80 p-5 rounded-3xl border border-slate-800 space-y-4 flex flex-col justify-between shadow-md">
           <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                <Vote className="w-4 h-4 text-amber-400" />
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+              <span className="text-sm sm:text-base font-black text-white flex items-center gap-2 tracking-tight">
+                <span className="p-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <Vote className="w-4 h-4" />
+                </span>
                 <span>민심 펄스 참여 현황</span>
               </span>
 
@@ -250,10 +256,10 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
                 <button
                   type="button"
                   onClick={onOpenPulseActivityDetail}
-                  className="text-[10px] text-amber-400 hover:text-white font-sans font-bold flex items-center gap-0.5"
+                  className="text-xs text-amber-400 hover:text-white font-sans font-bold flex items-center gap-0.5 bg-slate-800/90 hover:bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 transition-colors"
                 >
                   <span>펄스활동 상세</span>
-                  <ChevronRight className="w-3 h-3 text-amber-400" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>

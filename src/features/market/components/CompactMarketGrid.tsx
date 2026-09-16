@@ -16,11 +16,13 @@ export const CompactMarketGrid: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-white flex items-center gap-1.5">
-            <BarChart2 className="w-4 h-4 text-cyan-400" />
+          <h3 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+            <span className="p-1 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+              <BarChart2 className="w-4 h-4" />
+            </span>
             <span>{BRAND_STOCK_NAME} 실시간 전광판</span>
           </h3>
-          <p className="text-[11px] text-slate-300">10인 의원 호가 체결 현황</p>
+          <p className="text-xs text-slate-400">10인 의원 호가 체결 현황</p>
         </div>
 
         <MarketStatusBadge />

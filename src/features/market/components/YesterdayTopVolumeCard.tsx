@@ -16,11 +16,13 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
   return (
     <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-          <BarChart3 className="w-4 h-4 text-cyan-400" />
+        <h4 className="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-2">
+          <span className="p-1 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+            <BarChart3 className="w-4 h-4" />
+          </span>
           <span>어제 마감 거래량 & 거래대금 TOP 3 종목</span>
         </h4>
-        <span className="text-[10px] font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-0.5 rounded-full border border-cyan-500/30">
+        <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-1 rounded-full border border-cyan-500/30">
           어제 최종 집계
         </span>
       </div>

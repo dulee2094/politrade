@@ -68,20 +68,22 @@ export const MarketTop3SpotlightCard: React.FC<MarketTop3SpotlightCardProps> = (
     <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
       {/* Header & Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
-        <h4 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 shrink-0">
-          <Sparkles className="w-4 h-4 text-amber-400" />
+        <h4 className="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-2 shrink-0">
+          <span className="p-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+            <Sparkles className="w-4 h-4" />
+          </span>
           <span>시장 종목 현황 스팟라이트</span>
         </h4>
 
         {/* Tab Buttons */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           {tabs.map((t) => {
             const isActive = activeTab === t.id;
             return (
               <button
                 key={t.id}
                 onClick={() => setActiveTab(t.id)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1 whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                   isActive
                     ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'

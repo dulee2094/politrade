@@ -62,9 +62,9 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             <Award className="w-5 h-5 text-slate-950" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-base font-black text-white flex items-center gap-2 flex-wrap">
+            <h3 className="text-lg font-black text-white flex items-center gap-2 flex-wrap tracking-tight">
               <span className="whitespace-nowrap">주간 민심 펄스</span>
-              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold whitespace-nowrap">
+              <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold whitespace-nowrap">
                 WEEKLY PULSE
               </span>
             </h3>
