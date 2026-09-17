@@ -148,16 +148,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
           />
         </div>
 
-        {/* Right Column (6/12): 민심 펄스 현황 (Weekly Pulse Report Card + Poll Widget) */}
-        <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
+        {/* Right Column (6/12): 민심 펄스 종합 현황 (Option A: 4단 통합 스마트 펄스 대시보드) */}
+        <div className="lg:col-span-6 space-y-6">
           <WeeklyPulseReportCard 
             onOpenDetail={onOpenWeeklyPulse}
-            onOpenReviewsDetail={onOpenReviewsDetail}
-          />
-
-          {/* Best One Line Review Spotlight Card */}
-          <BestOneLineReviewSpotlightCard 
-            onOpenVoteModal={onOpenVoteModal}
             onOpenReviewsDetail={onOpenReviewsDetail}
           />
         </div>

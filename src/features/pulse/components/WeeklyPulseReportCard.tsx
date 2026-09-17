@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { usePulseVoting } from '../hooks/usePulseVoting';
 import { DailyBestWorstVoteModal } from './DailyBestWorstVoteModal';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
-import { PartyBadge } from '../../../shared/ui/PartyBadge';
-import { Award, ThumbsUp, ThumbsDown, MessageSquare, Sparkles, Gift, Heart, Vote, ArrowRight, Wallet, CheckCircle2, TrendingUp, AlertTriangle, Calendar, Megaphone } from 'lucide-react';
+import { PressBadge } from '../../auth/components/PressBadge';
+import { Award, ThumbsUp, Sparkles, Heart, Vote, ArrowRight, Wallet, CheckCircle2, Trophy } from 'lucide-react';
 import { formatPoints } from '../../../core/utils/formatters';
 
 interface WeeklyPulseReportCardProps {
@@ -15,13 +15,11 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
   const {
     hasVotedToday,
     submitDailyVote,
-    likeReview,
     weeklySummary,
     userSettlement,
     hasSettledThisWeek,
     executeWeeklySettlement,
     DAILY_VOTE_REWARD,
-    BEST_REVIEW_REWARD,
   } = usePulseVoting();
 
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
@@ -38,204 +36,240 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
   };
 
   return (
-    <div className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5 h-full flex flex-col justify-between">
+    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
 
-      {/* Top Pre-Notification Schedule Banner */}
-      <div className="relative z-10 bg-slate-950 p-2.5 px-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-        <div className="flex items-center space-x-2">
-          <div className="w-5 h-5 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0">
-            <Megaphone className="w-3.5 h-3.5" />
-          </div>
-          <span className="font-extrabold text-amber-300 font-sans">주간 타임라인:</span>
-          <span className="text-slate-300 font-mono text-[11px]">월~토 투표 마감 ➔ 월 10:00 발표 ➔ 월 11:00 정산</span>
-        </div>
-        <span className="text-[10px] font-extrabold text-amber-300 bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/30 font-mono shrink-0">
-          🎁 주주 배당 & 포상금 일괄 지급
-        </span>
-      </div>
-
-      {/* Header Bar */}
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-        {/* Title Area */}
+      {/* Dashboard Top Header */}
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
         <div className="flex items-center space-x-3 min-w-0">
           <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg shrink-0">
             <Award className="w-5 h-5 text-slate-950" />
           </div>
           <div className="min-w-0">
             <h3 className="text-lg font-black text-white flex items-center gap-2 flex-wrap tracking-tight">
-              <span className="whitespace-nowrap">주간 민심 펄스</span>
+              <span className="whitespace-nowrap">주간 민심 펄스 현황</span>
               <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold whitespace-nowrap">
-                WEEKLY PULSE
+                PULSE DASHBOARD
               </span>
             </h3>
-            <p className="text-xs text-slate-400 truncate sm:whitespace-normal">
-              주주 배당금(+1,000P/주) 및 한줄평 포상금(+10만P) 매주 정산
+            <p className="text-xs text-slate-400">
+              실시간 득표 및 지난주 확정 결과 4단계 통합 종합 현황
             </p>
           </div>
         </div>
 
-        {/* Buttons Area */}
-        <div className="flex items-center space-x-2 shrink-0 self-start sm:self-center">
+        <button
+          type="button"
+          onClick={() => setIsVoteModalOpen(true)}
+          className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all shadow-md flex items-center space-x-1.5 whitespace-nowrap shrink-0 ${
+            hasVotedToday
+              ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
+              : 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-amber-500/20'
+          }`}
+        >
+          <Vote className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+          <span>{hasVotedToday ? '오늘 투표 완료' : '오늘의 3인 투표 (+1,000P)'}</span>
+        </button>
+      </div>
+
+      {/* ================================================================ */}
+      {/* 1) 금주 베스트/워스트 투표 현황 (월~어제 누적) [LIVE] */}
+      {/* ================================================================ */}
+      <div className="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <h4 className="text-xs font-black text-white flex items-center gap-2">
+              <span>1) 금주 베스트/워스트 투표 현황</span>
+              <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded border border-emerald-500/30 font-mono">
+                LIVE · 월~어제 누적
+              </span>
+            </h4>
+          </div>
+
           {onOpenDetail && (
             <button
               type="button"
               onClick={onOpenDetail}
-              className="px-3 py-2 rounded-xl font-bold text-xs transition-all bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-500/40 flex items-center space-x-1.5 whitespace-nowrap"
+              className="text-xs text-indigo-300 hover:text-white font-extrabold flex items-center gap-1 bg-indigo-900/40 hover:bg-indigo-900/80 px-2.5 py-1 rounded-lg border border-indigo-500/30 transition-all shrink-0"
             >
-              <span>상세 리포트</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>상세현황</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           )}
+        </div>
 
-          {/* Daily Vote Trigger Button */}
-          <button
-            type="button"
-            onClick={() => setIsVoteModalOpen(true)}
-            className={`px-3.5 py-2 rounded-xl font-bold text-xs transition-all shadow-md flex items-center space-x-1.5 whitespace-nowrap ${
-              hasVotedToday
-                ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
-                : 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-amber-500/20'
-            }`}
-          >
-            <Vote className="w-3.5 h-3.5 text-slate-950 shrink-0" />
-            <span>{hasVotedToday ? '오늘 투표 완료' : '오늘의 3인 투표 (+1,000P)'}</span>
-          </button>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
+          {/* Live Best 3 */}
+          <div className="bg-slate-900/90 p-2.5 rounded-xl border border-emerald-500/20 space-y-1.5">
+            <div className="text-[11px] font-bold text-emerald-400 flex items-center justify-between">
+              <span>🏆 금주 실시간 BEST 3</span>
+              <span className="text-[9px] text-slate-400 font-mono">누적 득표 순</span>
+            </div>
+            <div className="space-y-1">
+              {weeklySummary.bestTop3.map((pol, idx) => (
+                <div key={'lb_' + pol.politicianId} className="flex items-center justify-between p-1.5 px-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs">
+                  <div className="flex items-center space-x-2 min-w-0">
+                    <span className={`w-4 h-4 rounded text-[10px] font-black font-mono flex items-center justify-center shrink-0 ${
+                      idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-6 h-6 rounded-md shrink-0" />
+                    <span className="font-extrabold text-white text-xs truncate">{pol.politicianName}</span>
+                    <span className="text-[10px] text-slate-400 shrink-0">{pol.party}</span>
+                  </div>
+                  <span className="font-mono font-bold text-emerald-400 text-xs shrink-0 ml-2">{pol.voteCount}표</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Live Worst 3 */}
+          <div className="bg-slate-900/90 p-2.5 rounded-xl border border-rose-500/20 space-y-1.5">
+            <div className="text-[11px] font-bold text-rose-400 flex items-center justify-between">
+              <span>⚠️ 금주 실시간 WORST 3</span>
+              <span className="text-[9px] text-slate-400 font-mono">누적 득표 순</span>
+            </div>
+            <div className="space-y-1">
+              {weeklySummary.worstTop3.map((pol, idx) => (
+                <div key={'lw_' + pol.politicianId} className="flex items-center justify-between p-1.5 px-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs">
+                  <div className="flex items-center space-x-2 min-w-0">
+                    <span className="w-4 h-4 rounded text-[10px] font-black font-mono bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center shrink-0">
+                      {idx + 1}
+                    </span>
+                    <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-6 h-6 rounded-md shrink-0" />
+                    <span className="font-extrabold text-white text-xs truncate">{pol.politicianName}</span>
+                    <span className="text-[10px] text-slate-400 shrink-0">{pol.party}</span>
+                  </div>
+                  <span className="font-mono font-bold text-rose-400 text-xs shrink-0 ml-2">{pol.voteCount}표</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Weekly Best 3 vs Worst 3 Dual Grid */}
-      <div className="relative z-10 grid grid-cols-1 xl:grid-cols-2 gap-4">
-        
-        {/* Weekly BEST 3 Box */}
-        <div className="bg-slate-900/90 p-4 rounded-2xl border border-emerald-500/30 space-y-3 shadow-md">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <div className="flex items-center space-x-2 font-bold text-xs text-white">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-              <span>🏆 지난 주 최종 BEST 3 의원</span>
-            </div>
-            <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-              보유 주주 1주당 +1,000 P 배당!
-            </span>
+      {/* ================================================================ */}
+      {/* 2) 금주 한줄평 득표 현황 (월~어제 누적) [LIVE] */}
+      {/* ================================================================ */}
+      <div className="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+            <h4 className="text-xs font-black text-white flex items-center gap-2">
+              <span>2) 금주 한줄평 득표 현황</span>
+              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/30 font-mono">
+                LIVE · 공감 순위
+              </span>
+            </h4>
           </div>
 
-          <div className="space-y-2">
-            {weeklySummary.bestTop3.map((pol, idx) => (
-              <div key={'b_' + pol.politicianId} className="flex items-center justify-between p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
-                <div className="flex items-center space-x-2.5">
-                  <span className={`w-5 h-5 rounded-md text-[11px] font-black font-mono flex items-center justify-center ${
-                    idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
-                  }`}>
-                    {idx + 1}
-                  </span>
-                  <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-8 h-8 rounded-lg" />
-                  <div>
-                    <span className="font-extrabold text-white">{pol.politicianName}</span>
-                    <div className="text-[10px] text-slate-400">{pol.party}</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono font-bold text-emerald-400 text-xs">{pol.voteCount}표</div>
-                  <div className="text-[9px] text-emerald-300 font-mono">+1,000P/주</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {onOpenReviewsDetail && (
+            <button
+              type="button"
+              onClick={onOpenReviewsDetail}
+              className="text-xs text-amber-300 hover:text-white font-extrabold flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/30 transition-all shrink-0"
+            >
+              <span>상세현황</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          )}
         </div>
 
-        {/* Weekly WORST 3 Box */}
-        <div className="bg-slate-900/90 p-4 rounded-2xl border border-rose-500/30 space-y-3 shadow-md">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <div className="flex items-center space-x-2 font-bold text-xs text-white">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-              <span>⚠️ 지난 주 최종 WORST 3 의원</span>
-            </div>
-            <span className="text-[10px] text-rose-400 font-mono font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">
-              보유 주주 1주당 -1,000 P 감액!
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            {weeklySummary.worstTop3.map((pol, idx) => (
-              <div key={'w_' + pol.politicianId} className="flex items-center justify-between p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs">
-                <div className="flex items-center space-x-2.5">
-                  <span className="w-5 h-5 rounded-md text-[11px] font-black font-mono bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center">
-                    {idx + 1}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          {weeklySummary.bestReviews.slice(0, 3).map((rev, idx) => (
+            <div key={rev.id} className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2 flex flex-col justify-between shadow-sm">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="bg-amber-500/20 text-amber-300 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border border-amber-500/30">
+                    {idx + 1}위
                   </span>
-                  <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-8 h-8 rounded-lg" />
-                  <div>
-                    <span className="font-extrabold text-white">{pol.politicianName}</span>
-                    <div className="text-[10px] text-slate-400">{pol.party}</div>
-                  </div>
+                  <span className="text-xs font-bold text-white truncate max-w-[90px]">{rev.userName}</span>
                 </div>
-                <div className="text-right">
-                  <div className="font-mono font-bold text-rose-400 text-xs">{pol.voteCount}표</div>
-                  <div className="text-[9px] text-rose-300 font-mono">-1,000P/주</div>
-                </div>
+                <p className="text-[11px] text-slate-300 italic line-clamp-2 leading-tight">"{rev.oneLineReview}"</p>
               </div>
-            ))}
-          </div>
+              <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-800/80 text-amber-400 font-mono">
+                <span className="text-slate-400">🎁 1위 시상 (+10만P)</span>
+                <span className="flex items-center gap-1 font-bold">
+                  <Heart className="w-3 h-3 text-rose-400 fill-rose-400" /> {rev.likes}표
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
-
       </div>
 
-      {/* User's Personal Weekly Dividend & Penalty Settlement Dashboard Box */}
-      <div className="relative z-10 bg-slate-900/90 p-4.5 rounded-2xl border border-indigo-500/40 space-y-3 font-mono shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 flex items-center justify-center shrink-0 font-sans">
-              <Wallet className="w-4 h-4" />
+      {/* ================================================================ */}
+      {/* 3) 지난 주 베스트/워스트 3인 선정결과 [PAST - CLOSED] */}
+      {/* ================================================================ */}
+      <div className="bg-slate-950/70 p-4 rounded-2xl border border-indigo-500/30 space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-400" />
+            <h4 className="text-xs font-black text-white flex items-center gap-2">
+              <span>3) 지난 주 베스트/워스트 3인 선정결과</span>
+              <span className="bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-0.5 rounded border border-indigo-500/30 font-mono">
+                CLOSED · 주주 배당 정산
+              </span>
+            </h4>
+          </div>
+
+          {onOpenDetail && (
+            <button
+              type="button"
+              onClick={onOpenDetail}
+              className="text-xs text-indigo-300 hover:text-white font-extrabold flex items-center gap-1 bg-indigo-900/40 hover:bg-indigo-900/80 px-2.5 py-1 rounded-lg border border-indigo-500/30 transition-all shrink-0"
+            >
+              <span>상세현황</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <div className="bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/30 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-emerald-400 font-bold">🏆 지난주 Best 3</span>
+              <span className="text-[10px] text-slate-300">주주 배당 (+1,000P/주)</span>
             </div>
-            <div>
-              <h4 className="text-xs font-bold text-white font-sans flex items-center gap-2">
-                <span>월요일 11시 통합 주주 배당금 & 베스트 한줄평 포상 정산</span>
-                {hasSettledThisWeek && (
-                  <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30">
-                    이번 주 정산 완료
-                  </span>
-                )}
-              </h4>
-              <p className="text-[11px] text-slate-400 font-sans">매주 월요일 11:00 AM: 주주 배당금 정산과 베스트 한줄평 포상금(+100,000P)이 일괄 입출금됩니다.</p>
+            <span className="font-mono text-emerald-400 font-extrabold">+{formatPoints(userSettlement.totalDividend)}</span>
+          </div>
+
+          <div className="bg-rose-950/30 p-2.5 rounded-xl border border-rose-500/30 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-rose-400 font-bold">⚠️ 지난주 Worst 3</span>
+              <span className="text-[10px] text-slate-300">손실 감액 (-1,000P/주)</span>
             </div>
+            <span className="font-mono text-rose-400 font-extrabold">-{formatPoints(userSettlement.totalPenalty)}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-900 p-2.5 rounded-xl border border-slate-800">
+          <div className="flex items-center space-x-2">
+            <Wallet className="w-4 h-4 text-indigo-400 shrink-0" />
+            <span className="text-xs text-slate-300 font-bold font-sans">나의 최종 순 정산액:</span>
+            <span className={`font-black text-sm font-mono ${userSettlement.netAmount >= 0 ? 'text-amber-300' : 'text-rose-400'}`}>
+              {userSettlement.netAmount >= 0 ? '+' : ''}{formatPoints(userSettlement.netAmount)}
+            </span>
           </div>
 
           <button
             type="button"
             onClick={handleClaimSettlement}
             disabled={hasSettledThisWeek}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all shadow-md flex items-center space-x-1.5 shrink-0 font-sans ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all shadow-md flex items-center space-x-1.5 shrink-0 ${
               hasSettledThisWeek
                 ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold shadow-indigo-500/20'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{hasSettledThisWeek ? '이번 주 정산 완료' : '월요일 11시 통합 정산/시상하기'}</span>
+            <span>{hasSettledThisWeek ? '정산 완료' : '정산 받기'}</span>
           </button>
         </div>
 
-        {/* Settlement Breakdown Summary Items */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <div className="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60 flex items-center justify-between">
-            <span className="text-slate-400 font-sans">예상 Best 배당금</span>
-            <span className="font-extrabold text-emerald-400">+{formatPoints(userSettlement.totalDividend)}</span>
-          </div>
-
-          <div className="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60 flex items-center justify-between">
-            <span className="text-slate-400 font-sans">예상 Worst 손실 감액</span>
-            <span className="font-extrabold text-rose-400">-{formatPoints(userSettlement.totalPenalty)}</span>
-          </div>
-
-          <div className="bg-slate-800/60 p-2.5 rounded-xl border border-indigo-500/30 flex items-center justify-between bg-indigo-950/40">
-            <span className="text-slate-300 font-sans font-bold">최종 순 정산액</span>
-            <span className={`font-black text-sm ${userSettlement.netAmount >= 0 ? 'text-amber-300' : 'text-rose-400'}`}>
-              {userSettlement.netAmount >= 0 ? '+' : ''}{formatPoints(userSettlement.netAmount)}
-            </span>
-          </div>
-        </div>
-
-        {/* Settlement Feedback Message Toast */}
         {settlementFeedback && (
-          <div className={`p-3 rounded-xl border text-xs font-bold font-sans flex items-center space-x-2 ${
+          <div className={`p-2.5 rounded-xl border text-xs font-bold flex items-center space-x-2 ${
             settlementFeedback.type === 'error'
               ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
               : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
@@ -246,61 +280,63 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
         )}
       </div>
 
-      {/* Bottom One-Line Review Ranking Spotlight */}
-      <div className="relative z-10 bg-slate-900/80 p-4 rounded-2xl border border-indigo-500/30 space-y-3 shadow-md">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
-          <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>✨ 금주의 베스트 한줄평 실시간 득표 순위 TOP 3</span>
-          </h4>
+      {/* ================================================================ */}
+      {/* 4) 지난 주 베스트 한 줄평 선정결과 [PAST - CLOSED] */}
+      {/* ================================================================ */}
+      <div className="bg-slate-950/70 p-4 rounded-2xl border border-amber-500/30 space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="flex items-center space-x-2">
+            <Trophy className="w-4 h-4 text-amber-400" />
+            <h4 className="text-xs font-black text-white flex items-center gap-2">
+              <span>4) 지난 주 베스트 한 줄평 선정결과</span>
+              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/30 font-mono">
+                명예의 전당 · +10만P 시상
+              </span>
+            </h4>
+          </div>
 
           {onOpenReviewsDetail && (
             <button
               type="button"
               onClick={onOpenReviewsDetail}
-              className="text-xs text-amber-300 hover:text-white font-extrabold flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg border border-amber-500/30 transition-all shrink-0"
+              className="text-xs text-amber-300 hover:text-white font-extrabold flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/30 transition-all shrink-0"
             >
-              <span>전체 한줄평 득표 현황 및 투표하기</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>상세현황</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {weeklySummary.bestReviews.length === 0 ? (
-            <div className="md:col-span-3 text-center py-4 text-slate-500 text-xs font-bold">
-              아직 이번 주 등록된 한줄평이 없습니다. 첫 한줄평을 남겨보세요!
-            </div>
-          ) : (
-            weeklySummary.bestReviews.map((rev, idx) => (
-              <div key={rev.id} className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 space-y-2 flex flex-col justify-between shadow-sm">
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="bg-amber-500/20 text-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-amber-500/30 font-mono">
-                        TOP {idx + 1}
-                      </span>
-                      <span className="text-xs font-extrabold text-white truncate max-w-[100px]">{rev.userName}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-500 font-mono">{rev.createdAt}</span>
-                  </div>
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans line-clamp-2 italic">
-                    "{rev.oneLineReview}"
-                  </p>
+        {/* Top Review Highlight */}
+        {(() => {
+          const topRev = weeklySummary.bestReviews?.[0] || {
+            userName: '여의도취재반장',
+            likes: 24,
+            oneLineReview: '우원식 국회의장의 상임위 중재안과 이준석 의원의 반도체 특구 법안이 실질적 민생 도움이 됨!',
+          };
+          return (
+            <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-xs shrink-0">
+                  🥇
                 </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 font-mono text-[11px]">
-                  <span className="bg-indigo-600/30 text-indigo-300 text-[9px] px-2 py-0.5 rounded-md font-sans font-bold">
-                    🎁 1위 시상 (+10만P)
-                  </span>
-                  <span className="text-amber-400 font-bold text-xs flex items-center gap-1">
-                    <Heart className="w-3 h-3 text-rose-400 fill-rose-400" /> {rev.likes}표
-                  </span>
+                <div className="min-w-0">
+                  <div className="flex items-center space-x-2 flex-wrap">
+                    <span className="text-xs font-extrabold text-white">{topRev.userName}</span>
+                    <PressBadge mediaName="KBS" />
+                    <span className="text-[10px] text-amber-400 font-mono">지난주 1위 ({topRev.likes}표 공감)</span>
+                  </div>
+                  <p className="text-xs text-slate-300 italic mt-0.5 leading-tight truncate sm:whitespace-normal">"{topRev.oneLineReview}"</p>
                 </div>
               </div>
-            ))
-          )}
-        </div>
+
+              <span className="text-[11px] font-mono font-extrabold text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-full border border-amber-500/30 flex items-center gap-1 shrink-0 self-start sm:self-center">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>+100,000P 시상 완료</span>
+              </span>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Voting Modal */}
