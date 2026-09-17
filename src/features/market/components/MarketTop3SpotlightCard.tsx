@@ -23,16 +23,16 @@ export const MarketTop3SpotlightCard: React.FC<MarketTop3SpotlightCardProps> = (
     .slice(0, 3);
 
   return (
-    <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+    <div className="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-3 shadow-md">
       {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 className="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-2">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h4 className="text-sm font-black text-white tracking-tight flex items-center gap-2">
           <span className="p-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
-            <Crown className="w-4 h-4" />
+            <Crown className="w-3.5 h-3.5" />
           </span>
           <span>시가총액 TOP 3 종목 (Market Cap Leaders)</span>
         </h4>
-        <span className="text-xs font-mono font-bold text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-full border border-amber-500/30 flex items-center gap-1">
+        <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950/80 px-2.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
           <Sparkles className="w-3 h-3 text-amber-400" />
           <span>시가총액 상위</span>
         </span>

@@ -8,9 +8,7 @@ import { MyAssetDetailView } from './features/portfolio/components/MyAssetDetail
 import { MyPulseActivityDetailView } from './features/pulse/components/MyPulseActivityDetailView';
 import { MyTradeHistoryDetailView } from './features/trading/components/MyTradeHistoryDetailView';
 import { CompactMarketGrid } from './features/market/components/CompactMarketGrid';
-import { YesterdayTopVolumeCard } from './features/market/components/YesterdayTopVolumeCard';
-import { MarketTop3SpotlightCard } from './features/market/components/MarketTop3SpotlightCard';
-import { MarketGainersLosersDualCard } from './features/market/components/MarketGainersLosersDualCard';
+import { MarketDashboardGroupCard } from './features/market/components/MarketDashboardGroupCard';
 import { WeeklyPulseReportCard } from './features/pulse/components/WeeklyPulseReportCard';
 import { BestOneLineReviewSpotlightCard } from './features/pulse/components/BestOneLineReviewSpotlightCard';
 import { MarketBoard } from './components/MarketBoard';
@@ -126,23 +124,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ================================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left Column (6/12): 주식 매매 / 시장 현황 (시가총액 TOP3 + 급상승/급하락 TOP3 + 거래량 TOP3) */}
+        {/* Left Column (6/12): 주식 시장 TOP 3 종합 현황 (통합 거대 그룹 대시보드) */}
         <div className="lg:col-span-6 space-y-6">
-          
-          {/* 1. 시가총액 TOP 3 종목 카드 */}
-          <MarketTop3SpotlightCard 
+          <MarketDashboardGroupCard
             politicians={politicians}
-            onSelectPolitician={setSelectedPoliticianId}
-          />
-
-          {/* 2. 어제 거래 급상승 & 급하락 TOP 3 듀얼 카드 */}
-          <MarketGainersLosersDualCard
-            politicians={politicians}
-            onSelectPolitician={setSelectedPoliticianId}
-          />
-
-          {/* 3. 어제 마감 거래량 & 거래대금 TOP 3 종목 카드 */}
-          <YesterdayTopVolumeCard 
             topVolumeList={topVolumeList}
             onSelectPolitician={setSelectedPoliticianId}
           />
@@ -161,7 +146,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ================================================================ */}
       {/* 4. POLI주식 실시간 매매 현황 카드 (CompactMarketGrid) - 1열 Full Width */}
       {/* ================================================================ */}
-      <div className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
+      <div id="compact-market-grid-section" className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
         <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">

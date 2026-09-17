@@ -14,15 +14,16 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
   onSelectPolitician,
 }) => {
   return (
-    <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 className="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-2">
+    <div className="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-3 shadow-md">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h4 className="text-sm font-black text-white tracking-tight flex items-center gap-2">
           <span className="p-1 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-            <BarChart3 className="w-4 h-4" />
+            <BarChart3 className="w-3.5 h-3.5" />
           </span>
           <span>어제 마감 거래량 & 거래대금 TOP 3 종목</span>
         </h4>
-        <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-1 rounded-full border border-cyan-500/30">
+        <span className="text-[10px] font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-0.5 rounded border border-cyan-500/30">
           어제 최종 집계
         </span>
       </div>

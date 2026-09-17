@@ -24,16 +24,16 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
     .slice(0, 3);
 
   return (
-    <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+    <div className="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-3 shadow-md">
       {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 className="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-2">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h4 className="text-sm font-black text-white tracking-tight flex items-center gap-2">
           <span className="p-1 rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/30">
-            <Flame className="w-4 h-4" />
+            <Flame className="w-3.5 h-3.5" />
           </span>
           <span>어제 거래 변동률 TOP 3 (급상승 vs 급하락)</span>
         </h4>
-        <span className="text-xs font-mono font-bold text-slate-300 bg-slate-800 px-2.5 py-1 rounded-full border border-slate-700">
+        <span className="text-[10px] font-mono font-bold text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded border border-slate-700">
           24H 등락률 기준
         </span>
       </div>
