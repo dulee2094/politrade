@@ -28,7 +28,11 @@ function copyRecursive(srcDir, destDir) {
 
 if (fs.existsSync(dest)) {
   console.log('Clearing old upload_for_github directory...');
-  fs.rmSync(dest, { recursive: true, force: true });
+  try {
+    fs.rmSync(dest, { recursive: true, force: true });
+  } catch (err) {
+    console.log('Note: direct rmSync had locked files, proceeding with force overwrite...');
+  }
 }
 
 console.log('Copying fresh source files...');
@@ -36,14 +40,15 @@ copyRecursive(src, dest);
 
 console.log('✅ FORCE COPY COMPLETED SUCCESSFULLY!\n');
 
-const heroPath = path.join(dest, 'src', 'features', 'landing', 'components', 'HeroSection.tsx');
-if (fs.existsSync(heroPath)) {
-  const content = fs.readFileSync(heroPath, 'utf-8');
-  if (content.includes('실시간 민심 펄스와 공적 이슈가 살아있는')) {
-    console.log('🎉 VERIFICATION CONFIRMED: upload_for_github now contains the LATEST HeroSection.tsx!');
+const pulseCardPath = path.join(dest, 'src', 'features', 'pulse', 'components', 'WeeklyPulseReportCard.tsx');
+if (fs.existsSync(pulseCardPath)) {
+  const content = fs.readFileSync(pulseCardPath, 'utf-8');
+  if (content.includes('PULSE DASHBOARD')) {
+    console.log('🎉 VERIFICATION CONFIRMED: upload_for_github contains the LATEST WeeklyPulseReportCard.tsx!');
   } else {
-    console.log('⚠️ WARNING: HeroSection.tsx in upload_for_github still has old content!');
+    console.log('⚠️ WARNING: WeeklyPulseReportCard.tsx in upload_for_github has old content!');
   }
 } else {
-  console.log('⚠️ WARNING: HeroSection.tsx missing in upload_for_github!');
+  console.log('⚠️ WARNING: WeeklyPulseReportCard.tsx missing in upload_for_github!');
 }
+
