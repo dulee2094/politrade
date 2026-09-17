@@ -50,23 +50,23 @@ export const MarketTop3SpotlightCard: React.FC<MarketTop3SpotlightCardProps> = (
               className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-amber-400/60 transition-all cursor-pointer space-y-2.5 group shadow-md hover:-translate-y-1"
             >
               {/* Header inside card */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <div className="flex items-center space-x-2 min-w-0">
                   <PoliticianAvatar
                     src={pol.imageUrl}
                     name={pol.name}
                     party={pol.party}
-                    className="w-9 h-9 rounded-xl"
+                    className="w-9 h-9 rounded-xl shrink-0"
                   />
-                  <div>
-                    <span className="font-extrabold text-xs text-white group-hover:text-amber-300 transition-colors">
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-xs text-white group-hover:text-amber-300 transition-colors whitespace-nowrap block truncate">
                       {pol.name}
                     </span>
-                    <div className="text-[10px] text-slate-400">{pol.party}</div>
+                    <div className="text-[10px] text-slate-400 whitespace-nowrap block truncate">{pol.party}</div>
                   </div>
                 </div>
                 <span
-                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${
+                  className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md shrink-0 whitespace-nowrap ${
                     idx === 0
                       ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
                       : 'bg-slate-800 text-slate-400'

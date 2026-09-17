@@ -60,8 +60,8 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
                 onClick={() => onSelectPolitician(pol.id)}
                 className="bg-slate-900/90 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-800 hover:border-emerald-500/50 transition-all cursor-pointer flex items-center justify-between group shadow-sm"
               >
-                <div className="flex items-center space-x-2.5">
-                  <span className={`w-5 h-5 rounded-md text-[10px] font-black font-mono flex items-center justify-center ${
+                <div className="flex items-center space-x-2 min-w-0">
+                  <span className={`w-5 h-5 rounded-md text-[10px] font-black font-mono flex items-center justify-center shrink-0 ${
                     idx === 0 ? 'bg-emerald-400 text-slate-950' : 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
                   }`}>
                     {idx + 1}
@@ -70,17 +70,17 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
                     src={pol.imageUrl}
                     name={pol.name}
                     party={pol.party}
-                    className="w-8 h-8 rounded-lg"
+                    className="w-8 h-8 rounded-lg shrink-0"
                   />
-                  <div>
-                    <span className="font-extrabold text-xs text-white group-hover:text-emerald-300 transition-colors">
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-xs text-white group-hover:text-emerald-300 transition-colors whitespace-nowrap block truncate">
                       {pol.name}
                     </span>
-                    <div className="text-[10px] text-slate-400">{pol.party}</div>
+                    <div className="text-[10px] text-slate-400 whitespace-nowrap block truncate">{pol.party}</div>
                   </div>
                 </div>
 
-                <div className="text-right font-mono">
+                <div className="text-right font-mono shrink-0 ml-2">
                   <div className="font-extrabold text-emerald-400 text-xs flex items-center justify-end gap-0.5">
                     <TrendingUp className="w-3 h-3" />
                     <span>{formatPercent(pol.change24h)}</span>
@@ -111,8 +111,8 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
                 onClick={() => onSelectPolitician(pol.id)}
                 className="bg-slate-900/90 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-800 hover:border-rose-500/50 transition-all cursor-pointer flex items-center justify-between group shadow-sm"
               >
-                <div className="flex items-center space-x-2.5">
-                  <span className={`w-5 h-5 rounded-md text-[10px] font-black font-mono flex items-center justify-center ${
+                <div className="flex items-center space-x-2 min-w-0">
+                  <span className={`w-5 h-5 rounded-md text-[10px] font-black font-mono flex items-center justify-center shrink-0 ${
                     idx === 0 ? 'bg-rose-500 text-white' : 'bg-slate-800 text-rose-400 border border-rose-500/30'
                   }`}>
                     {idx + 1}
@@ -121,13 +121,13 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
                     src={pol.imageUrl}
                     name={pol.name}
                     party={pol.party}
-                    className="w-8 h-8 rounded-lg"
+                    className="w-8 h-8 rounded-lg shrink-0"
                   />
-                  <div>
-                    <span className="font-extrabold text-xs text-white group-hover:text-rose-300 transition-colors">
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-xs text-white group-hover:text-rose-300 transition-colors whitespace-nowrap block truncate">
                       {pol.name}
                     </span>
-                    <div className="text-[10px] text-slate-400">{pol.party}</div>
+                    <div className="text-[10px] text-slate-400 whitespace-nowrap block truncate">{pol.party}</div>
                   </div>
                 </div>
 
