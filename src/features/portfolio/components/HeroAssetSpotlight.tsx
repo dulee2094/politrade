@@ -67,10 +67,11 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
   const holdingsCount = activeHoldingsList.length;
 
   return (
-    <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5">
+    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/50 p-5 sm:p-6 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-5">
+      <div className="absolute -top-12 -right-12 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
       
       {/* Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-500/20 pb-4">
         <div className="flex items-center space-x-3">
           <div className="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md shrink-0">
             <Wallet className="w-6 h-6" />
@@ -78,7 +79,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-base font-black text-white tracking-wide">마이 자산 대시보드 (Overview)</h2>
-              <span className="bg-slate-800 text-slate-300 text-[10px] px-2.5 py-0.5 rounded-full border border-slate-700 font-mono font-bold flex items-center gap-1">
+              <span className="bg-indigo-500/20 text-indigo-300 text-[10px] px-2.5 py-0.5 rounded-full border border-indigo-500/40 font-mono font-bold flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-amber-400" /> MY PORTFOLIO
               </span>
             </div>
@@ -102,7 +103,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
       {/* ================================================================ */}
       {/* 3대 핵심 카드로만 구성된 대시보드 (3-Column Grid) */}
       {/* ================================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5">
         
         {/* ============================================================ */}
         {/* CARD 1: 💰 총 평가 자산 (Net Worth Card) (4/12) */}
