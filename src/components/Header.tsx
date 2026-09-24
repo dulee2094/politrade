@@ -3,6 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { PressBadge } from '../features/auth/components/PressBadge';
 import { MarketStatusBadge } from '../shared/ui/MarketStatusBadge';
 import { PolitradeLogo } from '../shared/ui/PolitradeLogo';
+import { StockQuickSearch } from '../features/market/components/StockQuickSearch';
 import { formatPoints } from '../core/utils/formatters';
 
 interface HeaderProps {
@@ -20,6 +21,11 @@ export const Header: React.FC<HeaderProps> = ({ onShowLanding }) => {
           {/* Logo & Brand */}
           <div className="flex items-center space-x-3">
             <PolitradeLogo size="md" onClick={() => setActiveTab('dashboard')} />
+          </div>
+
+          {/* Center Stock Quick Search */}
+          <div className="hidden md:block">
+            <StockQuickSearch variant="header" placeholder="🔍 전체 POLI주식 검색 / 호가창 바로가기..." />
           </div>
 
           {/* Right Header Status Bar */}

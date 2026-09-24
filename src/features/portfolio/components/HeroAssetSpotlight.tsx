@@ -226,18 +226,6 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
               </div>
             )}
           </div>
-
-          {/* Quick Action Button: Solid Indigo */}
-          {onGoToMarket && (
-            <button
-              type="button"
-              onClick={onGoToMarket}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs py-3 rounded-xl transition-all shadow-md border border-indigo-400/30 flex items-center justify-center space-x-1.5"
-            >
-              <ShoppingBag className="w-4 h-4 text-amber-300" />
-              <span>📈 주식 매매하러 가기</span>
-            </button>
-          )}
         </div>
 
         {/* ============================================================ */}
@@ -299,18 +287,6 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
               <span className="font-bold text-indigo-300 font-mono">+100,000P</span>
             </div>
           </div>
-
-          {/* Quick Action Button: Solid High-Contrast Amber */}
-          {onOpenVoteModal && (
-            <button
-              type="button"
-              onClick={onOpenVoteModal}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center space-x-1.5"
-            >
-              <Vote className="w-4 h-4 fill-slate-950 text-slate-950" />
-              <span>{hasVotedToday ? '오늘 투표 완료 (수정하기)' : '🗳️ 오늘의 펄스 투표하기 (+1,000P)'}</span>
-            </button>
-          )}
         </div>
 
       </div>

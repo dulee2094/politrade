@@ -6,9 +6,10 @@ import { INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
 
 interface OrderBookWidgetProps {
   politician: Politician;
+  onSelectPrice?: (price: number) => void;
 }
 
-export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician }) => {
+export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician, onSelectPrice }) => {
   const isIPO = politician.phase === 'IPO';
   
   const targetShares = politician.ipoTargetShares || 10;
@@ -25,7 +26,7 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician }) 
             </span>
             <span className="text-xs font-bold text-white">공모가 정액 청약 단계</span>
           </div>
-          <span className="text-xs font-mono text-amber-400 font-bold">공모가 100,000 P / 주</span>
+          <span className="text-xs font-mono text-amber-400 font-bold">공모가 10,000 P / 주</span>
         </div>
 
         {/* Progress Bar */}
@@ -62,15 +63,20 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician }) 
           <Layers className="w-4 h-4 text-blue-400" />
           <span>실시간 5단계 호가창 (Phase 2)</span>
         </div>
-        <span className="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded-md font-mono border border-emerald-500/30">
-          실제 호가 체결
+        <span className="text-[10px] text-slate-400 font-sans">
+          💡 호가 클릭 시 주문 가격 자동 입력
         </span>
       </div>
 
       <div className="space-y-1">
         {/* Asks (Sell Orders - Red) */}
         {asks.slice().reverse().map((ask, i) => (
-          <div key={'ask_' + i} className="flex items-center justify-between p-1.5 rounded-lg bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 transition-colors">
+          <div
+            key={'ask_' + i}
+            onClick={() => onSelectPrice && onSelectPrice(ask.price)}
+            className="flex items-center justify-between p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-300 transition-colors cursor-pointer border border-transparent hover:border-rose-500/40"
+            title={`${formatPoints(ask.price)} 호가 선택`}
+          >
             <span className="text-[10px] text-rose-400 font-sans">매도 {asks.length - i}</span>
             <span className="font-bold">{formatPoints(ask.price)}</span>
             <span className="text-[11px] text-slate-300">{ask.shares}주</span>
@@ -78,14 +84,23 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician }) 
         ))}
 
         {/* Current Price Banner */}
-        <div className="p-2 my-1 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-between text-white font-bold">
+        <div
+          onClick={() => onSelectPrice && onSelectPrice(politician.currentPrice || 10000)}
+          className="p-2 my-1 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 flex items-center justify-between text-white font-bold cursor-pointer transition-colors"
+          title="현재 체결가 선택"
+        >
           <span className="text-[10px] font-sans text-slate-400">현재 체결가</span>
           <span className="text-sm font-mono text-amber-400">{formatPoints(politician.currentPrice || 10000)}</span>
         </div>
 
         {/* Bids (Buy Orders - Green) */}
         {bids.map((bid, i) => (
-          <div key={'bid_' + i} className="flex items-center justify-between p-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-colors">
+          <div
+            key={'bid_' + i}
+            onClick={() => onSelectPrice && onSelectPrice(bid.price)}
+            className="flex items-center justify-between p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-300 transition-colors cursor-pointer border border-transparent hover:border-emerald-500/40"
+            title={`${formatPoints(bid.price)} 호가 선택`}
+          >
             <span className="text-[10px] text-emerald-400 font-sans">매수 {i + 1}</span>
             <span className="font-bold">{formatPoints(bid.price)}</span>
             <span className="text-[11px] text-slate-300">{bid.shares}주</span>

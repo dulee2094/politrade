@@ -5,10 +5,13 @@ export interface LimitOrder {
   userId: string;
   userName: string;
   politicianId: string;
+  politicianName?: string;
   type: 'BUY' | 'SELL';
+  orderClass: 'LIMIT' | 'MARKET';
   price: number;
   shares: number;
   remainingShares: number;
+  status: 'PENDING' | 'PARTIALLY_FILLED' | 'FILLED' | 'CANCELLED';
   createdAt: string;
 }
 

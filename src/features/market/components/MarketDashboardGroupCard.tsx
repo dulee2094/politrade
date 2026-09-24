@@ -24,13 +24,13 @@ export const MarketDashboardGroupCard: React.FC<MarketDashboardGroupCardProps> =
   };
 
   return (
-    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
+    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border border-blue-500/30 shadow-2xl space-y-4">
       
       {/* Left Main Dashboard Top Header */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-10 h-10 rounded-2xl bg-blue-500 text-slate-950 flex items-center justify-center shadow-lg shrink-0">
-            <TrendingUp className="w-5 h-5 text-slate-950" />
+          <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shrink-0">
+            <TrendingUp className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">
             <h3 className="text-lg font-black text-white flex items-center gap-2 flex-wrap tracking-tight">
@@ -48,9 +48,9 @@ export const MarketDashboardGroupCard: React.FC<MarketDashboardGroupCardProps> =
         <button
           type="button"
           onClick={scrollToMarketGrid}
-          className="px-3.5 py-2 rounded-xl font-bold text-xs transition-all bg-blue-900/60 hover:bg-blue-800 text-blue-200 border border-blue-500/40 flex items-center space-x-1.5 whitespace-nowrap shrink-0 shadow-md"
+          className="px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all bg-blue-600 hover:bg-blue-500 text-white border border-blue-400/40 flex items-center space-x-1.5 whitespace-nowrap shrink-0 shadow-lg shadow-blue-500/20"
         >
-          <span>전체 종목 매매</span>
+          <span>📈 주식 매매하러 가기</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>

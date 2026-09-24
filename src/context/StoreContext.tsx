@@ -4,7 +4,8 @@ import { INITIAL_POLITICIANS } from '../data/mockPoliticians';
 import { INITIAL_COMMENTS } from '../data/mockCommunity';
 import { checkMonthlyAllowance } from '../core/allowance/monthlyAllowance';
 import { getMarketStatus } from '../core/trading/marketHours';
-import { INITIAL_IPO_PRICE, INITIAL_IPO_TARGET_SHARES, generateMockOrderBook, matchOrderBook } from '../core/orderbook/orderbookEngine';
+import { LimitOrder } from '../core/orderbook/orderbookTypes';
+import { INITIAL_IPO_PRICE, INITIAL_IPO_TARGET_SHARES, generateMockOrderBook, matchOrderBook, executeOrderBookMatch, cancelLimitOrderInBook } from '../core/orderbook/orderbookEngine';
 import { generateMarketBriefing, DailyMarketBriefing } from '../core/trading/marketBriefing';
 
 export interface ExtendedUserProfile extends UserProfile {
@@ -12,6 +13,7 @@ export interface ExtendedUserProfile extends UserProfile {
   pressName?: string;
   verifiedEmail?: string;
   lastAllowanceMonth?: string;
+  openOrders?: LimitOrder[];
 }
 
 interface StoreContextType {
@@ -29,6 +31,8 @@ interface StoreContextType {
   setAllowanceNotice: (msg: string | null) => void;
   
   // Actions
+  placeOrder: (politicianId: string, orderClass: 'LIMIT' | 'MARKET', type: 'BUY' | 'SELL', price: number, shares: number) => { success: boolean; message: string };
+  cancelOrder: (orderId: string) => { success: boolean; message: string };
   buyStock: (politicianId: string, shares: number) => { success: boolean; message: string };
   sellStock: (politicianId: string, shares: number) => { success: boolean; message: string };
   addComment: (politicianId: string, content: string) => void;
@@ -104,6 +108,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         initialUser = {
           ...parsed,
           holdings: parsed.holdings || {},
+          openOrders: parsed.openOrders || [],
           tradeHistory: parsed.tradeHistory || [],
         };
       } catch (e) {
@@ -113,6 +118,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           balance: 300000,
           initialBalance: 300000,
           holdings: {},
+          openOrders: [],
           tradeHistory: [],
           isReporterVerified: true,
           pressName: 'KBS',
@@ -126,6 +132,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         balance: 300000,
         initialBalance: 300000,
         holdings: {},
+        openOrders: [],
         tradeHistory: [],
         isReporterVerified: true,
         pressName: 'KBS',
@@ -172,8 +179,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }));
   };
 
-  const buyStock = (politicianId: string, shares: number) => {
-    // Check Market Hours Enforcement (24H Test Bypass enabled)
+  const placeOrder = (
+    politicianId: string,
+    orderClass: 'LIMIT' | 'MARKET',
+    type: 'BUY' | 'SELL',
+    targetPrice: number,
+    shares: number
+  ): { success: boolean; message: string } => {
     const mStatus = getMarketStatus();
     if (!mStatus.isOpen) {
       return {
@@ -184,56 +196,247 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const targetPol = getPoliticianById(politicianId);
     if (!targetPol) return { success: false, message: '정치인 정보를 찾을 수 없습니다.' };
-    if (shares <= 0) return { success: false, message: '올바른 매수 수량을 입력해 주세요.' };
+    if (shares <= 0) return { success: false, message: '올바른 수량을 입력해 주세요.' };
 
     const isIPO = targetPol.phase === 'IPO';
-
     if (isIPO) {
-      // Phase 1: Fixed 10,000 P Public Offering (10 Shares target for testing)
-      const totalCost = shares * INITIAL_IPO_PRICE;
-      if (user.balance < totalCost) {
+      if (type === 'BUY') {
+        const totalCost = shares * INITIAL_IPO_PRICE;
+        if (user.balance < totalCost) {
+          return {
+            success: false,
+            message: `포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`,
+          };
+        }
+
+        const newSold = targetPol.ipoSoldShares + shares;
+        const isCompleted = newSold >= targetPol.ipoTargetShares;
+
+        const nowStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+        const newHistory = [...targetPol.priceHistory, { time: nowStr, price: INITIAL_IPO_PRICE, volume: shares * 100 }];
+        if (newHistory.length > 20) newHistory.shift();
+
+        let updatedPolsList: Politician[] = [];
+        setPoliticians(prev => {
+          updatedPolsList = prev.map(p => {
+            if (p.id !== politicianId) return p;
+            return {
+              ...p,
+              phase: isCompleted ? 'ORDER_BOOK' : 'IPO',
+              ipoSoldShares: Math.min(p.ipoTargetShares, newSold),
+              currentPrice: INITIAL_IPO_PRICE,
+              volume24h: p.volume24h + totalCost,
+              totalVolume: p.totalVolume + totalCost,
+              priceHistory: newHistory,
+              orderBook: isCompleted ? generateMockOrderBook(INITIAL_IPO_PRICE) : p.orderBook,
+            };
+          });
+          return updatedPolsList;
+        });
+
+        const newOrder: TradeOrder = {
+          id: 'ord_' + Date.now(),
+          politicianId,
+          politicianName: targetPol.name,
+          type: 'BUY',
+          shares,
+          pricePerShare: INITIAL_IPO_PRICE,
+          totalPoints: totalCost,
+          timestamp: new Date().toLocaleString('ko-KR'),
+        };
+
+        setUser(prevUser => {
+          const userHoldings = prevUser.holdings || {};
+          const existingHolding: Holding = userHoldings[politicianId] || {
+            politicianId,
+            shares: 0,
+            avgPrice: 0,
+            totalInvested: 0,
+          };
+
+          const newTotalShares = existingHolding.shares + shares;
+          const newTotalInvested = existingHolding.totalInvested + totalCost;
+          const newAvgPrice = Math.round(newTotalInvested / newTotalShares);
+
+          return {
+            ...prevUser,
+            balance: prevUser.balance - totalCost,
+            holdings: {
+              ...userHoldings,
+              [politicianId]: {
+                politicianId,
+                shares: newTotalShares,
+                avgPrice: newAvgPrice,
+                totalInvested: newTotalInvested,
+              },
+            },
+            tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
+          };
+        });
+
+        setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
+
+        if (isCompleted) {
+          alert(`🎉 축하합니다! ${targetPol.name} POLI주식이 10주 공모 완판되어 Phase 2 실시간 호가창 정규 시장으로 즉시 상장 전환되었습니다!`);
+        }
+
+        return {
+          success: true,
+          message: `[Phase 1 공모 청약] ${targetPol.name} POLI주식 ${shares}주 공모가(10,000 P) 매수 완료!`,
+        };
+      } else {
+        const userHoldings = user.holdings || {};
+        const userHolding = userHoldings[politicianId];
+        if (!userHolding || userHolding.shares < shares) {
+          return { success: false, message: '매도 가능한 보유 주식이 부족합니다.' };
+        }
+
+        const totalRefund = shares * INITIAL_IPO_PRICE;
+        const nowStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+        let updatedPolsList: Politician[] = [];
+        setPoliticians(prev => {
+          updatedPolsList = prev.map(p => {
+            if (p.id !== politicianId) return p;
+            const newHistory = [...p.priceHistory, { time: nowStr, price: INITIAL_IPO_PRICE, volume: shares * 100 }];
+            if (newHistory.length > 20) newHistory.shift();
+
+            return {
+              ...p,
+              ipoSoldShares: Math.max(0, p.ipoSoldShares - shares),
+              volume24h: p.volume24h + totalRefund,
+              totalVolume: p.totalVolume + totalRefund,
+              priceHistory: newHistory,
+            };
+          });
+          return updatedPolsList;
+        });
+
+        const newOrder: TradeOrder = {
+          id: 'ord_' + Date.now(),
+          politicianId,
+          politicianName: targetPol.name,
+          type: 'SELL',
+          shares,
+          pricePerShare: INITIAL_IPO_PRICE,
+          totalPoints: totalRefund,
+          timestamp: new Date().toLocaleString('ko-KR'),
+        };
+
+        setUser(prevUser => {
+          const remainingShares = userHolding.shares - shares;
+          const updatedHoldings = { ...(prevUser.holdings || {}) };
+
+          if (remainingShares === 0) {
+            delete updatedHoldings[politicianId];
+          } else {
+            const costBasisSold = userHolding.avgPrice * shares;
+            updatedHoldings[politicianId] = {
+              ...userHolding,
+              shares: remainingShares,
+              totalInvested: Math.max(0, userHolding.totalInvested - costBasisSold),
+            };
+          }
+
+          return {
+            ...prevUser,
+            balance: prevUser.balance + totalRefund,
+            holdings: updatedHoldings,
+            tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
+          };
+        });
+
+        setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
+
+        return {
+          success: true,
+          message: `[Phase 1 공모 환불] ${targetPol.name} POLI주식 ${shares}주 공모가(10,000 P) 매도 완료! (+${totalRefund.toLocaleString()} P 입금)`,
+        };
+      }
+    }
+
+    // Phase 2: Real Order Book Matching
+    const validPrice = orderClass === 'LIMIT' && targetPrice > 0 ? Math.round(targetPrice) : targetPol.currentPrice;
+
+    if (type === 'BUY') {
+      const maxBudgetRequired = validPrice * shares;
+      if (user.balance < maxBudgetRequired) {
         return {
           success: false,
-          message: `포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`,
+          message: `포인트가 부족합니다. (필요: ${maxBudgetRequired.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`,
         };
       }
 
-      const newSold = targetPol.ipoSoldShares + shares;
-      const isCompleted = newSold >= targetPol.ipoTargetShares;
+      const matchRes = executeOrderBookMatch(
+        targetPol.orderBook || generateMockOrderBook(targetPol.currentPrice),
+        orderClass,
+        'BUY',
+        validPrice,
+        shares
+      );
 
+      const executedShares = matchRes.executedShares;
+      const unfilledShares = matchRes.unfilledShares;
+      const totalCostExecuted = matchRes.totalCostOrRefund;
+      const lockedUnfilledCost = (orderClass === 'LIMIT' && unfilledShares > 0) ? unfilledShares * validPrice : 0;
+      const totalDeductedBalance = totalCostExecuted + lockedUnfilledCost;
+
+      const newSpotPrice = matchRes.newSpotPrice || targetPol.currentPrice;
+      const newChange24h = parseFloat((((newSpotPrice - targetPol.previousClose) / targetPol.previousClose) * 100).toFixed(2));
       const nowStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-      const newHistory = [...targetPol.priceHistory, { time: nowStr, price: INITIAL_IPO_PRICE, volume: shares * 100 }];
-      if (newHistory.length > 20) newHistory.shift();
 
       let updatedPolsList: Politician[] = [];
-
       setPoliticians(prev => {
         updatedPolsList = prev.map(p => {
           if (p.id !== politicianId) return p;
+          const newHistory = [...p.priceHistory, { time: nowStr, price: newSpotPrice, volume: shares * 100 }];
+          if (newHistory.length > 20) newHistory.shift();
+
           return {
             ...p,
-            phase: isCompleted ? 'ORDER_BOOK' : 'IPO',
-            ipoSoldShares: Math.min(p.ipoTargetShares, newSold),
-            currentPrice: INITIAL_IPO_PRICE,
-            volume24h: p.volume24h + totalCost,
-            totalVolume: p.totalVolume + totalCost,
+            currentPrice: newSpotPrice,
+            change24h: newChange24h,
+            high24h: Math.max(p.high24h, newSpotPrice),
+            volume24h: p.volume24h + totalCostExecuted,
+            totalVolume: p.totalVolume + totalCostExecuted,
             priceHistory: newHistory,
-            orderBook: isCompleted ? generateMockOrderBook(INITIAL_IPO_PRICE) : p.orderBook,
+            orderBook: matchRes.updatedOrderBook,
           };
         });
         return updatedPolsList;
       });
 
-      const newOrder: TradeOrder = {
-        id: 'ord_' + Date.now(),
-        politicianId,
-        politicianName: targetPol.name,
-        type: 'BUY',
-        shares,
-        pricePerShare: INITIAL_IPO_PRICE,
-        totalPoints: totalCost,
-        timestamp: new Date().toLocaleString('ko-KR'),
-      };
+      let newOrder: TradeOrder | null = null;
+      if (executedShares > 0) {
+        newOrder = {
+          id: 'ord_' + Date.now(),
+          politicianId,
+          politicianName: targetPol.name,
+          type: 'BUY',
+          shares: executedShares,
+          pricePerShare: matchRes.avgExecutedPrice,
+          totalPoints: totalCostExecuted,
+          timestamp: new Date().toLocaleString('ko-KR'),
+        };
+      }
+
+      let newOpenOrder: LimitOrder | null = null;
+      if (orderClass === 'LIMIT' && unfilledShares > 0) {
+        newOpenOrder = {
+          id: 'lmt_' + Date.now(),
+          userId: user.name,
+          userName: user.name,
+          politicianId,
+          politicianName: targetPol.name,
+          type: 'BUY',
+          orderClass: 'LIMIT',
+          price: validPrice,
+          shares,
+          remainingShares: unfilledShares,
+          status: executedShares > 0 ? 'PARTIALLY_FILLED' : 'PENDING',
+          createdAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+        };
+      }
 
       setUser(prevUser => {
         const userHoldings = prevUser.holdings || {};
@@ -244,285 +447,243 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           totalInvested: 0,
         };
 
-        const newTotalShares = existingHolding.shares + shares;
-        const newTotalInvested = existingHolding.totalInvested + totalCost;
-        const newAvgPrice = Math.round(newTotalInvested / newTotalShares);
+        const newTotalShares = existingHolding.shares + executedShares;
+        const newTotalInvested = existingHolding.totalInvested + totalCostExecuted;
+        const newAvgPrice = newTotalShares > 0 ? Math.round(newTotalInvested / newTotalShares) : 0;
 
-        return {
-          ...prevUser,
-          balance: prevUser.balance - totalCost,
-          holdings: {
-            ...userHoldings,
-            [politicianId]: {
-              politicianId,
-              shares: newTotalShares,
-              avgPrice: newAvgPrice,
-              totalInvested: newTotalInvested,
-            },
-          },
-          tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
-        };
-      });
-
-      // Update Briefing Instantly on Real Execution
-      setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
-
-      if (isCompleted) {
-        alert(`🎉 축하합니다! ${targetPol.name} POLI주식이 10주 공모 완판되어 Phase 2 실시간 호가창 정규 시장으로 즉시 상장 전환되었습니다!`);
-      }
-
-      return {
-        success: true,
-        message: `[Phase 1 공모 청약] ${targetPol.name} POLI주식 ${shares}주 공모가(10,000 P) 매수 완료!`,
-      };
-    }
-
-    // Phase 2: Real Order Book Execution
-    const obMatch = matchOrderBook(targetPol.orderBook || generateMockOrderBook(targetPol.currentPrice), 'BUY', targetPol.currentPrice + 1000, shares);
-    const totalCost = obMatch.totalCostOrRefund || shares * targetPol.currentPrice;
-
-    if (user.balance < totalCost) {
-      return { 
-        success: false, 
-        message: `포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)` 
-      };
-    }
-
-    const newSpotPrice = obMatch.avgExecutedPrice || targetPol.currentPrice;
-    const newChange24h = parseFloat((((newSpotPrice - targetPol.previousClose) / targetPol.previousClose) * 100).toFixed(2));
-    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-
-    let updatedPolsList: Politician[] = [];
-
-    setPoliticians(prev => {
-      updatedPolsList = prev.map(p => {
-        if (p.id !== politicianId) return p;
-        const newHistory = [...p.priceHistory, { time: nowStr, price: newSpotPrice, volume: shares * 100 }];
-        if (newHistory.length > 20) newHistory.shift();
-
-        return {
-          ...p,
-          currentPrice: newSpotPrice,
-          change24h: newChange24h,
-          high24h: Math.max(p.high24h, newSpotPrice),
-          volume24h: p.volume24h + totalCost,
-          totalVolume: p.totalVolume + totalCost,
-          priceHistory: newHistory,
-          orderBook: obMatch.updatedOrderBook,
-        };
-      });
-      return updatedPolsList;
-    });
-
-    const newOrder: TradeOrder = {
-      id: 'ord_' + Date.now(),
-      politicianId,
-      politicianName: targetPol.name,
-      type: 'BUY',
-      shares,
-      pricePerShare: obMatch.avgExecutedPrice,
-      totalPoints: totalCost,
-      timestamp: new Date().toLocaleString('ko-KR'),
-    };
-
-    setUser(prevUser => {
-      const userHoldings = prevUser.holdings || {};
-      const existingHolding: Holding = userHoldings[politicianId] || {
-        politicianId,
-        shares: 0,
-        avgPrice: 0,
-        totalInvested: 0,
-      };
-
-      const newTotalShares = existingHolding.shares + shares;
-      const newTotalInvested = existingHolding.totalInvested + totalCost;
-      const newAvgPrice = Math.round(newTotalInvested / newTotalShares);
-
-      return {
-        ...prevUser,
-        balance: prevUser.balance - totalCost,
-        holdings: {
-          ...userHoldings,
-          [politicianId]: {
+        const updatedHoldings = { ...userHoldings };
+        if (newTotalShares > 0) {
+          updatedHoldings[politicianId] = {
             politicianId,
             shares: newTotalShares,
             avgPrice: newAvgPrice,
             totalInvested: newTotalInvested,
-          },
-        },
-        tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
-      };
-    });
+          };
+        }
 
-    // Update Briefing Instantly on Real Execution
-    setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
+        const prevOpenOrders = prevUser.openOrders || [];
+        const nextOpenOrders = newOpenOrder ? [newOpenOrder, ...prevOpenOrders] : prevOpenOrders;
+        const prevTradeHistory = prevUser.tradeHistory || [];
+        const nextTradeHistory = newOrder ? [newOrder, ...prevTradeHistory] : prevTradeHistory;
 
-    return { 
-      success: true, 
-      message: `[Phase 2 호가 체결] ${targetPol.name} POLI주식 ${shares}주 매수 완료! (${totalCost.toLocaleString()} P 차감)` 
-    };
-  };
+        return {
+          ...prevUser,
+          balance: prevUser.balance - totalDeductedBalance,
+          holdings: updatedHoldings,
+          openOrders: nextOpenOrders,
+          tradeHistory: nextTradeHistory,
+        };
+      });
 
-  const sellStock = (politicianId: string, shares: number) => {
-    // Check Market Hours Enforcement (24H Test Bypass enabled)
-    const mStatus = getMarketStatus();
-    if (!mStatus.isOpen) {
-      return {
-        success: false,
-        message: `🔴 장 마감: POLI주식 매매는 매일 12:00 ~ 14:00 정규장에만 가능합니다. (${mStatus.countdownText})`,
-      };
-    }
+      if (newOrder) {
+        setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
+      }
 
-    const targetPol = getPoliticianById(politicianId);
-    if (!targetPol) return { success: false, message: '정치인 정보를 찾을 수 없습니다.' };
+      if (executedShares > 0 && unfilledShares > 0) {
+        return {
+          success: true,
+          message: `[지정가 매수 부분체결] ${executedShares}주 체결 완료! 남은 ${unfilledShares}주는 ${validPrice.toLocaleString()} P에 매수 호가 등록되었습니다.`,
+        };
+      } else if (executedShares > 0) {
+        return {
+          success: true,
+          message: `[매수 체결 완료] ${targetPol.name} POLI주식 ${executedShares}주 매수 완료! (${totalCostExecuted.toLocaleString()} P 차감)`,
+        };
+      } else {
+        return {
+          success: true,
+          message: `[지정가 매수 대기] ${validPrice.toLocaleString()} P에 ${unfilledShares}주 매수 호가 등록 완료! (미체결 포인트 락업)`,
+        };
+      }
 
-    const userHoldings = user.holdings || {};
-    const userHolding = userHoldings[politicianId];
-    if (!userHolding || userHolding.shares < shares) {
-      return { success: false, message: '매도 가능한 보유 주식이 부족합니다.' };
-    }
-    if (shares <= 0) return { success: false, message: '올바른 매도 수량을 입력해 주세요.' };
+    } else {
+      // SELL ORDER
+      const userHoldings = user.holdings || {};
+      const userHolding = userHoldings[politicianId];
 
-    const isIPO = targetPol.phase === 'IPO';
+      const lockedSellShares = (user.openOrders || [])
+        .filter(o => o.politicianId === politicianId && o.type === 'SELL')
+        .reduce((acc, o) => acc + o.remainingShares, 0);
 
-    if (isIPO) {
-      // Phase 1 fixed refund
-      const totalRefund = shares * INITIAL_IPO_PRICE;
+      const availableShares = (userHolding ? userHolding.shares : 0) - lockedSellShares;
+
+      if (availableShares < shares) {
+        return { success: false, message: `매도 가능한 보유 주식이 부족합니다. (가능: ${availableShares}주 / 주문: ${shares}주)` };
+      }
+
+      const matchRes = executeOrderBookMatch(
+        targetPol.orderBook || generateMockOrderBook(targetPol.currentPrice),
+        orderClass,
+        'SELL',
+        validPrice,
+        shares
+      );
+
+      const executedShares = matchRes.executedShares;
+      const unfilledShares = matchRes.unfilledShares;
+      const totalRefundExecuted = matchRes.totalCostOrRefund;
+
+      const newSpotPrice = matchRes.newSpotPrice || targetPol.currentPrice;
+      const newChange24h = parseFloat((((newSpotPrice - targetPol.previousClose) / targetPol.previousClose) * 100).toFixed(2));
       const nowStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 
       let updatedPolsList: Politician[] = [];
-
       setPoliticians(prev => {
         updatedPolsList = prev.map(p => {
           if (p.id !== politicianId) return p;
-          const newHistory = [...p.priceHistory, { time: nowStr, price: INITIAL_IPO_PRICE, volume: shares * 100 }];
+          const newHistory = [...p.priceHistory, { time: nowStr, price: newSpotPrice, volume: shares * 100 }];
           if (newHistory.length > 20) newHistory.shift();
 
           return {
             ...p,
-            ipoSoldShares: Math.max(0, p.ipoSoldShares - shares),
-            volume24h: p.volume24h + totalRefund,
-            totalVolume: p.totalVolume + totalRefund,
+            currentPrice: newSpotPrice,
+            change24h: newChange24h,
+            low24h: Math.min(p.low24h, newSpotPrice),
+            volume24h: p.volume24h + totalRefundExecuted,
+            totalVolume: p.totalVolume + totalRefundExecuted,
             priceHistory: newHistory,
+            orderBook: matchRes.updatedOrderBook,
           };
         });
         return updatedPolsList;
       });
 
-      const newOrder: TradeOrder = {
-        id: 'ord_' + Date.now(),
-        politicianId,
-        politicianName: targetPol.name,
-        type: 'SELL',
-        shares,
-        pricePerShare: INITIAL_IPO_PRICE,
-        totalPoints: totalRefund,
-        timestamp: new Date().toLocaleString('ko-KR'),
-      };
+      let newOrder: TradeOrder | null = null;
+      if (executedShares > 0) {
+        newOrder = {
+          id: 'ord_' + Date.now(),
+          politicianId,
+          politicianName: targetPol.name,
+          type: 'SELL',
+          shares: executedShares,
+          pricePerShare: matchRes.avgExecutedPrice,
+          totalPoints: totalRefundExecuted,
+          timestamp: new Date().toLocaleString('ko-KR'),
+        };
+      }
+
+      let newOpenOrder: LimitOrder | null = null;
+      if (orderClass === 'LIMIT' && unfilledShares > 0) {
+        newOpenOrder = {
+          id: 'lmt_' + Date.now(),
+          userId: user.name,
+          userName: user.name,
+          politicianId,
+          politicianName: targetPol.name,
+          type: 'SELL',
+          orderClass: 'LIMIT',
+          price: validPrice,
+          shares,
+          remainingShares: unfilledShares,
+          status: executedShares > 0 ? 'PARTIALLY_FILLED' : 'PENDING',
+          createdAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+        };
+      }
 
       setUser(prevUser => {
-        const remainingShares = userHolding.shares - shares;
+        const remainingHoldingShares = userHolding.shares - executedShares;
         const updatedHoldings = { ...(prevUser.holdings || {}) };
 
-        if (remainingShares === 0) {
+        if (remainingHoldingShares <= 0) {
           delete updatedHoldings[politicianId];
         } else {
-          const costBasisSold = userHolding.avgPrice * shares;
+          const costBasisSold = userHolding.avgPrice * executedShares;
           updatedHoldings[politicianId] = {
             ...userHolding,
-            shares: remainingShares,
+            shares: remainingHoldingShares,
             totalInvested: Math.max(0, userHolding.totalInvested - costBasisSold),
           };
         }
 
+        const prevOpenOrders = prevUser.openOrders || [];
+        const nextOpenOrders = newOpenOrder ? [newOpenOrder, ...prevOpenOrders] : prevOpenOrders;
+        const prevTradeHistory = prevUser.tradeHistory || [];
+        const nextTradeHistory = newOrder ? [newOrder, ...prevTradeHistory] : prevTradeHistory;
+
         return {
           ...prevUser,
-          balance: prevUser.balance + totalRefund,
+          balance: prevUser.balance + totalRefundExecuted,
           holdings: updatedHoldings,
-          tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
+          openOrders: nextOpenOrders,
+          tradeHistory: nextTradeHistory,
         };
       });
 
-      // Update Briefing Instantly on Real Execution
-      setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
+      if (newOrder) {
+        setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
+      }
 
-      return {
-        success: true,
-        message: `[Phase 1 공모 환불] ${targetPol.name} POLI주식 ${shares}주 공모가(10,000 P) 매도 완료! (+${totalRefund.toLocaleString()} P 입금)`,
-      };
+      if (executedShares > 0 && unfilledShares > 0) {
+        return {
+          success: true,
+          message: `[지정가 매도 부분체결] ${executedShares}주 체결 완료! 남은 ${unfilledShares}주는 ${validPrice.toLocaleString()} P에 매도 호가 등록되었습니다.`,
+        };
+      } else if (executedShares > 0) {
+        return {
+          success: true,
+          message: `[매도 체결 완료] ${targetPol.name} POLI주식 ${executedShares}주 매도 완료! (+${totalRefundExecuted.toLocaleString()} P 입금)`,
+        };
+      } else {
+        return {
+          success: true,
+          message: `[지정가 매도 대기] ${validPrice.toLocaleString()} P에 ${unfilledShares}주 매도 호가 등록 완료! (미체결 주식 락업)`,
+        };
+      }
+    }
+  };
+
+  const cancelOrder = (orderId: string): { success: boolean; message: string } => {
+    const openOrders = user.openOrders || [];
+    const targetOrder = openOrders.find(o => o.id === orderId);
+    if (!targetOrder) {
+      return { success: false, message: '해당 미체결 주문을 찾을 수 없습니다.' };
     }
 
-    // Phase 2: Real Order Book Match Sell
-    const obMatch = matchOrderBook(targetPol.orderBook || generateMockOrderBook(targetPol.currentPrice), 'SELL', Math.max(1, targetPol.currentPrice - 1000), shares);
-    const totalRefund = obMatch.totalCostOrRefund || shares * targetPol.currentPrice;
+    const politician = getPoliticianById(targetOrder.politicianId);
+    const curPrice = politician?.currentPrice || targetOrder.price;
 
-    const newSpotPrice = obMatch.avgExecutedPrice || targetPol.currentPrice;
-    const newChange24h = parseFloat((((newSpotPrice - targetPol.previousClose) / targetPol.previousClose) * 100).toFixed(2));
-    const nowStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-
-    let updatedPolsList: Politician[] = [];
-
-    setPoliticians(prev => {
-      updatedPolsList = prev.map(p => {
-        if (p.id !== politicianId) return p;
-        const newHistory = [...p.priceHistory, { time: nowStr, price: newSpotPrice, volume: shares * 100 }];
-        if (newHistory.length > 20) newHistory.shift();
-
+    if (politician) {
+      setPoliticians(prev => prev.map(p => {
+        if (p.id !== targetOrder.politicianId) return p;
         return {
           ...p,
-          currentPrice: newSpotPrice,
-          change24h: newChange24h,
-          low24h: Math.min(p.low24h, newSpotPrice),
-          volume24h: p.volume24h + totalRefund,
-          totalVolume: p.totalVolume + totalRefund,
-          priceHistory: newHistory,
-          orderBook: obMatch.updatedOrderBook,
+          orderBook: cancelLimitOrderInBook(p.orderBook, targetOrder.type, targetOrder.price, targetOrder.remainingShares, curPrice),
         };
-      });
-      return updatedPolsList;
-    });
-
-    const newOrder: TradeOrder = {
-      id: 'ord_' + Date.now(),
-      politicianId,
-      politicianName: targetPol.name,
-      type: 'SELL',
-      shares,
-      pricePerShare: obMatch.avgExecutedPrice,
-      totalPoints: totalRefund,
-      timestamp: new Date().toLocaleString('ko-KR'),
-    };
+      }));
+    }
 
     setUser(prevUser => {
-      const remainingShares = userHolding.shares - shares;
-      const updatedHoldings = { ...(prevUser.holdings || {}) };
+      const remainingOpenOrders = (prevUser.openOrders || []).filter(o => o.id !== orderId);
+      let newBalance = prevUser.balance;
 
-      if (remainingShares === 0) {
-        delete updatedHoldings[politicianId];
-      } else {
-        const costBasisSold = userHolding.avgPrice * shares;
-        updatedHoldings[politicianId] = {
-          ...userHolding,
-          shares: remainingShares,
-          totalInvested: Math.max(0, userHolding.totalInvested - costBasisSold),
-        };
+      if (targetOrder.type === 'BUY') {
+        const refundPoints = targetOrder.remainingShares * targetOrder.price;
+        newBalance += refundPoints;
       }
 
       return {
         ...prevUser,
-        balance: prevUser.balance + totalRefund,
-        holdings: updatedHoldings,
-        tradeHistory: [newOrder, ...(prevUser.tradeHistory || [])],
+        balance: newBalance,
+        openOrders: remainingOpenOrders,
       };
     });
 
-    // Update Briefing Instantly on Real Execution
-    setBriefing(generateMarketBriefing(updatedPolsList.length > 0 ? updatedPolsList : politicians, newOrder));
-
-    return { 
-      success: true, 
-      message: `[Phase 2 호가 체결] ${targetPol.name} POLI주식 ${shares}주 매도 완료! (+${totalRefund.toLocaleString()} P 입금)` 
+    return {
+      success: true,
+      message: `미체결 ${targetOrder.type === 'BUY' ? '매수' : '매도'} 주문 (${targetOrder.remainingShares}주) 취소 완료!`,
     };
+  };
+
+  const buyStock = (politicianId: string, shares: number) => {
+    const targetPol = getPoliticianById(politicianId);
+    const price = targetPol?.currentPrice || 10000;
+    return placeOrder(politicianId, 'MARKET', 'BUY', price, shares);
+  };
+
+  const sellStock = (politicianId: string, shares: number) => {
+    const targetPol = getPoliticianById(politicianId);
+    const price = targetPol?.currentPrice || 10000;
+    return placeOrder(politicianId, 'MARKET', 'SELL', price, shares);
   };
 
   const addComment = (politicianId: string, content: string) => {
@@ -575,6 +736,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setIsSignUpModalOpen,
         allowanceNotice,
         setAllowanceNotice,
+        placeOrder,
+        cancelOrder,
         buyStock,
         sellStock,
         addComment,

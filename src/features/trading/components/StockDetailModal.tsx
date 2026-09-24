@@ -4,7 +4,7 @@ import { useTradingForm } from '../hooks/useTradingForm';
 import { TradingChart } from './TradingChart';
 import { OrderBookWidget } from './OrderBookWidget';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
-import { X, TrendingUp, TrendingDown, Lock } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, Lock, Clock, Trash2, ArrowUpRight, ArrowDownRight, Layers } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
@@ -13,19 +13,26 @@ import { getMarketStatus } from '../../../core/trading/marketHours';
 export const StockDetailModal: React.FC = () => {
   // 1. ALL React Hooks MUST execute unconditionally at the top level
   const { selectedPoliticianId, setSelectedPoliticianId, getPoliticianById, user } = useStore();
-  const [activeSubTab, setActiveSubTab] = useState<'chart' | 'news'>('chart');
+  const [activeSubTab, setActiveSubTab] = useState<'chart' | 'news' | 'openOrders'>('chart');
 
   const politician = selectedPoliticianId ? getPoliticianById(selectedPoliticianId) : undefined;
 
   const {
     tradeType,
     setTradeType,
+    orderClass,
+    setOrderClass,
     sharesInput,
     setSharesInput,
-    buyQuote,
-    sellQuote,
+    priceInput,
+    setPriceInput,
+    handleSelectPrice,
+    estimatedCostOrRefund,
+    estimatedAvgPrice,
     handleExecuteOrder,
+    cancelOrder,
     feedback,
+    openOrders,
   } = useTradingForm(politician);
 
   // 2. Early return AFTER all hooks have executed
@@ -42,9 +49,18 @@ export const StockDetailModal: React.FC = () => {
   const userShares = userHolding ? userHolding.shares : 0;
   const isIPO = politician.phase === 'IPO';
 
-  const currentQuote = tradeType === 'BUY' ? buyQuote : sellQuote;
   const newsList = Array.isArray(politician.news) ? politician.news : [];
   const priceHistoryData = Array.isArray(politician.priceHistory) ? politician.priceHistory : [];
+
+  // Filter open orders for current politician
+  const polOpenOrders = openOrders.filter(o => o.politicianId === politician.id);
+
+  const priceNum = parseInt(priceInput, 10) || currentPrice;
+
+  const adjustPrice = (delta: number) => {
+    const nextP = Math.max(100, priceNum + delta);
+    setPriceInput(nextP.toString());
+  };
 
   return (
     <div 
@@ -81,7 +97,7 @@ export const StockDetailModal: React.FC = () => {
                   </span>
                 ) : (
                   <span className="bg-emerald-600/30 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-mono font-bold">
-                    Phase 2 호가창 시장
+                    Phase 2 실시간 호가 시장
                   </span>
                 )}
               </div>
@@ -120,14 +136,14 @@ export const StockDetailModal: React.FC = () => {
           {/* Left Column: OrderBook / Chart & Info */}
           <div className="lg:col-span-2 space-y-4">
             
-            {/* Phase Status OrderBook Widget */}
-            <OrderBookWidget politician={politician} />
+            {/* Phase Status OrderBook Widget with Price Select Callback */}
+            <OrderBookWidget politician={politician} onSelectPrice={handleSelectPrice} />
 
             {/* Price Cards Header */}
             <div className="grid grid-cols-3 gap-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 font-mono">
               <div>
                 <span className="text-[10px] text-slate-400 font-sans">현재가</span>
-                <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice || 100000)}</div>
+                <div className="text-lg font-extrabold text-white">{formatPoints(politician.currentPrice || 10000)}</div>
               </div>
 
               <div>
@@ -164,17 +180,33 @@ export const StockDetailModal: React.FC = () => {
               >
                 관련 뉴스 ({newsList.length})
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveSubTab('openOrders')}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1 ${
+                  activeSubTab === 'openOrders' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>미체결 주문</span>
+                {polOpenOrders.length > 0 && (
+                  <span className="bg-amber-500 text-slate-950 font-mono text-[10px] px-1.5 py-0.2 rounded-full font-black">
+                    {polOpenOrders.length}
+                  </span>
+                )}
+              </button>
             </div>
 
-            {/* Chart / News Body */}
-            {activeSubTab === 'chart' ? (
+            {/* SubTab Body */}
+            {activeSubTab === 'chart' && (
               <TradingChart
                 data={priceHistoryData}
                 isUp={isUp}
                 high24h={high24h}
                 low24h={low24h}
               />
-            ) : (
+            )}
+
+            {activeSubTab === 'news' && (
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                 {newsList.map((item) => (
                   <div key={item.id} className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
@@ -185,6 +217,44 @@ export const StockDetailModal: React.FC = () => {
                     <h4 className="text-xs font-bold text-slate-200">{item.title}</h4>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {activeSubTab === 'openOrders' && (
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {polOpenOrders.length === 0 ? (
+                  <div className="text-center py-8 text-xs text-slate-500 bg-slate-800/40 rounded-xl border border-slate-700/40">
+                    대기 중인 미체결 주문이 없습니다.
+                  </div>
+                ) : (
+                  polOpenOrders.map((ord) => (
+                    <div key={ord.id} className="p-3 bg-slate-800/90 rounded-xl border border-slate-700/80 flex items-center justify-between font-mono text-xs">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                            ord.type === 'BUY' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                          }`}>
+                            {ord.type === 'BUY' ? '매수 지정가' : '매도 지정가'}
+                          </span>
+                          <span className="text-white font-bold">{formatPoints(ord.price)}</span>
+                          <span className="text-slate-400 text-[11px]">{ord.remainingShares}주 대기</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 font-sans">
+                          주문 시각: {ord.createdAt} | 상태: {ord.status === 'PARTIALLY_FILLED' ? '부분 체결' : '체결 대기'}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => cancelOrder(ord.id)}
+                        className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 rounded-lg border border-rose-500/30 text-xs font-sans font-bold flex items-center space-x-1 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>주문 취소</span>
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
             )}
 
@@ -199,11 +269,39 @@ export const StockDetailModal: React.FC = () => {
                   {isIPO ? 'Phase 1 공모 청약' : 'Phase 2 호가 주문'}
                 </h3>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  {isIPO ? '고정가 10,000 P' : '실시간 지정가 호가'}
+                  {isIPO ? '고정가 10,000 P' : '지정가 / 시장가 선택'}
                 </span>
               </div>
 
-              {/* Order Type Switch */}
+              {/* Order Class Switcher (Limit vs Market) - Only in Phase 2 */}
+              {!isIPO && (
+                <div className="grid grid-cols-2 gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setOrderClass('LIMIT')}
+                    className={`py-1.5 rounded-lg transition-all ${
+                      orderClass === 'LIMIT'
+                        ? 'bg-blue-600 text-white shadow'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    🎯 지정가 (Limit)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOrderClass('MARKET')}
+                    className={`py-1.5 rounded-lg transition-all ${
+                      orderClass === 'MARKET'
+                        ? 'bg-blue-600 text-white shadow'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    ⚡ 시장가 (Market)
+                  </button>
+                </div>
+              )}
+
+              {/* Order Type Switcher (Buy vs Sell) */}
               <div className="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-slate-700">
                 <button
                   type="button"
@@ -229,35 +327,85 @@ export const StockDetailModal: React.FC = () => {
                 </button>
               </div>
 
+              {/* Order Price Input (Visible when Limit Order in Phase 2) */}
+              {!isIPO && orderClass === 'LIMIT' && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-300">
+                    <span>주문 가격 (P)</span>
+                    <span className="text-[10px] text-slate-400 font-sans">💡 호가 클릭 시 자동 채움</span>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <input
+                      type="number"
+                      step={50}
+                      value={priceInput}
+                      onChange={e => setPriceInput(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-blue-500"
+                    />
+                    <div className="flex space-x-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => adjustPrice(-100)}
+                        className="px-2 py-2 bg-slate-900 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 font-mono text-xs"
+                      >
+                        -100
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => adjustPrice(100)}
+                        className="px-2 py-2 bg-slate-900 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 font-mono text-xs"
+                      >
+                        +100
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Share Amount Input */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300">주문 수량 (주)</label>
+                <div className="flex items-center justify-between text-xs font-bold text-slate-300">
+                  <span>주문 수량 (주)</span>
+                  {tradeType === 'SELL' && (
+                    <span
+                      onClick={() => setSharesInput(userShares.toString())}
+                      className="text-[10px] text-amber-400 cursor-pointer hover:underline"
+                    >
+                      최대 ({userShares}주)
+                    </span>
+                  )}
+                </div>
                 <input
                   type="number"
                   min={1}
-                  max={tradeType === 'SELL' ? userShares : 100}
+                  max={tradeType === 'SELL' ? userShares : 1000}
                   value={sharesInput}
                   onChange={e => setSharesInput(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm font-mono text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               {/* Quote Estimates */}
               <div className="space-y-2 bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/50 text-xs font-mono">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">총 필요 포인트</span>
+                  <span className="text-slate-400">총 {tradeType === 'BUY' ? '필요 포인트' : '예상 환불액'}</span>
                   <span className="font-bold text-white text-sm">
-                    {formatPoints(tradeType === 'BUY' ? (buyQuote?.totalCost || 0) : (sellQuote?.totalRefund || 0))}
+                    {formatPoints(estimatedCostOrRefund)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-slate-400">주당 체결가</span>
-                  <span className="text-slate-300">{formatPoints(currentQuote?.avgPrice || 10000)}</span>
+                  <span className="text-slate-300">{formatPoints(estimatedAvgPrice)}</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-slate-400">가격 체결 방식</span>
                   <span className="text-indigo-400 font-bold font-sans">
-                    {isIPO ? '10,000P 고정가' : '유저 실제 호가'}
+                    {isIPO
+                      ? '10,000P 고정가'
+                      : orderClass === 'LIMIT'
+                      ? '지정가 체결 / 미체결 잔량 호가 등록'
+                      : '실시간 시장가 체결'}
                   </span>
                 </div>
               </div>
@@ -290,7 +438,16 @@ export const StockDetailModal: React.FC = () => {
               {!mStatus.isOpen ? (
                 <span>🔒 장 마감 (정규장: 매일 12:00 ~ 14:00)</span>
               ) : (
-                <span>{politician.name} {BRAND_STOCK_NAME} {tradeType === 'BUY' ? (isIPO ? '공모 청약' : '매수하기') : '매도하기'}</span>
+                <span>
+                  {politician.name} {BRAND_STOCK_NAME}{' '}
+                  {tradeType === 'BUY'
+                    ? isIPO
+                      ? '공모 청약'
+                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매수하기`
+                    : isIPO
+                    ? '공모 환불'
+                    : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매도하기`}
+                </span>
               )}
             </button>
 

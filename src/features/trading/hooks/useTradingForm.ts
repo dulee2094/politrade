@@ -1,87 +1,56 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '../../../context/StoreContext';
-import { matchOrderBook, generateMockOrderBook, INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
+import { executeOrderBookMatch, generateMockOrderBook, INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
 import { Politician } from '../../../types';
 
 export function useTradingForm(politician?: Politician) {
-  const { user, buyStock, sellStock } = useStore();
+  const { user, placeOrder, cancelOrder } = useStore();
 
   const [tradeType, setTradeType] = useState<'BUY' | 'SELL'>('BUY');
+  const [orderClass, setOrderClass] = useState<'LIMIT' | 'MARKET'>('LIMIT');
   const [sharesInput, setSharesInput] = useState<string>('1');
+  const [priceInput, setPriceInput] = useState<string>(
+    politician?.currentPrice ? politician.currentPrice.toString() : '10000'
+  );
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Update priceInput when politician changes
+  useEffect(() => {
+    if (politician?.currentPrice) {
+      setPriceInput(politician.currentPrice.toString());
+    }
+  }, [politician?.id, politician?.currentPrice]);
 
   const userHoldingsMap = user?.holdings || {};
   const userHolding = (politician?.id && userHoldingsMap[politician.id]) || { shares: 0, avgPrice: 0, totalInvested: 0 };
   const sharesNum = Math.max(1, parseInt(sharesInput, 10) || 1);
+  const spotPrice = politician?.currentPrice || 10000;
+  const priceNum = Math.max(100, parseInt(priceInput, 10) || spotPrice);
 
   const isIPO = politician?.phase === 'IPO';
-  const spotPrice = politician?.currentPrice || 10000;
 
-  // Default Quotes
-  let buyQuote = {
-    totalCost: sharesNum * INITIAL_IPO_PRICE,
-    avgPrice: INITIAL_IPO_PRICE,
-    spotPrice: INITIAL_IPO_PRICE,
-    slippage: 0,
-    priceImpact: 0,
-    newSpotPrice: INITIAL_IPO_PRICE,
-  };
+  // Calculate Quotes
+  let estimatedCostOrRefund = 0;
+  let estimatedAvgPrice = spotPrice;
 
-  let sellQuote = {
-    totalRefund: sharesNum * INITIAL_IPO_PRICE,
-    avgPrice: INITIAL_IPO_PRICE,
-    spotPrice: INITIAL_IPO_PRICE,
-    slippage: 0,
-    priceImpact: 0,
-    newSpotPrice: INITIAL_IPO_PRICE,
-  };
-
-  try {
-    if (politician) {
-      if (isIPO) {
-        buyQuote = {
-          totalCost: sharesNum * INITIAL_IPO_PRICE,
-          avgPrice: INITIAL_IPO_PRICE,
-          spotPrice: INITIAL_IPO_PRICE,
-          slippage: 0,
-          priceImpact: 0,
-          newSpotPrice: INITIAL_IPO_PRICE,
-        };
-        sellQuote = {
-          totalRefund: sharesNum * INITIAL_IPO_PRICE,
-          avgPrice: INITIAL_IPO_PRICE,
-          spotPrice: INITIAL_IPO_PRICE,
-          slippage: 0,
-          priceImpact: 0,
-          newSpotPrice: INITIAL_IPO_PRICE,
-        };
-      } else {
-        const safeOrderBook = politician.orderBook || generateMockOrderBook(spotPrice);
-        const obMatchBuy = matchOrderBook(safeOrderBook, 'BUY', spotPrice + 1000, sharesNum);
-        const obMatchSell = matchOrderBook(safeOrderBook, 'SELL', Math.max(1, spotPrice - 1000), sharesNum);
-        
-        buyQuote = {
-          totalCost: obMatchBuy ? obMatchBuy.totalCostOrRefund : sharesNum * spotPrice,
-          avgPrice: obMatchBuy ? obMatchBuy.avgExecutedPrice : spotPrice,
-          spotPrice,
-          slippage: 0,
-          priceImpact: 0,
-          newSpotPrice: obMatchBuy ? obMatchBuy.avgExecutedPrice : spotPrice,
-        };
-
-        sellQuote = {
-          totalRefund: obMatchSell ? obMatchSell.totalCostOrRefund : sharesNum * spotPrice,
-          avgPrice: obMatchSell ? obMatchSell.avgExecutedPrice : spotPrice,
-          spotPrice,
-          slippage: 0,
-          priceImpact: 0,
-          newSpotPrice: obMatchSell ? obMatchSell.avgExecutedPrice : spotPrice,
-        };
-      }
-    }
-  } catch (e) {
-    /* Safe fallback quotes */
+  if (isIPO) {
+    estimatedCostOrRefund = sharesNum * INITIAL_IPO_PRICE;
+    estimatedAvgPrice = INITIAL_IPO_PRICE;
+  } else if (orderClass === 'LIMIT') {
+    estimatedCostOrRefund = sharesNum * priceNum;
+    estimatedAvgPrice = priceNum;
+  } else {
+    // MARKET order preview
+    const safeOrderBook = politician?.orderBook || generateMockOrderBook(spotPrice);
+    const matchRes = executeOrderBookMatch(safeOrderBook, 'MARKET', tradeType, spotPrice, sharesNum);
+    estimatedCostOrRefund = matchRes.totalCostOrRefund || (sharesNum * spotPrice);
+    estimatedAvgPrice = matchRes.avgExecutedPrice || spotPrice;
   }
+
+  const handleSelectPrice = (price: number) => {
+    setPriceInput(price.toString());
+    setOrderClass('LIMIT');
+  };
 
   const handleExecuteOrder = () => {
     setFeedback(null);
@@ -90,33 +59,42 @@ export function useTradingForm(politician?: Politician) {
       setFeedback({ type: 'error', message: '수량을 1주 이상 입력해주세요.' });
       return;
     }
+    if (orderClass === 'LIMIT' && priceNum <= 0) {
+      setFeedback({ type: 'error', message: '올바른 주문 가격을 입력해주세요.' });
+      return;
+    }
 
-    if (tradeType === 'BUY') {
-      const res = buyStock(politician.id, sharesNum);
-      if (res.success) {
-        setFeedback({ type: 'success', message: res.message });
-      } else {
-        setFeedback({ type: 'error', message: res.message });
-      }
+    const res = placeOrder(
+      politician.id,
+      orderClass,
+      tradeType,
+      orderClass === 'LIMIT' ? priceNum : spotPrice,
+      sharesNum
+    );
+
+    if (res.success) {
+      setFeedback({ type: 'success', message: res.message });
     } else {
-      const res = sellStock(politician.id, sharesNum);
-      if (res.success) {
-        setFeedback({ type: 'success', message: res.message });
-      } else {
-        setFeedback({ type: 'error', message: res.message });
-      }
+      setFeedback({ type: 'error', message: res.message });
     }
   };
 
   return {
     tradeType,
     setTradeType,
+    orderClass,
+    setOrderClass,
     sharesInput,
     setSharesInput,
-    buyQuote,
-    sellQuote,
+    priceInput,
+    setPriceInput,
+    handleSelectPrice,
+    estimatedCostOrRefund,
+    estimatedAvgPrice,
     handleExecuteOrder,
+    cancelOrder,
     feedback,
     userBalance: user?.balance || 0,
+    openOrders: user?.openOrders || [],
   };
 }

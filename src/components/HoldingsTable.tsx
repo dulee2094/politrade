@@ -1,10 +1,11 @@
 import React from 'react';
 import { useStore } from '../context/StoreContext';
-import { TrendingUp, TrendingDown, ArrowRight, Layers } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowRight, Layers, Sparkles } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../config/constants';
 import { formatPoints, formatPercent } from '../core/utils/formatters';
 import { PartyBadge } from '../shared/ui/PartyBadge';
 import { PoliticianAvatar } from '../shared/ui/PoliticianAvatar';
+import { StockQuickSearch } from '../features/market/components/StockQuickSearch';
 
 export const HoldingsTable: React.FC = () => {
   const { user, politicians, setSelectedPoliticianId, setActiveTab } = useStore();
@@ -33,31 +34,56 @@ export const HoldingsTable: React.FC = () => {
 
   if (holdingsList.length === 0) {
     return (
-      <div className="bg-slate-800/60 rounded-2xl border border-slate-700/60 p-8 text-center space-y-4">
-        <div className="w-12 h-12 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto text-slate-400">
-          <Layers className="w-6 h-6" />
+      <div className="bg-slate-800/80 rounded-2xl border border-slate-700/80 p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-2xl border border-blue-500/30 flex items-center justify-center mx-auto">
+            <Layers className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-extrabold text-slate-100">현재 보유 중인 {BRAND_STOCK_NAME}이 없습니다</h3>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              아래에서 원하시는 정치인 주식을 검색하거나 선택하여 실시간 호가창(Order Book) 지정가/시장가 매매를 바로 시작해보세요!
+            </p>
+          </div>
         </div>
-        <div className="space-y-1">
-          <h3 className="text-base font-bold text-slate-200">보유 중인 {BRAND_STOCK_NAME}이 없습니다</h3>
-          <p className="text-xs text-slate-400">
-            정치인 전광판에서 마음에 드는 국회의원의 {BRAND_STOCK_NAME}을 가상머니로 매수해 보세요!
-          </p>
+
+        {/* Quick Search Selector */}
+        <div className="max-w-md mx-auto">
+          <StockQuickSearch variant="inline" placeholder="🔍 매매할 종목 검색 (이름/정당/지역구)..." />
         </div>
-        <button
-          type="button"
-          onClick={() => setActiveTab('market')}
-          className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20"
-        >
-          <span>{BRAND_STOCK_NAME} 전광판 보러가기</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
+
+        {/* Quick Politician Buttons Grid */}
+        <div className="pt-2 border-t border-slate-700/50 space-y-2">
+          <div className="text-[11px] font-mono text-slate-400 text-center font-bold flex items-center justify-center gap-1">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>추천 10인 POLI주식 바로 매매하기</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {politicians.map((pol) => (
+              <button
+                key={pol.id}
+                type="button"
+                onClick={() => setSelectedPoliticianId(pol.id)}
+                className="p-2 bg-slate-900/80 hover:bg-slate-700 border border-slate-700/80 hover:border-blue-500/50 rounded-xl transition-all text-left flex items-center space-x-2 group"
+              >
+                <PoliticianAvatar src={pol.imageUrl} name={pol.name} party={pol.party} className="w-7 h-7 rounded-lg shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-white group-hover:text-blue-300 truncate">{pol.name}</div>
+                  <div className="text-[10px] font-mono text-amber-400 font-extrabold">{formatPoints(pol.currentPrice)}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-xl">
-      <div className="p-5 border-b border-slate-700/60 flex items-center justify-between">
+    <div className="bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-xl space-y-0">
+      
+      {/* Table Header with Quick Search Bar */}
+      <div className="p-4 sm:p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-white flex items-center gap-2">
             <span>보유 {BRAND_STOCK_NAME} 현황</span>
@@ -66,6 +92,11 @@ export const HoldingsTable: React.FC = () => {
             </span>
           </h2>
           <p className="text-xs text-slate-400">실시간 시세 기준 {BRAND_STOCK_NAME} 평가손익</p>
+        </div>
+
+        {/* Quick Search Dropdown in Table Header */}
+        <div className="shrink-0">
+          <StockQuickSearch variant="inline" placeholder="🔍 전체 종목 호가창 바로가기..." />
         </div>
       </div>
 
@@ -155,6 +186,7 @@ export const HoldingsTable: React.FC = () => {
           </tbody>
         </table>
       </div>
+
     </div>
   );
 };
