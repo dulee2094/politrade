@@ -144,37 +144,38 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       </div>
 
       {/* ================================================================ */}
-      {/* 4. POLI주식 실시간 매매 현황 카드 (CompactMarketGrid) - 1열 Full Width */}
+      {/* 4. POLI주식 실시간 매매 전광판 퀵 바로가기 배너 */}
       {/* ================================================================ */}
-      <div id="compact-market-grid-section" className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div id="compact-market-grid-section" className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900/95 to-indigo-950/60 p-6 sm:p-7 rounded-3xl border border-indigo-500/30 shadow-2xl">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-          <div>
-            <h3 className="text-base font-black text-white flex items-center gap-2">
-              <span>국회의원 POLI주식 실시간 매매 시장 (Market Overview)</span>
-              <span className="bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded-full border border-blue-500/30 font-mono">
-                10 SEATS
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center space-x-2">
+              <span className="bg-blue-600/30 text-blue-300 text-[10px] px-2.5 py-0.5 rounded-full border border-blue-500/40 font-mono font-bold flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-400" /> FULL MARKET BOARD
               </span>
+              <span className="bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded-full font-mono">
+                전체 의원 매매 센터
+              </span>
+            </div>
+            <h3 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
+              <span>국회의원 POLI주식 실시간 매매 전광판</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">실시간 주가 수급 체결 현황 및 주식 즉시 매매</p>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              의원 검색, 정당별 필터(국민의힘/더불어민주당 등), 상승률/거래량/주가순 정렬 및 호가창 매매를 전용 매매 센터에서 이용하실 수 있습니다.
+            </p>
           </div>
 
           <button
             type="button"
             onClick={() => setActiveTab('market')}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center space-x-1.5 shrink-0"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-extrabold px-6 py-3.5 rounded-2xl transition-all shadow-xl shadow-blue-500/25 flex items-center justify-center space-x-2 shrink-0 group border border-blue-400/30 hover:scale-[1.02]"
           >
-            <span>전광판 전체 보기 & 매매하기</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>주식매매하러 가기</span>
+            <ArrowRight className="w-4 h-4 text-blue-200 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-
-        {/* 10 Politician Responsive Stock Grid */}
-        <div className="relative z-10">
-          <CompactMarketGrid />
-        </div>
-
       </div>
 
     </div>
@@ -262,9 +263,9 @@ const MainContent: React.FC = () => {
           </>
         )}
 
-        {/* My Dedicated Portfolio View */}
+        {/* Dedicated Market Trading View */}
         {activeTab === 'market' && (
-          <FullPortfolioDetail onBackToHome={() => handleTabChange('dashboard')} />
+          <MarketBoard onBackToHome={() => handleTabChange('dashboard')} />
         )}
 
         {/* Community Board */}
