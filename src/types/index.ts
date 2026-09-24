@@ -1,6 +1,6 @@
 import { TradingPhase, OrderBookSnapshot } from '../core/orderbook/orderbookTypes';
 
-export type Party = '국민의힘' | '더불어민주당' | '조국혁신당' | '개혁신당' | '무소속';
+export type Party = '국민의힘' | '더불어민주당' | '조국혁신당' | '개혁신당' | '기본소득당' | '진보당' | '무소속' | '기타';
 
 export interface PricePoint {
   time: string;
@@ -76,4 +76,19 @@ export interface CommentItem {
   holdingStatus: 'HOLDER' | 'OBSERVER';
   likes: number;
   timestamp: string;
+}
+
+export interface ListingPetition {
+  id: string;
+  politicianName: string;
+  party: Party;
+  district: string;
+  title: string;
+  bio: string;
+  imageUrl?: string;
+  petitionerName: string;
+  createdAt: string;
+  expiresAt: string;
+  agreedUsers: string[];
+  status: 'ACTIVE' | 'APPROVED' | 'EXPIRED';
 }

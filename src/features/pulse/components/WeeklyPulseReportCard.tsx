@@ -36,10 +36,10 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
   };
 
   return (
-    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border border-amber-500/30 shadow-2xl space-y-4">
+    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border border-amber-500/30 shadow-2xl h-full flex flex-col justify-between space-y-4">
 
       {/* Dashboard Top Header */}
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5 shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
           <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg shrink-0">
             <Award className="w-5 h-5 text-slate-950" />
@@ -70,6 +70,9 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
           <span>{hasVotedToday ? '✅ 오늘 투표 완료 (수정)' : '🗳️ 오늘의 펄스 투표하기 (+1,000P)'}</span>
         </button>
       </div>
+
+      {/* Flexible Equal-Height Inner Content Container */}
+      <div className="flex-1 flex flex-col justify-between space-y-4">
 
       {/* ================================================================ */}
       {/* 1. 금주 베스트/워스트 투표 현황 (월~어제 누적) [LIVE] */}
@@ -341,6 +344,8 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
           );
         })()}
       </div>
+
+      </div> {/* End flex-1 container */}
 
       {/* Voting Modal */}
       <DailyBestWorstVoteModal

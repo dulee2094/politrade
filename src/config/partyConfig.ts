@@ -44,6 +44,27 @@ export const PARTY_STYLES: Record<Party, PartyStyle> = {
     border: 'border-slate-500/30',
     badgeBg: 'bg-slate-500/20 text-slate-400 border-slate-500/40',
   },
+  '기본소득당': {
+    name: '기본소득당',
+    bgLight: 'bg-emerald-500/10',
+    text: 'text-emerald-400',
+    border: 'border-emerald-500/30',
+    badgeBg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
+  },
+  '진보당': {
+    name: '진보당',
+    bgLight: 'bg-violet-500/10',
+    text: 'text-violet-400',
+    border: 'border-violet-500/30',
+    badgeBg: 'bg-violet-500/20 text-violet-400 border-violet-500/40',
+  },
+  '기타': {
+    name: '기타',
+    bgLight: 'bg-slate-500/10',
+    text: 'text-slate-400',
+    border: 'border-slate-500/30',
+    badgeBg: 'bg-slate-500/20 text-slate-400 border-slate-500/40',
+  },
 };
 
 export function getPartyStyle(party: Party): PartyStyle {

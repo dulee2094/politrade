@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Politician, UserProfile, CommentItem, Holding, TradeOrder } from '../types';
+import { Politician, UserProfile, CommentItem, Holding, TradeOrder, ListingPetition, Party } from '../types';
 import { INITIAL_POLITICIANS } from '../data/mockPoliticians';
 import { INITIAL_COMMENTS } from '../data/mockCommunity';
 import { checkMonthlyAllowance } from '../core/allowance/monthlyAllowance';
@@ -30,6 +30,11 @@ interface StoreContextType {
   allowanceNotice: string | null;
   setAllowanceNotice: (msg: string | null) => void;
   
+  // Listing Petitions
+  petitions: ListingPetition[];
+  createPetition: (data: { name: string; party: Party; district: string; title: string; bio: string }) => { success: boolean; message: string };
+  agreePetition: (petitionId: string) => { success: boolean; message: string };
+
   // Actions
   placeOrder: (politicianId: string, orderClass: 'LIMIT' | 'MARKET', type: 'BUY' | 'SELL', price: number, shares: number) => { success: boolean; message: string };
   cancelOrder: (orderId: string) => { success: boolean; message: string };
@@ -42,8 +47,38 @@ interface StoreContextType {
   resetAllCache: () => void;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'politrade_user_v21';
-const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v21';
+const LOCAL_STORAGE_KEY_USER = 'politrade_user_v30';
+const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v30';
+const LOCAL_STORAGE_KEY_PETITIONS = 'politrade_petitions_v30';
+
+const INITIAL_PETITIONS: ListingPetition[] = [
+  {
+    id: 'PET_001',
+    politicianName: '김태호',
+    party: '국민의힘',
+    district: '경남 산청·함양·거창·합천',
+    title: '제22대 국회의원 / 4선 중진',
+    bio: '경남도지사 출신 4선 의원. 지역 균형 발전 및 농어촌 경제 활성화 입법 추진으로 상장 청원합니다.',
+    petitionerName: '여의도취재반장',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
+    agreedUsers: ['여의도취재반장', '정치분석가', '뉴스리포터', '의정모니터', '국회인사이드', '정치개혁러', '민심추적자', '투표참여왕'],
+    status: 'ACTIVE',
+  },
+  {
+    id: 'PET_002',
+    politicianName: '배준영',
+    party: '국민의힘',
+    district: '인천 중구·강화군·옹진군',
+    title: '국민의힘 원내수석부대표 / 재선',
+    bio: '인천 항만 및 도서 지역 원도심 개발 특구 법안 추진 이슈로 상장 청원합니다.',
+    petitionerName: '인천정치통',
+    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
+    agreedUsers: ['인천정치통', '바다사랑', '수도권유권자', '의정뉴스', '민심체크'],
+    status: 'ACTIVE',
+  }
+];
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
@@ -705,6 +740,114 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setComments(prev => [newComment, ...prev]);
   };
 
+  const [petitions, setPetitions] = useState<ListingPetition[]>(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_PETITIONS);
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return INITIAL_PETITIONS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY_PETITIONS, JSON.stringify(petitions));
+  }, [petitions]);
+
+  const createPetition = (data: { name: string; party: Party; district: string; title: string; bio: string }) => {
+    const alreadyListed = politicians.some(p => p.name.trim() === data.name.trim());
+    if (alreadyListed) {
+      return { success: false, message: `'${data.name}' 의원은 이미 POLI주식 시장에 상장되어 있습니다.` };
+    }
+
+    const activePet = petitions.find(p => p.politicianName.trim() === data.name.trim() && p.status === 'ACTIVE');
+    if (activePet) {
+      return { success: false, message: `'${data.name}' 의원의 상장 청원이 이미 진행 중입니다. 청원소 목록에서 동의해 주세요!` };
+    }
+
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+    const newPet: ListingPetition = {
+      id: `PET_${Date.now()}`,
+      politicianName: data.name,
+      party: data.party,
+      district: data.district,
+      title: data.title,
+      bio: data.bio || `${data.name} 의원의 제22대 의정 활동 지표 검증 상장 청원입니다.`,
+      petitionerName: user.name,
+      createdAt: now.toISOString(),
+      expiresAt: expiresAt,
+      agreedUsers: [user.name],
+      status: 'ACTIVE',
+    };
+
+    setPetitions(prev => [newPet, ...prev]);
+    return { success: true, message: `'${data.name}' 의원의 상장 청원이 성공적으로 발의되었습니다! (10일 기한 카운트다운 시작)` };
+  };
+
+  const agreePetition = (petitionId: string) => {
+    const pet = petitions.find(p => p.id === petitionId);
+    if (!pet) return { success: false, message: '청원 건을 찾을 수 없습니다.' };
+
+    if (pet.status !== 'ACTIVE') {
+      return { success: false, message: '이미 종료되었거나 상장이 완료된 청원입니다.' };
+    }
+
+    if (new Date() > new Date(pet.expiresAt)) {
+      setPetitions(prev => prev.map(p => p.id === petitionId ? { ...p, status: 'EXPIRED' } : p));
+      return { success: false, message: '10일 청원 기간이 만료되어 상장에 실패했습니다.' };
+    }
+
+    if (pet.agreedUsers.includes(user.name)) {
+      return { success: false, message: '이미 본 청원에 동의하셨습니다.' };
+    }
+
+    const updatedAgreedUsers = [...pet.agreedUsers, user.name];
+    const TOTAL_MOCK_USERS = 50;
+    const TARGET_REQUIRED = Math.max(10, Math.ceil(TOTAL_MOCK_USERS * 0.10));
+
+    const isApproved = updatedAgreedUsers.length >= TARGET_REQUIRED;
+
+    if (isApproved) {
+      setPetitions(prev => prev.map(p => p.id === petitionId ? { ...p, agreedUsers: updatedAgreedUsers, status: 'APPROVED' } : p));
+
+      const newPolId = `POL_${Date.now()}`;
+      const newPolitician: Politician = {
+        id: newPolId,
+        name: pet.politicianName,
+        party: pet.party,
+        district: pet.district,
+        title: pet.title,
+        imageUrl: pet.imageUrl || '',
+        bio: pet.bio || `${pet.politicianName} 의원의 유저 청원 100% 달성 신규 상장 주식입니다.`,
+        phase: 'IPO',
+        ipoSoldShares: 0,
+        ipoTargetShares: 10,
+        orderBook: generateMockOrderBook(10000),
+        currentPrice: 10000,
+        previousClose: 10000,
+        change24h: 0,
+        high24h: 10000,
+        low24h: 10000,
+        volume24h: 0,
+        totalVolume: 0,
+        priceHistory: [
+          { time: '09:00', price: 10000, volume: 0 },
+          { time: '17:00', price: 10000, volume: 0 },
+        ],
+        news: [
+          { id: `n_auto_${Date.now()}_1`, title: `${pet.politicianName} 의원, 유저 상장 청원 승인으로 POLI주식 신규 상장!`, source: 'POLITRADE 공시', time: '방금 전', url: '#' },
+          { id: `n_auto_${Date.now()}_2`, title: `제22대 국회 의정 활동 기대... 유저 동의율 100% 달성`, source: '국회이슈', time: '10분 전', url: '#' },
+        ]
+      };
+
+      setPoliticians(prev => [...prev, newPolitician]);
+      return { success: true, message: `🎉 축하합니다! 동의 수 ${updatedAgreedUsers.length}명 달성으로 '${pet.politicianName}' 의원이 POLI주식 시장에 자동 신규 상장되었습니다!` };
+    } else {
+      setPetitions(prev => prev.map(p => p.id === petitionId ? { ...p, agreedUsers: updatedAgreedUsers } : p));
+      return { success: true, message: `'${pet.politicianName}' 의원의 상장 청원에 동의하셨습니다. (현재 ${updatedAgreedUsers.length}/${TARGET_REQUIRED}명)` };
+    }
+  };
+
   const updatePressVerification = (data: { isVerified: boolean; email: string; mediaName: string; verifiedAt: string }, nickname: string) => {
     setUser(prev => ({
       ...prev,
@@ -736,6 +879,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setIsSignUpModalOpen,
         allowanceNotice,
         setAllowanceNotice,
+        petitions,
+        createPetition,
+        agreePetition,
         placeOrder,
         cancelOrder,
         buyStock,

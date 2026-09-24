@@ -122,19 +122,20 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       {/* ================================================================ */}
       {/* 3. 2-COLUMN GRID: 주식 매매/시장 현황 (좌) vs 민심 펄스 현황 (우) */}
       {/* ================================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
         {/* Left Column (6/12): 주식 시장 TOP 3 종합 현황 (통합 거대 그룹 대시보드) */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 flex flex-col">
           <MarketDashboardGroupCard
             politicians={politicians}
             topVolumeList={topVolumeList}
             onSelectPolitician={setSelectedPoliticianId}
+            onGoToMarket={() => setActiveTab('market')}
           />
         </div>
 
         {/* Right Column (6/12): 민심 펄스 종합 현황 (Option A: 4단 통합 스마트 펄스 대시보드) */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 flex flex-col">
           <WeeklyPulseReportCard 
             onOpenDetail={onOpenWeeklyPulse}
             onOpenReviewsDetail={onOpenReviewsDetail}
