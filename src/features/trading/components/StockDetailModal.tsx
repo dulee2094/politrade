@@ -67,9 +67,10 @@ export const StockDetailModal: React.FC = () => {
     setPriceInput(nextP.toString());
   };
 
-  const handleOrderInitiate = () => {
+  const handleOrderInitiate = (selectedType: 'BUY' | 'SELL') => {
     setValidationError(null);
     if (!politician) return;
+    setTradeType(selectedType);
 
     const sharesNum = parseInt(sharesInput, 10) || 0;
     if (sharesNum <= 0) {
@@ -84,7 +85,7 @@ export const StockDetailModal: React.FC = () => {
     }
 
     if (isIPO) {
-      if (tradeType === 'BUY') {
+      if (selectedType === 'BUY') {
         const totalCost = sharesNum * 10000;
         if (user.balance < totalCost) {
           setValidationError(`포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`);
@@ -97,7 +98,7 @@ export const StockDetailModal: React.FC = () => {
         }
       }
     } else {
-      if (tradeType === 'BUY') {
+      if (selectedType === 'BUY') {
         const totalCost = targetPrice * sharesNum;
         if (user.balance < totalCost) {
           setValidationError(`포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`);
@@ -377,29 +378,47 @@ export const StockDetailModal: React.FC = () => {
                 </div>
               )}
 
-              {/* Order Type Switcher (Buy vs Sell) */}
-              <div className="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-slate-700">
+              {/* Order Execution Action Buttons (Buy Order vs Sell Order) */}
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setTradeType('BUY')}
-                  className={`py-2 text-xs font-extrabold rounded-lg transition-all ${
-                    tradeType === 'BUY'
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                  onClick={() => handleOrderInitiate('BUY')}
+                  disabled={!mStatus.isOpen}
+                  className={`py-3 px-2 rounded-xl font-sans font-extrabold text-xs transition-all shadow-md flex items-center justify-center space-x-1 ${
+                    !mStatus.isOpen
+                      ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
+                      : tradeType === 'BUY'
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20 ring-2 ring-emerald-400/50'
+                      : 'bg-emerald-700/80 hover:bg-emerald-600 text-white opacity-90'
                   }`}
                 >
-                  {isIPO ? '공모 매수' : '매수 (Buy)'}
+                  <span>
+                    {!mStatus.isOpen
+                      ? '🔒 매수 (장마감)'
+                      : isIPO
+                      ? '공모 청약 주문하기'
+                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매수 주문하기`}
+                  </span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setTradeType('SELL')}
-                  className={`py-2 text-xs font-extrabold rounded-lg transition-all ${
-                    tradeType === 'SELL'
-                      ? 'bg-rose-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                  onClick={() => handleOrderInitiate('SELL')}
+                  disabled={!mStatus.isOpen}
+                  className={`py-3 px-2 rounded-xl font-sans font-extrabold text-xs transition-all shadow-md flex items-center justify-center space-x-1 ${
+                    !mStatus.isOpen
+                      ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
+                      : tradeType === 'SELL'
+                      ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-500/20 ring-2 ring-rose-400/50'
+                      : 'bg-rose-700/80 hover:bg-rose-600 text-white opacity-90'
                   }`}
                 >
-                  {isIPO ? '공모 환불' : '매도 (Sell)'}
+                  <span>
+                    {!mStatus.isOpen
+                      ? '🔒 매도 (장마감)'
+                      : isIPO
+                      ? '공모 환불 주문하기'
+                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매도 주문하기`}
+                  </span>
                 </button>
               </div>
 
@@ -443,14 +462,12 @@ export const StockDetailModal: React.FC = () => {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-300">
                   <span>주문 수량 (주)</span>
-                  {tradeType === 'SELL' && (
-                    <span
-                      onClick={() => setSharesInput(userShares.toString())}
-                      className="text-[10px] text-amber-400 cursor-pointer hover:underline"
-                    >
-                      최대 ({userShares}주)
-                    </span>
-                  )}
+                  <span
+                    onClick={() => setSharesInput(userShares.toString())}
+                    className="text-[10px] text-amber-400 cursor-pointer hover:underline font-sans"
+                  >
+                    최대 ({userShares}주)
+                  </span>
                 </div>
                 <input
                   type="number"
@@ -497,35 +514,6 @@ export const StockDetailModal: React.FC = () => {
                 </div>
               )}
             </div>
-
-            {/* Execute Order Button (Locked during Off-Hours) */}
-            <button
-              type="button"
-              onClick={handleOrderInitiate}
-              disabled={!mStatus.isOpen}
-              className={`w-full py-3.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center justify-center space-x-1 ${
-                !mStatus.isOpen
-                  ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                  : tradeType === 'BUY'
-                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
-                  : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-500/20'
-              }`}
-            >
-              {!mStatus.isOpen ? (
-                <span>🔒 장 마감 (정규장: 매일 12:00 ~ 14:00)</span>
-              ) : (
-                <span>
-                  {politician.name} {BRAND_STOCK_NAME}{' '}
-                  {tradeType === 'BUY'
-                    ? isIPO
-                      ? '공모 청약 주문하기'
-                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매수 주문하기`
-                    : isIPO
-                    ? '공모 환불 주문하기'
-                    : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매도 주문하기`}
-                </span>
-              )}
-            </button>
 
           </div>
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Trophy, ThumbsUp, Sparkles, ArrowRight, Quote } from 'lucide-react';
 import { usePulseVoting } from '../hooks/usePulseVoting';
-import { PressBadge } from '../../auth/components/PressBadge';
 
 interface BestOneLineReviewSpotlightCardProps {
   onOpenVoteModal?: () => void;
@@ -58,7 +57,6 @@ export const BestOneLineReviewSpotlightCard: React.FC<BestOneLineReviewSpotlight
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs font-extrabold text-white">{topReview.userName}</span>
-                <PressBadge mediaName="KBS" />
               </div>
               <span className="text-[10px] text-slate-500 font-mono">지난주 1위 선정 ({topReview.likes}표 공감)</span>
             </div>

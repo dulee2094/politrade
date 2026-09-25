@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { usePulseVoting } from '../hooks/usePulseVoting';
 import { DailyBestWorstVoteModal } from './DailyBestWorstVoteModal';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
-import { PressBadge } from '../../auth/components/PressBadge';
-import { Award, ThumbsUp, Sparkles, Heart, Vote, ArrowRight, Wallet, CheckCircle2, Trophy } from 'lucide-react';
+import { Award, ThumbsUp, Heart, Vote, ArrowRight, Wallet, CheckCircle2, Trophy } from 'lucide-react';
 import { formatPoints } from '../../../core/utils/formatters';
 
 interface WeeklyPulseReportCardProps {
@@ -47,9 +46,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
           <div className="min-w-0">
             <h3 className="text-lg font-black text-white flex items-center gap-2 flex-wrap tracking-tight">
               <span className="whitespace-nowrap">주간 민심 펄스 현황</span>
-              <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold whitespace-nowrap">
-                PULSE DASHBOARD
-              </span>
             </h3>
             <p className="text-xs text-slate-400">
               실시간 득표 및 지난주 확정 결과 4단계 통합 종합 현황
@@ -83,9 +79,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             <span className="w-2.5 h-2.5 rounded-full bg-indigo-400" />
             <h4 className="text-sm font-black text-white flex items-center gap-2">
               <span>지난 주 베스트/워스트 선정결과</span>
-              <span className="bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-0.5 rounded border border-indigo-500/30 font-mono">
-                CLOSED · 지난주 최종 확정
-              </span>
             </h4>
           </div>
 
@@ -163,9 +156,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             <Trophy className="w-4 h-4 text-amber-400" />
             <h4 className="text-sm font-black text-white flex items-center gap-2">
               <span>지난 주 베스트 한 줄평 선정결과</span>
-              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/30 font-mono">
-                명예의 전당 · +10만P 시상
-              </span>
             </h4>
           </div>
 
@@ -197,20 +187,27 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
                 <div className="min-w-0">
                   <div className="flex items-center space-x-2 flex-wrap">
                     <span className="text-xs font-extrabold text-white">{topRev.userName}</span>
-                    <PressBadge mediaName="KBS" />
                     <span className="text-[10px] text-amber-400 font-mono">지난주 1위 ({topRev.likes}표 공감)</span>
                   </div>
                   <p className="text-xs text-slate-300 italic mt-0.5 leading-tight truncate sm:whitespace-normal">"{topRev.oneLineReview}"</p>
                 </div>
               </div>
-
-              <span className="text-[11px] font-mono font-extrabold text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-full border border-amber-500/30 flex items-center gap-1 shrink-0 self-start sm:self-center">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>+100,000P 시상 완료</span>
-              </span>
             </div>
           );
         })()}
+      </div>
+
+      {/* ================================================================ */}
+      {/* Section Divider Bar: Past Closed Results vs This Week Live Status */}
+      {/* ================================================================ */}
+      <div className="relative my-2 py-1 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full bg-gradient-to-r from-transparent via-slate-700/60 to-transparent h-[1px]" />
+        </div>
+        <div className="relative z-10 px-3.5 py-1 bg-slate-900 border border-slate-700/70 rounded-full font-mono text-[11px] font-extrabold text-slate-300 flex items-center space-x-2 shadow-inner">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>LIVE · 금주 실시간 현황</span>
+        </div>
       </div>
 
       {/* ================================================================ */}
@@ -222,9 +219,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <h4 className="text-sm font-black text-white flex items-center gap-2">
               <span>금주 베스트/워스트 투표 현황</span>
-              <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded border border-emerald-500/30 font-mono">
-                LIVE · 월~어제 누적
-              </span>
             </h4>
           </div>
 
@@ -294,9 +288,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
             <h4 className="text-sm font-black text-white flex items-center gap-2">
               <span>금주 한줄평 득표 현황</span>
-              <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-amber-500/30 font-mono">
-                LIVE · 공감 순위
-              </span>
             </h4>
           </div>
 
@@ -328,7 +319,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
                 <div className="min-w-0">
                   <div className="flex items-center space-x-2 flex-wrap">
                     <span className="text-xs font-extrabold text-white">{topRev.userName}</span>
-                    <PressBadge mediaName="KBS" />
                     <span className="text-[10px] text-amber-400 font-mono flex items-center gap-1">
                       <Heart className="w-3 h-3 text-rose-400 fill-rose-400 inline" /> {topRev.likes}표 실시간 1위
                     </span>

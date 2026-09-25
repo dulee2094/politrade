@@ -34,7 +34,7 @@ console.log('✅ FORCE OVERWRITE COMPLETED SUCCESSFULLY!\n');
 const pulseCardPath = path.join(dest, 'src', 'features', 'pulse', 'components', 'WeeklyPulseReportCard.tsx');
 if (fs.existsSync(pulseCardPath)) {
   const content = fs.readFileSync(pulseCardPath, 'utf-8');
-  if (content.includes('PULSE DASHBOARD')) {
+  if (content.includes('주간 민심 펄스 현황')) {
     console.log('🎉 VERIFICATION CONFIRMED: upload_for_github contains the LATEST WeeklyPulseReportCard.tsx!');
   } else {
     console.log('⚠️ WARNING: WeeklyPulseReportCard.tsx in upload_for_github has old content!');
