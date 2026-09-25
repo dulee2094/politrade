@@ -36,32 +36,33 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
             <div
               key={'vol_' + pol.id}
               onClick={() => onSelectPolitician(pol.id)}
-              className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-cyan-400/60 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1"
+              className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-cyan-400/60 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1 relative overflow-hidden"
             >
-              <div className="flex items-center justify-between gap-1.5">
-                <div className="flex items-center space-x-2 min-w-0">
-                  <PoliticianAvatar
-                    src={pol.imageUrl}
-                    name={pol.name}
-                    party={pol.party}
-                    className="w-9 h-9 rounded-xl shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <span className="font-extrabold text-xs text-white group-hover:text-cyan-300 transition-colors whitespace-nowrap block truncate">
-                      {pol.name}
-                    </span>
-                    <div className="text-[10px] text-slate-400 whitespace-nowrap block truncate">{pol.party}</div>
-                  </div>
+              {/* Top-Right Rank Badge Overlay */}
+              <span
+                className={`absolute top-2.5 right-2.5 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md shadow-sm z-10 ${
+                  idx === 0
+                    ? 'bg-cyan-400/20 text-cyan-300 border border-cyan-400/40'
+                    : 'bg-slate-900/80 text-slate-400 border border-slate-700/60'
+                }`}
+              >
+                {idx === 0 ? '🥇 1위' : idx === 1 ? '🥈 2위' : '🥉 3위'}
+              </span>
+
+              {/* Header inside card */}
+              <div className="flex items-center space-x-2.5 pr-14">
+                <PoliticianAvatar
+                  src={pol.imageUrl}
+                  name={pol.name}
+                  party={pol.party}
+                  className="w-10 h-10 rounded-xl shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <span className="font-black text-sm text-white group-hover:text-cyan-300 transition-colors block leading-tight">
+                    {pol.name}
+                  </span>
+                  <div className="text-[11px] text-slate-400 font-medium block mt-0.5">{pol.party}</div>
                 </div>
-                <span
-                  className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md shrink-0 whitespace-nowrap ${
-                    idx === 0
-                      ? 'bg-cyan-400/20 text-cyan-300 border border-cyan-400/30'
-                      : 'bg-slate-800 text-slate-400'
-                  }`}
-                >
-                  {idx === 0 ? '🥇 1위' : idx === 1 ? '🥈 2위' : '🥉 3위'}
-                </span>
               </div>
 
               <div className="pt-2 border-t border-slate-700/50 space-y-0.5">
