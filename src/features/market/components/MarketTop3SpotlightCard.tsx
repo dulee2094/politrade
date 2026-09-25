@@ -51,28 +51,28 @@ export const MarketTop3SpotlightCard: React.FC<MarketTop3SpotlightCardProps> = (
             >
               {/* Top-Right Rank Badge Overlay */}
               <span
-                className={`absolute top-2.5 right-2.5 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md shadow-sm z-10 ${
+                className={`absolute top-2.5 right-2 text-[10px] font-mono font-black px-1.5 py-0.5 rounded-md shadow-sm z-10 ${
                   idx === 0
                     ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
                     : 'bg-slate-900/80 text-slate-400 border border-slate-700/60'
                 }`}
               >
-                {idx === 0 ? '👑 TOP 1' : `TOP ${idx + 1}`}
+                {idx === 0 ? '👑 1' : `${idx + 1}`}
               </span>
 
               {/* Header inside card */}
-              <div className="flex items-center space-x-2.5 pr-14">
+              <div className="flex items-center space-x-2 pr-7 min-w-0">
                 <PoliticianAvatar
                   src={pol.imageUrl}
                   name={pol.name}
                   party={pol.party}
-                  className="w-10 h-10 rounded-xl shrink-0"
+                  className="w-8 h-8 rounded-lg shrink-0"
                 />
                 <div className="min-w-0 flex-1">
-                  <span className="font-black text-sm text-white group-hover:text-amber-300 transition-colors block leading-tight">
+                  <span className="font-extrabold text-xs text-white group-hover:text-amber-300 transition-colors whitespace-nowrap block truncate">
                     {pol.name}
                   </span>
-                  <div className="text-[11px] text-slate-400 font-medium block mt-0.5">{pol.party}</div>
+                  <div className="text-[10px] text-slate-400 font-medium whitespace-nowrap block truncate mt-0.5">{pol.party}</div>
                 </div>
               </div>
 
