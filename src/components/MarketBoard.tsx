@@ -119,6 +119,14 @@ export const MarketBoard: React.FC<MarketBoardProps> = ({ onBackToHome }) => {
               <span className="text-xs text-slate-400 font-bold hidden md:inline">정렬:</span>
               <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
                 <button
+                  onClick={() => setSortBy('name')}
+                  className={`px-3 py-1.5 rounded-lg transition-all font-bold ${
+                    sortBy === 'name' ? 'bg-slate-800 text-blue-400 border border-blue-500/40 shadow-sm' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  가나다순
+                </button>
+                <button
                   onClick={() => setSortBy('change')}
                   className={`px-3 py-1.5 rounded-lg transition-all font-bold ${
                     sortBy === 'change' ? 'bg-slate-800 text-blue-400 border border-blue-500/40 shadow-sm' : 'text-slate-400 hover:text-slate-200'

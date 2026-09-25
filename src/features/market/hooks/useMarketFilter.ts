@@ -4,7 +4,7 @@ import { Politician } from '../../../types';
 export function useMarketFilter(politicians: Politician[]) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedParty, setSelectedParty] = useState<string>('ALL');
-  const [sortBy, setSortBy] = useState<'change' | 'volume' | 'price'>('change');
+  const [sortBy, setSortBy] = useState<'change' | 'volume' | 'price' | 'name'>('change');
 
   const filteredPoliticians = politicians
     .filter(pol => {
@@ -19,6 +19,7 @@ export function useMarketFilter(politicians: Politician[]) {
       if (sortBy === 'change') return b.change24h - a.change24h;
       if (sortBy === 'volume') return b.volume24h - a.volume24h;
       if (sortBy === 'price') return b.currentPrice - a.currentPrice;
+      if (sortBy === 'name') return a.name.localeCompare(b.name, 'ko');
       return 0;
     });
 
