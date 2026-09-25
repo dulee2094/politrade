@@ -4,7 +4,7 @@ import { useTradingForm } from '../hooks/useTradingForm';
 import { TradingChart } from './TradingChart';
 import { OrderBookWidget } from './OrderBookWidget';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
-import { X, TrendingUp, TrendingDown, Lock, Clock, Trash2, ArrowUpRight, ArrowDownRight, Layers } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, Lock, Clock, Trash2, ArrowUpRight, ArrowDownRight, Layers, CheckCircle2, AlertTriangle, HelpCircle } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
@@ -12,8 +12,14 @@ import { getMarketStatus } from '../../../core/trading/marketHours';
 
 export const StockDetailModal: React.FC = () => {
   // 1. ALL React Hooks MUST execute unconditionally at the top level
-  const { selectedPoliticianId, setSelectedPoliticianId, getPoliticianById, user } = useStore();
+  const { selectedPoliticianId, setSelectedPoliticianId, getPoliticianById, user, placeOrder } = useStore();
   const [activeSubTab, setActiveSubTab] = useState<'chart' | 'news' | 'openOrders'>('chart');
+
+  // 2-Step Modal States
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isResultOpen, setIsResultOpen] = useState(false);
+  const [resultInfo, setResultInfo] = useState<{ success: boolean; message: string } | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const politician = selectedPoliticianId ? getPoliticianById(selectedPoliticianId) : undefined;
 
@@ -29,7 +35,6 @@ export const StockDetailModal: React.FC = () => {
     handleSelectPrice,
     estimatedCostOrRefund,
     estimatedAvgPrice,
-    handleExecuteOrder,
     cancelOrder,
     feedback,
     openOrders,
@@ -60,6 +65,77 @@ export const StockDetailModal: React.FC = () => {
   const adjustPrice = (delta: number) => {
     const nextP = Math.max(100, priceNum + delta);
     setPriceInput(nextP.toString());
+  };
+
+  const handleOrderInitiate = () => {
+    setValidationError(null);
+    if (!politician) return;
+
+    const sharesNum = parseInt(sharesInput, 10) || 0;
+    if (sharesNum <= 0) {
+      setValidationError('주문 수량을 1주 이상 입력해주세요.');
+      return;
+    }
+
+    const targetPrice = orderClass === 'LIMIT' ? priceNum : currentPrice;
+    if (orderClass === 'LIMIT' && targetPrice <= 0) {
+      setValidationError('올바른 주문 가격을 입력해주세요.');
+      return;
+    }
+
+    if (isIPO) {
+      if (tradeType === 'BUY') {
+        const totalCost = sharesNum * 10000;
+        if (user.balance < totalCost) {
+          setValidationError(`포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`);
+          return;
+        }
+      } else {
+        if (userShares < sharesNum) {
+          setValidationError('매도 가능한 보유 주식이 부족합니다.');
+          return;
+        }
+      }
+    } else {
+      if (tradeType === 'BUY') {
+        const totalCost = targetPrice * sharesNum;
+        if (user.balance < totalCost) {
+          setValidationError(`포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`);
+          return;
+        }
+      } else {
+        const lockedSellShares = (user.openOrders || [])
+          .filter(o => o.politicianId === politician.id && o.type === 'SELL')
+          .reduce((acc, o) => acc + o.remainingShares, 0);
+        const availableShares = userShares - lockedSellShares;
+        if (availableShares < sharesNum) {
+          setValidationError(`매도 가능한 보유 주식이 부족합니다. (가능: ${availableShares}주 / 주문: ${sharesNum}주)`);
+          return;
+        }
+      }
+    }
+
+    // Pre-validation passed -> open confirmation modal
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmSubmit = () => {
+    setIsConfirmOpen(false);
+    if (!politician) return;
+
+    const sharesNum = Math.max(1, parseInt(sharesInput, 10) || 1);
+    const targetPrice = orderClass === 'LIMIT' ? priceNum : currentPrice;
+
+    const res = placeOrder(
+      politician.id,
+      orderClass,
+      tradeType,
+      targetPrice,
+      sharesNum
+    );
+
+    setResultInfo(res);
+    setIsResultOpen(true);
   };
 
   return (
@@ -410,14 +486,14 @@ export const StockDetailModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Feedback messages */}
-              {feedback && (
-                <div className={`p-3 rounded-xl border text-xs ${
-                  feedback.type === 'error'
+              {/* Validation & Feedback messages */}
+              {(validationError || feedback) && (
+                <div className={`p-3 rounded-xl border text-xs font-sans font-bold ${
+                  (validationError || feedback?.type === 'error')
                     ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
                     : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
                 }`}>
-                  {feedback.message}
+                  {validationError || feedback?.message}
                 </div>
               )}
             </div>
@@ -425,7 +501,7 @@ export const StockDetailModal: React.FC = () => {
             {/* Execute Order Button (Locked during Off-Hours) */}
             <button
               type="button"
-              onClick={handleExecuteOrder}
+              onClick={handleOrderInitiate}
               disabled={!mStatus.isOpen}
               className={`w-full py-3.5 rounded-xl font-extrabold text-xs transition-all shadow-lg flex items-center justify-center space-x-1 ${
                 !mStatus.isOpen
@@ -442,11 +518,11 @@ export const StockDetailModal: React.FC = () => {
                   {politician.name} {BRAND_STOCK_NAME}{' '}
                   {tradeType === 'BUY'
                     ? isIPO
-                      ? '공모 청약'
-                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매수하기`
+                      ? '공모 청약 주문하기'
+                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매수 주문하기`
                     : isIPO
-                    ? '공모 환불'
-                    : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매도하기`}
+                    ? '공모 환불 주문하기'
+                    : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매도 주문하기`}
                 </span>
               )}
             </button>
@@ -456,6 +532,147 @@ export const StockDetailModal: React.FC = () => {
         </div>
 
       </div>
+
+      {/* 1. Order Confirmation Modal Overlay */}
+      {isConfirmOpen && (
+        <div 
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="bg-slate-900 border border-indigo-500/50 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl text-slate-100 animate-fade-in">
+            <div className="flex items-center space-x-3 border-b border-slate-800 pb-3">
+              <div className="p-2.5 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30">
+                <HelpCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-white">주문 제출 전 최종 확인</h3>
+                <p className="text-xs text-slate-400">아래 내용을 확인하신 후 주문을 최종 제출하세요.</p>
+              </div>
+            </div>
+
+            {/* Target Politician & Trade Info */}
+            <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700/60 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between font-sans">
+                <span className="text-slate-400 text-xs font-medium">대상 주식</span>
+                <div className="flex items-center space-x-2">
+                  <PoliticianAvatar src={politician.imageUrl} name={politician.name} party={politician.party} className="w-6 h-6 rounded-lg" />
+                  <span className="font-extrabold text-white text-sm">{politician.name} POLI주식</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-slate-700/50 pt-2 font-sans">
+                <span className="text-slate-400 text-xs font-medium">주문 구분</span>
+                <span className={`px-2.5 py-1 rounded-md font-extrabold text-xs ${
+                  tradeType === 'BUY'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                }`}>
+                  {isIPO
+                    ? tradeType === 'BUY' ? '공모 청약 주문' : '공모 환불 주문'
+                    : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} ${tradeType === 'BUY' ? '매수' : '매도'} 주문`}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-slate-700/50 pt-2">
+                <span className="text-slate-400 font-sans">주문 단가</span>
+                <span className="font-bold text-white">
+                  {isIPO ? '10,000 P (고정가)' : orderClass === 'LIMIT' ? `${formatPoints(parseInt(priceInput, 10) || currentPrice)}` : '실시간 시장가'}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-slate-700/50 pt-2">
+                <span className="text-slate-400 font-sans">주문 수량</span>
+                <span className="font-bold text-amber-400">{sharesInput} 주</span>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-slate-700/50 pt-2 text-sm font-bold">
+                <span className="text-slate-300 font-sans">총 {tradeType === 'BUY' ? '필요 포인트' : '예상 환불액'}</span>
+                <span className="text-emerald-400 font-extrabold">{formatPoints(estimatedCostOrRefund)}</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-indigo-950/40 border border-indigo-500/30 rounded-xl text-xs text-indigo-200 text-center font-medium font-sans">
+              💡 위 내용으로 매매 주문을 최종 제출하시겠습니까?
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-1 font-sans">
+              <button
+                type="button"
+                onClick={() => setIsConfirmOpen(false)}
+                className="py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-xs transition-colors border border-slate-700"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSubmit}
+                className={`py-3 rounded-xl font-extrabold text-xs transition-all shadow-lg text-white ${
+                  tradeType === 'BUY'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20'
+                    : 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/20'
+                }`}
+              >
+                확인 및 주문 제출
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Order Result Modal Overlay */}
+      {isResultOpen && resultInfo && (
+        <div 
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl text-slate-100 animate-fade-in">
+            <div className="flex items-center space-x-3 border-b border-slate-800 pb-3">
+              <div className={`p-2.5 rounded-xl border ${
+                resultInfo.success
+                  ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/30'
+                  : 'bg-rose-600/20 text-rose-400 border-rose-500/30'
+              }`}>
+                {resultInfo.success ? <CheckCircle2 className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-white">
+                  {resultInfo.success ? '주문 처리 결과 안내' : '주문 처리 실패'}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  {resultInfo.success ? '요청하신 주문이 정상 처리되었습니다.' : '주문 처리 중 오류가 발생하였습니다.'}
+                </p>
+              </div>
+            </div>
+
+            <div className={`p-4 rounded-xl border text-xs leading-relaxed font-sans ${
+              resultInfo.success
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+                : 'bg-rose-500/10 border-rose-500/30 text-rose-200'
+            }`}>
+              <p className="font-bold text-sm mb-1">{resultInfo.message}</p>
+            </div>
+
+            <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 font-mono text-xs space-y-1.5">
+              <div className="flex items-center justify-between text-slate-300">
+                <span>현재 보유 포인트</span>
+                <span className="font-bold text-amber-400">{formatPoints(user?.balance || 0)}</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-300">
+                <span>{politician.name} 보유 수량</span>
+                <span className="font-bold text-white">{userShares} 주</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsResultOpen(false)}
+              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-extrabold text-xs shadow-lg shadow-blue-600/20 transition-all font-sans"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

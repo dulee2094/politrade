@@ -3,6 +3,7 @@ import { useStore } from '../../../context/StoreContext';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
 import { Party, ListingPetition } from '../../../types';
+import { UNLISTED_POLITICIAN_CANDIDATES } from '../data/unlistedCandidates';
 import { Vote, Sparkles, Clock, CheckCircle2, AlertCircle, PlusCircle, UserCheck, ShieldCheck, ArrowRight, X } from 'lucide-react';
 
 interface ListingPetitionHubProps {
@@ -13,14 +14,59 @@ export const ListingPetitionHub: React.FC<ListingPetitionHubProps> = ({ onGoToMa
   const { petitions, createPetition, agreePetition, user, politicians } = useStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string>(UNLISTED_POLITICIAN_CANDIDATES[0].id);
   const [formData, setFormData] = useState({
-    name: '',
-    party: '국민의힘' as Party,
-    district: '',
-    title: '',
+    name: UNLISTED_POLITICIAN_CANDIDATES[0].name,
+    party: UNLISTED_POLITICIAN_CANDIDATES[0].party,
+    district: UNLISTED_POLITICIAN_CANDIDATES[0].district,
+    title: UNLISTED_POLITICIAN_CANDIDATES[0].title,
     bio: '',
   });
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const [candidatePartyFilter, setCandidatePartyFilter] = useState<string>('ALL');
+  const [candidateSearchQuery, setCandidateSearchQuery] = useState<string>('');
+
+  const filteredCandidates = UNLISTED_POLITICIAN_CANDIDATES.filter(cand => {
+    const matchParty = candidatePartyFilter === 'ALL' || cand.party === candidatePartyFilter;
+    const matchSearch = 
+      cand.name.includes(candidateSearchQuery) || 
+      cand.district.includes(candidateSearchQuery) ||
+      cand.title.includes(candidateSearchQuery);
+    return matchParty && matchSearch;
+  });
+
+  const handleOpenModal = () => {
+    setFeedback(null);
+    setCandidatePartyFilter('ALL');
+    setCandidateSearchQuery('');
+    const firstCand = UNLISTED_POLITICIAN_CANDIDATES[0];
+    if (firstCand) {
+      setSelectedCandidateId(firstCand.id);
+      setFormData({
+        name: firstCand.name,
+        party: firstCand.party,
+        district: firstCand.district,
+        title: firstCand.title,
+        bio: '',
+      });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSelectCandidate = (candId: string) => {
+    setSelectedCandidateId(candId);
+    const cand = UNLISTED_POLITICIAN_CANDIDATES.find(c => c.id === candId);
+    if (cand) {
+      setFormData(prev => ({
+        ...prev,
+        name: cand.name,
+        party: cand.party,
+        district: cand.district,
+        title: cand.title,
+      }));
+    }
+  };
 
   // Total Mock Users Benchmark (50 users)
   const TOTAL_MOCK_USERS = 50;
@@ -102,7 +148,7 @@ export const ListingPetitionHub: React.FC<ListingPetitionHubProps> = ({ onGoToMa
 
           <button
             type="button"
-            onClick={() => { setFeedback(null); setIsModalOpen(true); }}
+            onClick={handleOpenModal}
             className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs px-5 py-3.5 rounded-2xl transition-all shadow-xl shadow-amber-500/20 flex items-center justify-center space-x-2 shrink-0 border border-amber-400/40 hover:scale-[1.02]"
           >
             <PlusCircle className="w-4 h-4 text-slate-950" />
@@ -343,70 +389,77 @@ export const ListingPetitionHub: React.FC<ListingPetitionHubProps> = ({ onGoToMa
 
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300">국회의원 성명 *</label>
-                <input
-                  type="text"
-                  placeholder="예: 김태호, 배준영 등..."
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
-                  required
-                />
-              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <span>신규 상장 대상 국회의원 선택 (제22대 전체 현직) *</span>
+                  <span className="text-[10px] text-amber-400 font-mono font-bold">검증 DB {UNLISTED_POLITICIAN_CANDIDATES.length}명</span>
+                </label>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">소속 정당 *</label>
+                {/* Party filter & Search controls */}
+                <div className="grid grid-cols-3 gap-2">
                   <select
-                    value={formData.party}
-                    onChange={e => setFormData({ ...formData, party: e.target.value as Party })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                    value={candidatePartyFilter}
+                    onChange={e => setCandidatePartyFilter(e.target.value)}
+                    className="col-span-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-sans"
                   >
+                    <option value="ALL">전체 정당</option>
                     <option value="국민의힘">국민의힘</option>
                     <option value="더불어민주당">더불어민주당</option>
                     <option value="조국혁신당">조국혁신당</option>
                     <option value="개혁신당">개혁신당</option>
-                    <option value="기본소득당">기본소득당</option>
                     <option value="진보당">진보당</option>
-                    <option value="무소속">무소속</option>
-                    <option value="기타">기타</option>
                   </select>
-                </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">지역구 / 비례 *</label>
                   <input
                     type="text"
-                    placeholder="예: 경남 산청·함양..."
-                    value={formData.district}
-                    onChange={e => setFormData({ ...formData, district: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
-                    required
+                    placeholder="의원 이름 또는 지역구 검색..."
+                    value={candidateSearchQuery}
+                    onChange={e => setCandidateSearchQuery(e.target.value)}
+                    className="col-span-2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
                   />
                 </div>
+
+                <select
+                  value={selectedCandidateId}
+                  onChange={e => handleSelectCandidate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 font-sans"
+                >
+                  {filteredCandidates.map(cand => (
+                    <option key={cand.id} value={cand.id}>
+                      [{cand.party}] {cand.name} ({cand.district}) - {cand.title}
+                    </option>
+                  ))}
+                  {filteredCandidates.length === 0 && (
+                    <option value="" disabled>검색 조건에 해당하는 미상장 의원이 없습니다.</option>
+                  )}
+                </select>
+              </div>
+
+              {/* Auto-filled Politician Info Preview Card */}
+              <div className="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 space-y-2">
+                <div className="text-[11px] font-mono text-amber-400 font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>검증된 제22대 현직 국회의원 정보</span>
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-base font-extrabold text-white">{formData.name}</span>
+                    <PartyBadge party={formData.party} />
+                  </div>
+                  <span className="text-xs text-slate-400 font-mono">{formData.district}</span>
+                </div>
+                <p className="text-xs text-slate-300 font-sans">{formData.title}</p>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300">현직 타이틀 *</label>
-                <input
-                  type="text"
-                  placeholder="예: 제22대 국회의원 / 4선 중진"
-                  value={formData.title}
-                  onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300">상장 청원 이유 (1줄 요약)</label>
+                <label className="text-xs font-bold text-slate-300">상장 청원 이유 (1줄 요약) *</label>
                 <textarea
                   rows={2}
                   placeholder="왜 이 의원의 주식이 상장되어야 하는지 이유를 적어주세요..."
                   value={formData.bio}
                   onChange={e => setFormData({ ...formData, bio: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                  required
                 />
               </div>
 

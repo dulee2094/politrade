@@ -32,36 +32,48 @@ export function generateMockOrderBook(currentPrice: number): OrderBookSnapshot {
 
 export function ensureMinOrderBookLevels(orderBook: OrderBookSnapshot, currentPrice: number): OrderBookSnapshot {
   const basePrice = Math.max(1000, currentPrice || 10000);
-  let asks = Array.isArray(orderBook?.asks) ? [...orderBook.asks] : [];
-  let bids = Array.isArray(orderBook?.bids) ? [...orderBook.bids] : [];
-
-  // Sort asks ascending
+  
+  // Clean & sort asks ascending by price (only keep positive shares)
+  let asks = Array.isArray(orderBook?.asks)
+    ? orderBook.asks.filter(a => a && typeof a.price === 'number' && a.shares > 0).map(a => ({ ...a }))
+    : [];
   asks.sort((a, b) => a.price - b.price);
-  // Sort bids descending
+
+  // Clean & sort bids descending by price (only keep positive shares)
+  let bids = Array.isArray(orderBook?.bids)
+    ? orderBook.bids.filter(b => b && typeof b.price === 'number' && b.shares > 0).map(b => ({ ...b }))
+    : [];
   bids.sort((a, b) => b.price - a.price);
 
-  // If asks are empty or fewer than 5 levels, supplement missing levels
+  // If asks < 5 levels, append missing levels starting above the highest existing ask
   if (asks.length < 5) {
     const existingPrices = new Set(asks.map(a => a.price));
-    const offsets = [50, 100, 200, 300, 400];
-    for (const offset of offsets) {
-      const p = basePrice + offset;
+    let startPrice = asks.length > 0 ? asks[asks.length - 1].price : basePrice;
+    let nextOffset = 50;
+    while (asks.length < 5) {
+      let p = startPrice + nextOffset;
       if (!existingPrices.has(p)) {
         asks.push({ price: p, shares: 5, totalPoints: p * 5 });
+        existingPrices.add(p);
       }
+      nextOffset += 50;
     }
     asks.sort((a, b) => a.price - b.price);
   }
 
-  // If bids are empty or fewer than 5 levels, supplement missing levels
+  // If bids < 5 levels, append missing levels starting below the lowest existing bid
   if (bids.length < 5) {
     const existingPrices = new Set(bids.map(b => b.price));
-    const offsets = [50, 100, 200, 300, 400];
-    for (const offset of offsets) {
-      const p = Math.max(100, basePrice - offset);
-      if (!existingPrices.has(p)) {
+    let startPrice = bids.length > 0 ? bids[bids.length - 1].price : basePrice;
+    let nextOffset = 50;
+    while (bids.length < 5) {
+      let p = Math.max(100, startPrice - nextOffset);
+      if (!existingPrices.has(p) && p > 0) {
         bids.push({ price: p, shares: 5, totalPoints: p * 5 });
+        existingPrices.add(p);
       }
+      nextOffset += 50;
+      if (p <= 100) break;
     }
     bids.sort((a, b) => b.price - a.price);
   }
