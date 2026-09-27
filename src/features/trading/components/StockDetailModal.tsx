@@ -64,7 +64,7 @@ export const StockDetailModal: React.FC = () => {
   const priceNum = parseInt(priceInput, 10) || currentPrice;
 
   const adjustPrice = (delta: number) => {
-    const nextP = Math.max(100, priceNum + delta);
+    const nextP = Math.max(1000, priceNum + delta);
     setPriceInput(nextP.toString());
   };
 

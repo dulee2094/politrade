@@ -47,9 +47,9 @@ interface StoreContextType {
   resetAllCache: () => void;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'politrade_user_v30';
-const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v30';
-const LOCAL_STORAGE_KEY_PETITIONS = 'politrade_petitions_v30';
+const LOCAL_STORAGE_KEY_USER = 'politrade_user_v40';
+const LOCAL_STORAGE_KEY_POLS = 'politrade_pols_v40';
+const LOCAL_STORAGE_KEY_PETITIONS = 'politrade_petitions_v40';
 
 const INITIAL_PETITIONS: ListingPetition[] = [
   {
@@ -83,7 +83,7 @@ const INITIAL_PETITIONS: ListingPetition[] = [
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Always force fresh politicians data on version bump v16
+  // Always force fresh politicians data on version bump v40
   const [politicians, setPoliticians] = useState<Politician[]>(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY_POLS);
     if (saved) {
@@ -93,11 +93,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const cached = parsed.find(p => p.id === initPol.id);
           if (!cached) return initPol;
 
-          const validOrderBook = (cached.orderBook && Array.isArray(cached.orderBook.asks) && Array.isArray(cached.orderBook.bids))
+          const isValidPrice = typeof cached.currentPrice === 'number' && cached.currentPrice >= 30000 && cached.currentPrice % 1000 === 0;
+
+          const validOrderBook = (cached.orderBook && Array.isArray(cached.orderBook.asks) && Array.isArray(cached.orderBook.bids) && isValidPrice)
             ? cached.orderBook
             : initPol.orderBook;
 
-          const validPriceHistory = (Array.isArray(cached.priceHistory) && cached.priceHistory.length > 0)
+          const validPriceHistory = (Array.isArray(cached.priceHistory) && cached.priceHistory.length > 0 && isValidPrice)
             ? cached.priceHistory
             : initPol.priceHistory;
 
@@ -120,11 +122,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             orderBook: validOrderBook,
             priceHistory: validPriceHistory,
             news: validNews,
-            currentPrice: typeof cached.currentPrice === 'number' ? cached.currentPrice : initPol.currentPrice,
-            previousClose: typeof cached.previousClose === 'number' ? cached.previousClose : initPol.previousClose,
+            currentPrice: isValidPrice ? cached.currentPrice : initPol.currentPrice,
+            previousClose: isValidPrice && typeof cached.previousClose === 'number' ? cached.previousClose : initPol.previousClose,
             change24h: typeof cached.change24h === 'number' ? cached.change24h : initPol.change24h,
-            high24h: typeof cached.high24h === 'number' ? cached.high24h : initPol.high24h,
-            low24h: typeof cached.low24h === 'number' ? cached.low24h : initPol.low24h,
+            high24h: isValidPrice && typeof cached.high24h === 'number' ? cached.high24h : initPol.high24h,
+            low24h: isValidPrice && typeof cached.low24h === 'number' ? cached.low24h : initPol.low24h,
             volume24h: typeof cached.volume24h === 'number' ? cached.volume24h : initPol.volume24h,
             totalVolume: typeof cached.totalVolume === 'number' ? cached.totalVolume : initPol.totalVolume,
           };

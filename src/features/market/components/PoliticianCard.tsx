@@ -4,6 +4,7 @@ import { PartyBadge } from '../../../shared/ui/PartyBadge';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { TrendingUp, TrendingDown, Flame } from 'lucide-react';
 import { formatPoints, formatPercent, formatVolume } from '../../../core/utils/formatters';
+import { INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
 
 interface PoliticianCardProps {
   politician: Politician;
@@ -63,7 +64,7 @@ export const PoliticianCard: React.FC<PoliticianCardProps> = ({ politician: pol,
         <div className="bg-slate-900/80 rounded-xl p-3 border border-indigo-500/30 space-y-1 font-mono">
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-slate-400">공모 청약가</span>
-            <span className="font-bold text-amber-400">100,000 P (고정)</span>
+            <span className="font-bold text-amber-400">{formatPoints(INITIAL_IPO_PRICE)} (고정)</span>
           </div>
           <div className="space-y-1 pt-1">
             <div className="flex items-center justify-between text-[10px] text-slate-300">

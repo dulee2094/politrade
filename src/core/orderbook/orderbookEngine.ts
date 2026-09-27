@@ -1,7 +1,7 @@
 import { LimitOrder, OrderBookSnapshot, OrderBookLevel } from './orderbookTypes';
 
 export const INITIAL_IPO_PRICE = 50000;
-export const INITIAL_IPO_TARGET_SHARES = 10; // 10 shares for testing
+export const INITIAL_IPO_TARGET_SHARES = 10; // 10 shares total circulating supply
 
 export const TICK_INTERVAL = 1000;
 
@@ -9,9 +9,11 @@ export const TICK_INTERVAL = 1000;
  * Generates initial 5-level mock orderbook around current price.
  * Asks: sorted ascending by price (lowest ask first)
  * Bids: sorted descending by price (highest bid first)
+ * Quantities strictly 1~2 shares per level matching 10-share total supply.
  */
 export function generateMockOrderBook(currentPrice: number): OrderBookSnapshot {
-  const basePrice = Math.max(TICK_INTERVAL, currentPrice || INITIAL_IPO_PRICE);
+  const rawPrice = currentPrice || INITIAL_IPO_PRICE;
+  const basePrice = Math.max(TICK_INTERVAL, Math.round(rawPrice / TICK_INTERVAL) * TICK_INTERVAL);
   
   const asks: OrderBookLevel[] = [
     { price: basePrice + 1000, shares: 1, totalPoints: (basePrice + 1000) * 1 },
@@ -33,28 +35,45 @@ export function generateMockOrderBook(currentPrice: number): OrderBookSnapshot {
 }
 
 export function ensureMinOrderBookLevels(orderBook: OrderBookSnapshot, currentPrice: number): OrderBookSnapshot {
-  const basePrice = Math.max(TICK_INTERVAL, currentPrice || INITIAL_IPO_PRICE);
+  const rawPrice = currentPrice || INITIAL_IPO_PRICE;
+  const basePrice = Math.max(TICK_INTERVAL, Math.round(rawPrice / TICK_INTERVAL) * TICK_INTERVAL);
   
-  // Clean & sort asks ascending by price (only keep positive shares)
+  // Clean & sort asks ascending by price (only keep positive shares, clamp to 1~2 shares, round to 1,000 P)
   let asks = Array.isArray(orderBook?.asks)
-    ? orderBook.asks.filter(a => a && typeof a.price === 'number' && a.shares > 0).map(a => ({ ...a }))
+    ? orderBook.asks.filter(a => a && typeof a.price === 'number' && a.shares > 0).map(a => {
+        const roundedP = Math.round(a.price / TICK_INTERVAL) * TICK_INTERVAL;
+        const safeShares = Math.min(2, Math.max(1, a.shares));
+        return {
+          price: roundedP,
+          shares: safeShares,
+          totalPoints: roundedP * safeShares,
+        };
+      })
     : [];
   asks.sort((a, b) => a.price - b.price);
 
-  // Clean & sort bids descending by price (only keep positive shares)
+  // Clean & sort bids descending by price (only keep positive shares, clamp to 1~2 shares, round to 1,000 P)
   let bids = Array.isArray(orderBook?.bids)
-    ? orderBook.bids.filter(b => b && typeof b.price === 'number' && b.shares > 0).map(b => ({ ...b }))
+    ? orderBook.bids.filter(b => b && typeof b.price === 'number' && b.shares > 0).map(b => {
+        const roundedP = Math.round(b.price / TICK_INTERVAL) * TICK_INTERVAL;
+        const safeShares = Math.min(2, Math.max(1, b.shares));
+        return {
+          price: roundedP,
+          shares: safeShares,
+          totalPoints: roundedP * safeShares,
+        };
+      })
     : [];
   bids.sort((a, b) => b.price - a.price);
 
-  // If asks < 5 levels, append missing levels starting above the highest existing ask
+  // If asks < 5 levels, append missing levels starting above basePrice
   if (asks.length < 5) {
     const existingPrices = new Set(asks.map(a => a.price));
     let startPrice = asks.length > 0 ? asks[asks.length - 1].price : basePrice;
     let nextOffset = TICK_INTERVAL;
     while (asks.length < 5) {
-      let p = startPrice + nextOffset;
-      if (!existingPrices.has(p)) {
+      let p = Math.round((startPrice + nextOffset) / TICK_INTERVAL) * TICK_INTERVAL;
+      if (!existingPrices.has(p) && p > basePrice) {
         asks.push({ price: p, shares: 1, totalPoints: p * 1 });
         existingPrices.add(p);
       }
@@ -63,14 +82,14 @@ export function ensureMinOrderBookLevels(orderBook: OrderBookSnapshot, currentPr
     asks.sort((a, b) => a.price - b.price);
   }
 
-  // If bids < 5 levels, append missing levels starting below the lowest existing bid
+  // If bids < 5 levels, append missing levels starting below basePrice
   if (bids.length < 5) {
     const existingPrices = new Set(bids.map(b => b.price));
     let startPrice = bids.length > 0 ? bids[bids.length - 1].price : basePrice;
     let nextOffset = TICK_INTERVAL;
     while (bids.length < 5) {
-      let p = Math.max(TICK_INTERVAL, startPrice - nextOffset);
-      if (!existingPrices.has(p) && p > 0) {
+      let p = Math.max(TICK_INTERVAL, Math.round((startPrice - nextOffset) / TICK_INTERVAL) * TICK_INTERVAL);
+      if (!existingPrices.has(p) && p > 0 && p < basePrice) {
         bids.push({ price: p, shares: 1, totalPoints: p * 1 });
         existingPrices.add(p);
       }
@@ -140,7 +159,7 @@ export function executeOrderBookMatch(
   let asks: OrderBookLevel[] = currentBook.asks.map(a => ({ ...a })).sort((a, b) => a.price - b.price);
   let bids: OrderBookLevel[] = currentBook.bids.map(b => ({ ...b })).sort((a, b) => b.price - a.price);
 
-  let lastMatchPrice = targetPrice;
+  let lastMatchPrice = Math.round(targetPrice / TICK_INTERVAL) * TICK_INTERVAL;
 
   if (orderType === 'BUY') {
     // BUY order matches against ASKS (lowest ask first)
@@ -225,7 +244,7 @@ export function executeOrderBookMatch(
     }
   }
 
-  const avgExecutedPrice = executedShares > 0 ? Math.round(totalCostOrRefund / executedShares) : targetPrice;
+  const avgExecutedPrice = executedShares > 0 ? Math.round((totalCostOrRefund / executedShares) / TICK_INTERVAL) * TICK_INTERVAL : targetPrice;
   const newSpotPrice = executedShares > 0 ? lastMatchPrice : targetPrice;
 
   // Ensure healthy level depth
