@@ -79,11 +79,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-base font-black text-white tracking-wide">마이 자산 대시보드 (Overview)</h2>
-              <span className="bg-indigo-500/20 text-indigo-300 text-[10px] px-2.5 py-0.5 rounded-full border border-indigo-500/40 font-mono font-bold flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-amber-400" /> MY PORTFOLIO
-              </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">핵심 요약 현황 3종 & 퀵 실행 서비스</p>
           </div>
         </div>
 
@@ -117,16 +113,6 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
                 </span>
                 <span>총 평가 자산 <span className="text-xs text-slate-400 font-bold font-mono">(Net Worth)</span></span>
               </span>
-              {onOpenAssetDetail && (
-                <button
-                  type="button"
-                  onClick={onOpenAssetDetail}
-                  className="text-xs text-indigo-300 hover:text-white font-mono font-bold bg-slate-800/90 hover:bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 flex items-center gap-0.5 transition-colors"
-                >
-                  <span>초기 30만P 대비</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              )}
             </div>
             <div className="text-3xl font-black text-white font-mono tracking-tight pt-1">
               {formatPoints(totalAsset)}

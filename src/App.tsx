@@ -23,6 +23,8 @@ import { UserProfileDetailModal } from './features/auth/components/UserProfileDe
 import { WeeklyPulseDetailModal } from './features/pulse/components/WeeklyPulseDetailModal';
 import { DailyBestWorstVoteModal } from './features/pulse/components/DailyBestWorstVoteModal';
 import { WeeklyOneLineReviewsDetailView } from './features/pulse/components/WeeklyOneLineReviewsDetailView';
+import { NoticeGuideBanner } from './features/notice/components/NoticeGuideBanner';
+import { NoticeGuideDetailModal } from './features/notice/components/NoticeGuideDetailModal';
 import { usePulseVoting } from './features/pulse/hooks/usePulseVoting';
 import { ShieldAlert, Sparkles, TrendingUp, Calendar, Newspaper, ArrowRight } from 'lucide-react';
 import { formatPoints, formatPercent } from './core/utils/formatters';
@@ -35,6 +37,7 @@ interface DashboardHomeProps {
   onOpenTradeDetail: () => void;
   onOpenVoteModal: () => void;
   onOpenReviewsDetail: () => void;
+  onOpenNoticeModal: () => void;
 }
 
 const DashboardHome: React.FC<DashboardHomeProps> = ({ 
@@ -44,7 +47,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   onOpenPulseActivityDetail,
   onOpenTradeDetail,
   onOpenVoteModal,
-  onOpenReviewsDetail
+  onOpenReviewsDetail,
+  onOpenNoticeModal,
 }) => {
   const { 
     politicians, 
@@ -81,31 +85,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
           </div>
         )}
 
-        <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center shrink-0">
-              <Newspaper className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold text-white">신뢰 검증 회원 플랫폼</span>
-                <PressBadge mediaName={user.pressName || 'KBS'} />
-              </div>
-              <p className="text-[11px] text-slate-300 mt-0.5">
-                닉네임(<strong className="text-white">{user.name}</strong>)으로 매월 정기 지원금(5만P)으로 매매 및 민심 광장 토론에 참여하세요.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2 text-xs font-mono">
-            <button
-              onClick={onOpenUserProfile}
-              className="bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white px-3 py-1.5 rounded-lg border border-blue-500/40 transition-all font-sans font-bold text-xs"
-            >
-              인증 회원 상세 프로필 보기
-            </button>
-          </div>
-        </div>
+        <NoticeGuideBanner onOpenNoticeModal={onOpenNoticeModal} />
       </div>
 
       {/* ================================================================ */}
@@ -195,6 +175,7 @@ const MainContent: React.FC = () => {
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const [isWeeklyPulseModalOpen, setIsWeeklyPulseModalOpen] = useState(false);
   const [isDailyVoteModalOpen, setIsDailyVoteModalOpen] = useState(false);
+  const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
   const [activeDetailView, setActiveDetailView] = useState<'asset' | 'pulse_activity' | 'trade_history' | 'reviews_detail' | null>(null);
 
   const { submitDailyVote, DAILY_VOTE_REWARD } = usePulseVoting();
@@ -259,6 +240,7 @@ const MainContent: React.FC = () => {
                 onOpenTradeDetail={() => setActiveDetailView('trade_history')}
                 onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
                 onOpenReviewsDetail={() => setActiveDetailView('reviews_detail')}
+                onOpenNoticeModal={() => setIsNoticeModalOpen(true)}
               />
             )}
           </>
@@ -296,6 +278,13 @@ const MainContent: React.FC = () => {
       <WeeklyPulseDetailModal
         isOpen={isWeeklyPulseModalOpen}
         onClose={() => setIsWeeklyPulseModalOpen(false)}
+        onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
+      />
+
+      {/* Standalone Platform Notice & Guide Modal */}
+      <NoticeGuideDetailModal
+        isOpen={isNoticeModalOpen}
+        onClose={() => setIsNoticeModalOpen(false)}
         onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
       />
 

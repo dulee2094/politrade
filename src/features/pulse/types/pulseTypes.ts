@@ -32,6 +32,8 @@ export interface WeeklyPulseSummary {
   totalUsersCount: number;
   bestTop3: PoliticianVoteCount[];
   worstTop3: PoliticianVoteCount[];
+  bestTop10: PoliticianVoteCount[];
+  worstTop10: PoliticianVoteCount[];
   bestReviews: PulseVoteRecord[];
   dailyVoterCounts: DailyVoterTrend[];
 }

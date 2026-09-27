@@ -31,9 +31,6 @@ export const MarketDashboardGroupCard: React.FC<MarketDashboardGroupCardProps> =
             <h3 className="text-lg font-black text-white flex items-center gap-2 flex-wrap tracking-tight">
               <span className="whitespace-nowrap">주식 시장 TOP 3 종합 현황</span>
             </h3>
-            <p className="text-xs text-slate-400">
-              시가총액 · 거래 변동률 · 거래량 TOP 3 주요 종목 종합 현황
-            </p>
           </div>
         </div>
 

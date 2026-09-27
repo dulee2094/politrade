@@ -47,9 +47,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
             <h3 className="text-lg font-black text-white flex items-center gap-2 flex-wrap tracking-tight">
               <span className="whitespace-nowrap">주간 민심 펄스 현황</span>
             </h3>
-            <p className="text-xs text-slate-400">
-              실시간 득표 및 지난주 확정 결과 4단계 통합 종합 현황
-            </p>
           </div>
         </div>
 
@@ -200,14 +197,17 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
       {/* ================================================================ */}
       {/* Section Divider Bar: Past Closed Results vs This Week Live Status */}
       {/* ================================================================ */}
-      <div className="relative my-2 py-1 flex items-center justify-center">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full bg-gradient-to-r from-transparent via-slate-700/60 to-transparent h-[1px]" />
+      <div className="my-3 p-3 rounded-2xl bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/30 flex items-center justify-between shadow-xl">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+          <h4 className="text-sm font-black text-white tracking-tight flex items-center gap-2">
+            <span className="text-emerald-400 font-mono">⚡</span>
+            <span>금주 실시간 민심 펄스 투표 집계</span>
+          </h4>
         </div>
-        <div className="relative z-10 px-3.5 py-1 bg-slate-900 border border-slate-700/70 rounded-full font-mono text-[11px] font-extrabold text-slate-300 flex items-center space-x-2 shadow-inner">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>LIVE · 금주 실시간 현황</span>
-        </div>
+        <span className="text-[10px] font-mono font-extrabold text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/40 shadow-sm">
+          실시간 집계 중
+        </span>
       </div>
 
       {/* ================================================================ */}
@@ -326,10 +326,6 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({ on
                   <p className="text-xs text-slate-300 italic mt-0.5 leading-tight truncate sm:whitespace-normal">"{topRev.oneLineReview}"</p>
                 </div>
               </div>
-
-              <span className="text-[11px] font-mono font-extrabold text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-full border border-amber-500/30 flex items-center gap-1 shrink-0 self-start sm:self-center">
-                <span>🎁 1위 시상 예정 (+10만P)</span>
-              </span>
             </div>
           );
         })()}

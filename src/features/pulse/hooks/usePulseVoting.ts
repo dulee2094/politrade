@@ -184,26 +184,29 @@ export function usePulseVoting() {
     const quorum30Pct = totalUsersCount * 0.30;
     const reviewQuorum10Pct = totalUsersCount * 0.10;
 
-    const buildTopList = (countsMap: Record<string, number>): PoliticianVoteCount[] => {
-      return Object.entries(countsMap)
-        .map(([id, count]) => {
-          const pol = politicians.find(p => p.id === id);
-          const isQuorumMet = count >= 31 && count > quorum30Pct;
-          return {
-            politicianId: id,
-            politicianName: pol ? pol.name : id,
-            party: pol ? pol.party : '무소속',
-            imageUrl: pol ? pol.imageUrl : '',
-            voteCount: count,
-            isQuorumMet,
-          };
-        })
+    const buildTopList = (countsMap: Record<string, number>, limit = 10): PoliticianVoteCount[] => {
+      const list: PoliticianVoteCount[] = politicians.map(pol => {
+        const count = countsMap[pol.id] || 0;
+        const isQuorumMet = count >= 31 && count > quorum30Pct;
+        return {
+          politicianId: pol.id,
+          politicianName: pol.name,
+          party: pol.party,
+          imageUrl: pol.imageUrl,
+          voteCount: count,
+          isQuorumMet,
+        };
+      });
+
+      return list
         .sort((a, b) => b.voteCount - a.voteCount)
-        .slice(0, 3);
+        .slice(0, limit);
     };
 
-    const bestTop3 = buildTopList(bestCounts);
-    const worstTop3 = buildTopList(worstCounts);
+    const bestTop3 = buildTopList(bestCounts, 3);
+    const worstTop3 = buildTopList(worstCounts, 3);
+    const bestTop10 = buildTopList(bestCounts, 10);
+    const worstTop10 = buildTopList(worstCounts, 10);
 
     // Reviews with text meeting quorum (> 10 likes & > 10% of total users), top 1 winner
     const reviewsWithText = votes
@@ -228,6 +231,8 @@ export function usePulseVoting() {
       totalUsersCount,
       bestTop3,
       worstTop3,
+      bestTop10,
+      worstTop10,
       bestReviews: reviewsWithText,
       dailyVoterCounts,
     };

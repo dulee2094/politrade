@@ -32,10 +32,6 @@ export const MarketTop3SpotlightCard: React.FC<MarketTop3SpotlightCardProps> = (
           </span>
           <span>시가총액 TOP 3 종목 (Market Cap Leaders)</span>
         </h4>
-        <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950/80 px-2.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-amber-400" />
-          <span>시가총액 상위</span>
-        </span>
       </div>
 
       {/* Grid of 3 Top Market Cap Stock Cards */}

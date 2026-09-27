@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePulseVoting } from '../hooks/usePulseVoting';
 import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
-import { X, Award, Vote, Sparkles, CheckCircle2, Wallet, Heart, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, Award, Vote, Sparkles, CheckCircle2, Wallet, Heart, Flame } from 'lucide-react';
 import { formatPoints } from '../../../core/utils/formatters';
 
 interface WeeklyPulseDetailModalProps {
@@ -40,31 +40,34 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
     }
   };
 
+  const bestList = weeklySummary.bestTop10 || weeklySummary.bestTop3;
+  const worstList = weeklySummary.worstTop10 || weeklySummary.worstTop3;
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto"
       onClick={onClose}
     >
       <div 
-        className="bg-slate-900 border border-slate-700/80 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden my-auto p-6 space-y-6 max-h-[90vh] flex flex-col"
+        className="bg-slate-900 border border-slate-700/80 rounded-3xl w-full max-w-5xl shadow-2xl overflow-hidden my-auto p-6 space-y-6 max-h-[90vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-4 shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg">
-              <Award className="w-6 h-6 text-slate-950" />
+          <div className="flex items-center space-x-3 min-w-0">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg shrink-0">
+              <Flame className="w-6 h-6 text-slate-950" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h2 className="text-xl font-extrabold text-white">주간 민심 펄스 종합 상세 리포트</h2>
-                <span className="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-0.5 rounded-full border border-amber-500/40 font-mono font-bold">
-                  WEEKLY REPORT
+            <div className="min-w-0">
+              <div className="flex items-center space-x-2 flex-wrap">
+                <h2 className="text-xl font-black text-white">금주 실시간 민심 펄스 득표 순위 (TOP 10)</h2>
+                <span className="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-mono font-bold flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> LIVE REAL-TIME RANKING
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                누적 민심 여론조사 집계 & 주주 배당금(+1,000P/주) 및 손실 감액(-1,000P/주) 정산
+                월요일부터 현재까지 집계된 금주 실시간 민심 여론조사 득표 순위 (상위 10위 BEST / WORST 의원 목록)
               </p>
             </div>
           </div>
@@ -72,7 +75,7 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/60 hover:bg-slate-800 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/60 hover:bg-slate-800 transition-colors shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -88,7 +91,7 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
                 <Vote className="w-4 h-4 text-amber-400" />
                 <span>오늘의 일일 펄스 투표 참여 (+{DAILY_VOTE_REWARD}P 지급)</span>
               </h4>
-              <p className="text-xs text-slate-300 mt-0.5">매일 1회 Best 3인 / Worst 3인을 선택하고 가상 포 포인트를 보상받으세요.</p>
+              <p className="text-xs text-slate-300 mt-0.5">매일 1회 Best 3인 / Worst 3인을 선택하고 실시간 득표 순위에 참여해보세요.</p>
             </div>
 
             <button
@@ -103,73 +106,73 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
             </button>
           </div>
 
-          {/* Dual Grid: Weekly Best 3 vs Worst 3 */}
+          {/* Dual Grid: Weekly Real-Time Best 10 vs Worst 10 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            {/* BEST 3 */}
-            <div className="bg-slate-900/90 p-4 rounded-2xl border border-emerald-500/30 space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="font-extrabold text-xs text-white flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  🏆 지난 주 최종 BEST 3 의원
+            {/* BEST 10 */}
+            <div className="bg-slate-900/90 p-4 rounded-2xl border border-emerald-500/30 space-y-3 flex flex-col">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5 shrink-0">
+                <span className="font-black text-sm text-white flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  🏆 금주 실시간 BEST 10 의원
                 </span>
                 <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                  +1,000 P / 주 배당
+                  누적 득표 순
                 </span>
               </div>
 
-              <div className="space-y-2">
-                {weeklySummary.bestTop3.map((pol, idx) => (
-                  <div key={'b_' + pol.politicianId} className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
-                    <div className="flex items-center space-x-3">
-                      <span className={`w-6 h-6 rounded-md text-xs font-black font-mono flex items-center justify-center ${
-                        idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
+              <div className="space-y-2 flex-1 max-h-[480px] overflow-y-auto pr-1">
+                {bestList.map((pol, idx) => (
+                  <div key={'b_' + pol.politicianId} className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs hover:bg-emerald-500/15 transition-colors">
+                    <div className="flex items-center space-x-2.5 min-w-0">
+                      <span className={`w-6 h-6 rounded-md text-xs font-black font-mono flex items-center justify-center shrink-0 ${
+                        idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : idx === 2 ? 'bg-amber-700 text-white' : 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
                       }`}>
                         {idx + 1}
                       </span>
-                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-9 h-9 rounded-lg" />
-                      <div>
-                        <span className="font-extrabold text-white">{pol.politicianName}</span>
-                        <div className="text-[10px] text-slate-400">{pol.party}</div>
+                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-8 h-8 rounded-lg shrink-0" />
+                      <div className="min-w-0">
+                        <span className="font-extrabold text-white block truncate">{pol.politicianName}</span>
+                        <div className="text-[10px] text-slate-400 truncate">{pol.party}</div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-mono font-bold text-emerald-400 text-sm">{pol.voteCount}표</div>
-                      <div className="text-[10px] text-emerald-300 font-mono">+1,000P/주</div>
+                    <div className="text-right shrink-0 ml-2">
+                      <div className="font-mono font-extrabold text-emerald-400 text-xs">{pol.voteCount}표</div>
+                      <div className="text-[9px] text-emerald-300 font-mono">실시간 {idx + 1}위</div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* WORST 3 */}
-            <div className="bg-slate-900/90 p-4 rounded-2xl border border-rose-500/30 space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="font-extrabold text-xs text-white flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-                  ⚠️ 지난 주 최종 WORST 3 의원
+            {/* WORST 10 */}
+            <div className="bg-slate-900/90 p-4 rounded-2xl border border-rose-500/30 space-y-3 flex flex-col">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5 shrink-0">
+                <span className="font-black text-sm text-white flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse" />
+                  🚨 금주 실시간 WORST 10 의원
                 </span>
                 <span className="text-[10px] text-rose-400 font-mono font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">
-                  -1,000 P / 주 감액
+                  누적 득표 순
                 </span>
               </div>
 
-              <div className="space-y-2">
-                {weeklySummary.worstTop3.map((pol, idx) => (
-                  <div key={'w_' + pol.politicianId} className="flex items-center justify-between p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs">
-                    <div className="flex items-center space-x-3">
-                      <span className="w-6 h-6 rounded-md text-xs font-black font-mono bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center">
+              <div className="space-y-2 flex-1 max-h-[480px] overflow-y-auto pr-1">
+                {worstList.map((pol, idx) => (
+                  <div key={'w_' + pol.politicianId} className="flex items-center justify-between p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs hover:bg-rose-500/15 transition-colors">
+                    <div className="flex items-center space-x-2.5 min-w-0">
+                      <span className="w-6 h-6 rounded-md text-xs font-black font-mono bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
-                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-9 h-9 rounded-lg" />
-                      <div>
-                        <span className="font-extrabold text-white">{pol.politicianName}</span>
-                        <div className="text-[10px] text-slate-400">{pol.party}</div>
+                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-8 h-8 rounded-lg shrink-0" />
+                      <div className="min-w-0">
+                        <span className="font-extrabold text-white block truncate">{pol.politicianName}</span>
+                        <div className="text-[10px] text-slate-400 truncate">{pol.party}</div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-mono font-bold text-rose-400 text-sm">{pol.voteCount}표</div>
-                      <div className="text-[10px] text-rose-300 font-mono">-1,000P/주</div>
+                    <div className="text-right shrink-0 ml-2">
+                      <div className="font-mono font-extrabold text-rose-400 text-xs">{pol.voteCount}표</div>
+                      <div className="text-[9px] text-rose-300 font-mono">실시간 {idx + 1}위</div>
                     </div>
                   </div>
                 ))}
@@ -187,14 +190,14 @@ export const WeeklyPulseDetailModal: React.FC<WeeklyPulseDetailModalProps> = ({
                 </div>
                 <div>
                   <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
-                    <span>내 주식 주간 배당금 및 손실 정산 내역</span>
+                    <span>금주 내 주식 실시간 예상 배당금 정산</span>
                     {hasSettledThisWeek && (
                       <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2.5 py-0.5 rounded-full border border-emerald-500/30">
                         정산 완료
                       </span>
                     )}
                   </h4>
-                  <p className="text-xs text-slate-400">내가 보유한 주식 중 주간 Best/Worst 3에 지정된 의원 주식 수량 기반 정산</p>
+                  <p className="text-xs text-slate-400">내가 보유한 주식 중 금주 실시간 Best/Worst 3에 지정된 의원 주식 수량 기반 예상 정산</p>
                 </div>
               </div>
 

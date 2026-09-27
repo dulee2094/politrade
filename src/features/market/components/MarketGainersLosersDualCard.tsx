@@ -33,9 +33,6 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
           </span>
           <span>어제 거래 변동률 TOP 3 (급상승 vs 급하락)</span>
         </h4>
-        <span className="text-[10px] font-mono font-bold text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded border border-slate-700">
-          24H 등락률 기준
-        </span>
       </div>
 
       {/* 2-Column Subgrid: Gainers (Left) vs Losers (Right) */}
@@ -48,9 +45,6 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
               <TrendingUp className="w-4 h-4" />
               <span>🔥 어제 거래 급상승 TOP 3</span>
             </div>
-            <span className="text-[10px] font-mono font-bold text-emerald-300 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30">
-              최고 상승세
-            </span>
           </div>
 
           <div className="space-y-2">
@@ -99,9 +93,6 @@ export const MarketGainersLosersDualCard: React.FC<MarketGainersLosersDualCardPr
               <TrendingDown className="w-4 h-4" />
               <span>📉 어제 거래 급하락 TOP 3</span>
             </div>
-            <span className="text-[10px] font-mono font-bold text-rose-300 bg-rose-950 px-2 py-0.5 rounded border border-rose-500/30">
-              최고 조정세
-            </span>
           </div>
 
           <div className="space-y-2">

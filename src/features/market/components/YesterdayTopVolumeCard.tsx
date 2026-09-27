@@ -23,9 +23,6 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
           </span>
           <span>어제 마감 거래량 & 거래대금 TOP 3 종목</span>
         </h4>
-        <span className="text-[10px] font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-0.5 rounded border border-cyan-500/30">
-          어제 최종 집계
-        </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
