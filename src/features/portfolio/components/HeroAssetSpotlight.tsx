@@ -67,7 +67,7 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
   const holdingsCount = activeHoldingsList.length;
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/50 p-5 sm:p-6 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-5">
+    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/70 p-5 sm:p-6 rounded-3xl border-2 border-indigo-500/60 shadow-[0_0_25px_rgba(99,102,241,0.2)] space-y-5">
       <div className="absolute -top-12 -right-12 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
       
       {/* Header Row */}

@@ -19,7 +19,7 @@ export const MarketDashboardGroupCard: React.FC<MarketDashboardGroupCardProps> =
   onGoToMarket,
 }) => {
   return (
-    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border border-blue-500/30 shadow-2xl h-full flex flex-col justify-between space-y-4">
+    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border-2 border-blue-500/60 shadow-[0_0_25px_rgba(59,130,246,0.2)] h-full flex flex-col justify-between space-y-4">
       
       {/* Left Main Dashboard Top Header */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5 shrink-0">

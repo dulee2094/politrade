@@ -21,6 +21,9 @@ import { PoliticianAvatar } from './shared/ui/PoliticianAvatar';
 import { NewsFeedList } from './features/news/components/NewsFeedList';
 import { UserProfileDetailModal } from './features/auth/components/UserProfileDetailModal';
 import { WeeklyPulseDetailModal } from './features/pulse/components/WeeklyPulseDetailModal';
+import { PastWeekBestWorstDetailModal } from './features/pulse/components/PastWeekBestWorstDetailModal';
+import { PastWeekBestReviewDetailModal } from './features/pulse/components/PastWeekBestReviewDetailModal';
+import { CurrentWeekBestWorstDetailModal } from './features/pulse/components/CurrentWeekBestWorstDetailModal';
 import { DailyBestWorstVoteModal } from './features/pulse/components/DailyBestWorstVoteModal';
 import { WeeklyOneLineReviewsDetailView } from './features/pulse/components/WeeklyOneLineReviewsDetailView';
 import { NoticeGuideBanner } from './features/notice/components/NoticeGuideBanner';
@@ -32,6 +35,10 @@ import { formatPoints, formatPercent } from './core/utils/formatters';
 interface DashboardHomeProps {
   onOpenUserProfile: () => void;
   onOpenWeeklyPulse: () => void;
+  onOpenPastBestWorstDetail: () => void;
+  onOpenPastReviewDetail: () => void;
+  onOpenCurrentBestWorstDetail: () => void;
+  onOpenCurrentReviewsDetail: () => void;
   onOpenAssetDetail: () => void;
   onOpenPulseActivityDetail: () => void;
   onOpenTradeDetail: () => void;
@@ -43,6 +50,10 @@ interface DashboardHomeProps {
 const DashboardHome: React.FC<DashboardHomeProps> = ({ 
   onOpenUserProfile, 
   onOpenWeeklyPulse,
+  onOpenPastBestWorstDetail,
+  onOpenPastReviewDetail,
+  onOpenCurrentBestWorstDetail,
+  onOpenCurrentReviewsDetail,
   onOpenAssetDetail,
   onOpenPulseActivityDetail,
   onOpenTradeDetail,
@@ -117,6 +128,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
         {/* Right Column (6/12): 민심 펄스 종합 현황 (Option A: 4단 통합 스마트 펄스 대시보드) */}
         <div className="lg:col-span-6 flex flex-col">
           <WeeklyPulseReportCard 
+            onOpenPastBestWorstDetail={onOpenPastBestWorstDetail}
+            onOpenPastReviewDetail={onOpenPastReviewDetail}
+            onOpenCurrentBestWorstDetail={onOpenCurrentBestWorstDetail}
+            onOpenCurrentReviewsDetail={onOpenCurrentReviewsDetail}
             onOpenDetail={onOpenWeeklyPulse}
             onOpenReviewsDetail={onOpenReviewsDetail}
           />
@@ -174,6 +189,9 @@ const MainContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<'landing' | 'app'>('landing');
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const [isWeeklyPulseModalOpen, setIsWeeklyPulseModalOpen] = useState(false);
+  const [isPastBestWorstModalOpen, setIsPastBestWorstModalOpen] = useState(false);
+  const [isPastReviewModalOpen, setIsPastReviewModalOpen] = useState(false);
+  const [isCurrentBestWorstModalOpen, setIsCurrentBestWorstModalOpen] = useState(false);
   const [isDailyVoteModalOpen, setIsDailyVoteModalOpen] = useState(false);
   const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
   const [activeDetailView, setActiveDetailView] = useState<'asset' | 'pulse_activity' | 'trade_history' | 'reviews_detail' | null>(null);
@@ -235,6 +253,10 @@ const MainContent: React.FC = () => {
               <DashboardHome
                 onOpenUserProfile={() => setIsUserProfileModalOpen(true)}
                 onOpenWeeklyPulse={() => setIsWeeklyPulseModalOpen(true)}
+                onOpenPastBestWorstDetail={() => setIsPastBestWorstModalOpen(true)}
+                onOpenPastReviewDetail={() => setIsPastReviewModalOpen(true)}
+                onOpenCurrentBestWorstDetail={() => setIsCurrentBestWorstModalOpen(true)}
+                onOpenCurrentReviewsDetail={() => setActiveDetailView('reviews_detail')}
                 onOpenAssetDetail={() => setActiveDetailView('asset')}
                 onOpenPulseActivityDetail={() => setActiveDetailView('pulse_activity')}
                 onOpenTradeDetail={() => setActiveDetailView('trade_history')}
@@ -274,7 +296,26 @@ const MainContent: React.FC = () => {
         onClose={() => setIsUserProfileModalOpen(false)}
       />
 
-      {/* Standalone Weekly Pulse Detail Modal */}
+      {/* Modal 1: Past Week Best/Worst Modal */}
+      <PastWeekBestWorstDetailModal
+        isOpen={isPastBestWorstModalOpen}
+        onClose={() => setIsPastBestWorstModalOpen(false)}
+      />
+
+      {/* Modal 2: Past Week Best Review Winner Modal */}
+      <PastWeekBestReviewDetailModal
+        isOpen={isPastReviewModalOpen}
+        onClose={() => setIsPastReviewModalOpen(false)}
+      />
+
+      {/* Modal 3: Current Week Best/Worst Live Ranking Modal */}
+      <CurrentWeekBestWorstDetailModal
+        isOpen={isCurrentBestWorstModalOpen}
+        onClose={() => setIsCurrentBestWorstModalOpen(false)}
+        onOpenVoteModal={() => setIsDailyVoteModalOpen(true)}
+      />
+
+      {/* Standalone Weekly Pulse Detail Modal (Legacy Fallback) */}
       <WeeklyPulseDetailModal
         isOpen={isWeeklyPulseModalOpen}
         onClose={() => setIsWeeklyPulseModalOpen(false)}
