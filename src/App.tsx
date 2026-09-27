@@ -219,7 +219,15 @@ const MainContent: React.FC = () => {
     <div className="min-h-screen flex flex-col justify-between bg-slate-950 text-slate-100 font-sans">
       
       {/* Header Navigation */}
-      <Header onShowLanding={() => setCurrentView('landing')} />
+      <Header 
+        onShowLanding={() => setCurrentView('landing')} 
+        onGoToDashboard={() => {
+          setActiveDetailView(null);
+          setActiveTab('dashboard');
+        }}
+        onOpenUserProfile={() => setIsUserProfileModalOpen(true)}
+        onOpenSignUpModal={() => setIsSignUpModalOpen(true)}
+      />
 
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6 flex-1">

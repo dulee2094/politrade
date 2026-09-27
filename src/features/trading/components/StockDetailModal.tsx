@@ -9,6 +9,7 @@ import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { formatPoints, formatPercent } from '../../../core/utils/formatters';
 import { PartyBadge } from '../../../shared/ui/PartyBadge';
 import { getMarketStatus } from '../../../core/trading/marketHours';
+import { INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
 
 export const StockDetailModal: React.FC = () => {
   // 1. ALL React Hooks MUST execute unconditionally at the top level
@@ -45,7 +46,7 @@ export const StockDetailModal: React.FC = () => {
 
   const mStatus = getMarketStatus();
   const change24h = typeof politician.change24h === 'number' ? politician.change24h : 0;
-  const currentPrice = typeof politician.currentPrice === 'number' ? politician.currentPrice : 10000;
+  const currentPrice = typeof politician.currentPrice === 'number' ? politician.currentPrice : INITIAL_IPO_PRICE;
   const high24h = typeof politician.high24h === 'number' ? politician.high24h : currentPrice;
   const low24h = typeof politician.low24h === 'number' ? politician.low24h : currentPrice;
   const isUp = change24h >= 0;
@@ -86,7 +87,7 @@ export const StockDetailModal: React.FC = () => {
 
     if (isIPO) {
       if (selectedType === 'BUY') {
-        const totalCost = sharesNum * 10000;
+        const totalCost = sharesNum * INITIAL_IPO_PRICE;
         if (user.balance < totalCost) {
           setValidationError(`포인트가 부족합니다. (필요: ${totalCost.toLocaleString()} P / 보유: ${user.balance.toLocaleString()} P)`);
           return;
@@ -170,7 +171,7 @@ export const StockDetailModal: React.FC = () => {
                 </span>
                 {isIPO ? (
                   <span className="bg-indigo-600/30 text-indigo-300 text-xs px-2.5 py-0.5 rounded-full border border-indigo-500/40 font-mono font-bold">
-                    Phase 1 공모 중 (10,000 P)
+                    Phase 1 공모 중 ({formatPoints(INITIAL_IPO_PRICE)})
                   </span>
                 ) : (
                   <span className="bg-emerald-600/30 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-mono font-bold">
@@ -346,7 +347,7 @@ export const StockDetailModal: React.FC = () => {
                   {isIPO ? 'Phase 1 공모 청약' : 'Phase 2 호가 주문'}
                 </h3>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  {isIPO ? '고정가 10,000 P' : '지정가 / 시장가 선택'}
+                  {isIPO ? `공모가 ${formatPoints(INITIAL_IPO_PRICE)}` : '지정가 / 시장가 선택'}
                 </span>
               </div>
 
@@ -433,7 +434,7 @@ export const StockDetailModal: React.FC = () => {
                   <div className="flex items-center space-x-1.5">
                     <input
                       type="number"
-                      step={50}
+                      step={1000}
                       value={priceInput}
                       onChange={e => setPriceInput(e.target.value)}
                       className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-blue-500"
@@ -441,17 +442,17 @@ export const StockDetailModal: React.FC = () => {
                     <div className="flex space-x-1 shrink-0">
                       <button
                         type="button"
-                        onClick={() => adjustPrice(-100)}
+                        onClick={() => adjustPrice(-1000)}
                         className="px-2 py-2 bg-slate-900 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 font-mono text-xs"
                       >
-                        -100
+                        -1,000
                       </button>
                       <button
                         type="button"
-                        onClick={() => adjustPrice(100)}
+                        onClick={() => adjustPrice(1000)}
                         className="px-2 py-2 bg-slate-900 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 font-mono text-xs"
                       >
-                        +100
+                        +1,000
                       </button>
                     </div>
                   </div>
@@ -495,7 +496,7 @@ export const StockDetailModal: React.FC = () => {
                   <span className="text-slate-400">가격 체결 방식</span>
                   <span className="text-indigo-400 font-bold font-sans">
                     {isIPO
-                      ? '10,000P 고정가'
+                      ? `${formatPoints(INITIAL_IPO_PRICE)} 공모가`
                       : orderClass === 'LIMIT'
                       ? '지정가 체결 / 미체결 잔량 호가 등록'
                       : '실시간 시장가 체결'}
@@ -564,7 +565,7 @@ export const StockDetailModal: React.FC = () => {
               <div className="flex items-center justify-between border-t border-slate-700/50 pt-2">
                 <span className="text-slate-400 font-sans">주문 단가</span>
                 <span className="font-bold text-white">
-                  {isIPO ? '10,000 P (고정가)' : orderClass === 'LIMIT' ? `${formatPoints(parseInt(priceInput, 10) || currentPrice)}` : '실시간 시장가'}
+                  {isIPO ? `${formatPoints(INITIAL_IPO_PRICE)} (공모가)` : orderClass === 'LIMIT' ? `${formatPoints(parseInt(priceInput, 10) || currentPrice)}` : '실시간 시장가'}
                 </span>
               </div>
 

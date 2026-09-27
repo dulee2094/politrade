@@ -65,8 +65,8 @@ export const MarketBoard: React.FC<MarketBoardProps> = ({ onBackToHome }) => {
           onClick={() => setSubTab('market')}
           className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center space-x-2 ${
             subTab === 'market'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+              ? 'bg-blue-600 text-white border border-blue-400/40 shadow-md shadow-blue-500/20'
+              : 'bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 hover:bg-slate-800 hover:text-white'
           }`}
         >
           <BarChart2 className="w-4 h-4" />
@@ -78,8 +78,8 @@ export const MarketBoard: React.FC<MarketBoardProps> = ({ onBackToHome }) => {
           onClick={() => setSubTab('petition')}
           className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center space-x-2 ${
             subTab === 'petition'
-              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+              ? 'bg-amber-500 text-slate-950 border border-amber-400/40 shadow-md shadow-amber-500/20'
+              : 'bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-slate-500 hover:bg-slate-800 hover:text-white'
           }`}
         >
           <Vote className="w-4 h-4" />
@@ -127,6 +127,14 @@ export const MarketBoard: React.FC<MarketBoardProps> = ({ onBackToHome }) => {
                   가나다순
                 </button>
                 <button
+                  onClick={() => setSortBy('price')}
+                  className={`px-3 py-1.5 rounded-lg transition-all font-bold ${
+                    sortBy === 'price' ? 'bg-slate-800 text-blue-400 border border-blue-500/40 shadow-sm' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  주가순
+                </button>
+                <button
                   onClick={() => setSortBy('change')}
                   className={`px-3 py-1.5 rounded-lg transition-all font-bold ${
                     sortBy === 'change' ? 'bg-slate-800 text-blue-400 border border-blue-500/40 shadow-sm' : 'text-slate-400 hover:text-slate-200'
@@ -141,14 +149,6 @@ export const MarketBoard: React.FC<MarketBoardProps> = ({ onBackToHome }) => {
                   }`}
                 >
                   거래량순
-                </button>
-                <button
-                  onClick={() => setSortBy('price')}
-                  className={`px-3 py-1.5 rounded-lg transition-all font-bold ${
-                    sortBy === 'price' ? 'bg-slate-800 text-blue-400 border border-blue-500/40 shadow-sm' : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  주가순
                 </button>
               </div>
             </div>

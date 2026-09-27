@@ -26,7 +26,7 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician, on
             </span>
             <span className="text-xs font-bold text-white">공모가 정액 청약 단계</span>
           </div>
-          <span className="text-xs font-mono text-amber-400 font-bold">공모가 10,000 P / 주</span>
+          <span className="text-xs font-mono text-amber-400 font-bold">공모가 {formatPoints(INITIAL_IPO_PRICE)} / 주</span>
         </div>
 
         {/* Progress Bar */}
@@ -85,12 +85,12 @@ export const OrderBookWidget: React.FC<OrderBookWidgetProps> = ({ politician, on
 
         {/* Current Price Banner */}
         <div
-          onClick={() => onSelectPrice && onSelectPrice(politician.currentPrice || 10000)}
+          onClick={() => onSelectPrice && onSelectPrice(politician.currentPrice || INITIAL_IPO_PRICE)}
           className="p-2 my-1 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 flex items-center justify-between text-white font-bold cursor-pointer transition-colors"
           title="현재 체결가 선택"
         >
           <span className="text-[10px] font-sans text-slate-400">현재 체결가</span>
-          <span className="text-sm font-mono text-amber-400">{formatPoints(politician.currentPrice || 10000)}</span>
+          <span className="text-sm font-mono text-amber-400">{formatPoints(politician.currentPrice || INITIAL_IPO_PRICE)}</span>
         </div>
 
         {/* Bids (Buy Orders - Green) */}

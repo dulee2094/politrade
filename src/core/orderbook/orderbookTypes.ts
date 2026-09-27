@@ -29,6 +29,6 @@ export interface OrderBookSnapshot {
 export interface IPOMetadata {
   targetShares: number; // 1,000 shares
   soldShares: number;   // e.g. 850 shares
-  fixedPrice: number;   // 10,000 P
+  fixedPrice: number;   // 50,000 P
   isCompleted: boolean;
 }

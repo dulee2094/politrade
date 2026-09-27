@@ -10,7 +10,7 @@ export function useTradingForm(politician?: Politician) {
   const [orderClass, setOrderClass] = useState<'LIMIT' | 'MARKET'>('LIMIT');
   const [sharesInput, setSharesInput] = useState<string>('1');
   const [priceInput, setPriceInput] = useState<string>(
-    politician?.currentPrice ? politician.currentPrice.toString() : '10000'
+    politician?.currentPrice ? politician.currentPrice.toString() : INITIAL_IPO_PRICE.toString()
   );
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -24,7 +24,7 @@ export function useTradingForm(politician?: Politician) {
   const userHoldingsMap = user?.holdings || {};
   const userHolding = (politician?.id && userHoldingsMap[politician.id]) || { shares: 0, avgPrice: 0, totalInvested: 0 };
   const sharesNum = Math.max(1, parseInt(sharesInput, 10) || 1);
-  const spotPrice = politician?.currentPrice || 10000;
+  const spotPrice = politician?.currentPrice || INITIAL_IPO_PRICE;
   const priceNum = Math.max(100, parseInt(priceInput, 10) || spotPrice);
 
   const isIPO = politician?.phase === 'IPO';

@@ -53,7 +53,7 @@ export const VirtualUsersTestWidget: React.FC = () => {
     }, 1500);
 
     setTimeout(() => {
-      setLogs(prev => [...prev, '✅ [Check 4] 주간 Best 3 주주 1주당 +1,000P 배당금 & Worst 3 1주당 -1,000P 감액 정산 정상']);
+      setLogs(prev => [...prev, '✅ [Check 4] 주간 Best 3 주주 차등 배당금 (1위 +3,000P / 2위 +2,000P / 3위 +1,000P) & Worst 3 차등 감액 정산 정상']);
     }, 2000);
 
     setTimeout(() => {

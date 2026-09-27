@@ -19,24 +19,10 @@ export const CurrentWeekBestWorstDetailModal: React.FC<CurrentWeekBestWorstDetai
     hasVotedToday,
     weeklySummary,
     userSettlement,
-    hasSettledThisWeek,
-    executeWeeklySettlement,
     DAILY_VOTE_REWARD,
   } = usePulseVoting();
 
-  const [settlementFeedback, setSettlementFeedback] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
   if (!isOpen) return null;
-
-  const handleClaimSettlement = () => {
-    setSettlementFeedback(null);
-    const res = executeWeeklySettlement();
-    if (res.success) {
-      setSettlementFeedback({ type: 'success', message: res.message });
-    } else {
-      setSettlementFeedback({ type: 'error', message: res.message });
-    }
-  };
 
   const bestList = weeklySummary.bestTop10 || weeklySummary.bestTop3;
   const worstList = weeklySummary.worstTop10 || weeklySummary.worstTop3;
@@ -114,9 +100,6 @@ export const CurrentWeekBestWorstDetailModal: React.FC<CurrentWeekBestWorstDetai
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                   🏆 금주 실시간 BEST 10 의원
                 </span>
-                <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                  누적 득표 순
-                </span>
               </div>
 
               <div className="space-y-2 flex-1 max-h-[480px] overflow-y-auto pr-1">
@@ -149,9 +132,6 @@ export const CurrentWeekBestWorstDetailModal: React.FC<CurrentWeekBestWorstDetai
                 <span className="font-black text-sm text-white flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse" />
                   🚨 금주 실시간 WORST 10 의원
-                </span>
-                <span className="text-[10px] text-rose-400 font-mono font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">
-                  누적 득표 순
                 </span>
               </div>
 
@@ -188,30 +168,19 @@ export const CurrentWeekBestWorstDetailModal: React.FC<CurrentWeekBestWorstDetai
                 </div>
                 <div>
                   <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
-                    <span>금주 내 주식 실시간 예상 배당금 정산</span>
-                    {hasSettledThisWeek && (
-                      <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                        정산 완료
-                      </span>
-                    )}
+                    <span>금주 내 주식 실시간 예상 배당금 & 자산 가치 영향</span>
+                    <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2.5 py-0.5 rounded-full border border-amber-500/30 font-bold">
+                      실시간 예측
+                    </span>
                   </h4>
-                  <p className="text-xs text-slate-400">내가 보유한 주식 중 금주 실시간 Best/Worst 3에 지정된 의원 주식 수량 기반 예상 정산</p>
+                  <p className="text-xs text-slate-400 mt-0.5">내가 보유한 주식 중 금주 실시간 Best/Worst 3위 지정 의원 주식 수량 기반 실시간 예측 시뮬레이션</p>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleClaimSettlement}
-                disabled={hasSettledThisWeek}
-                className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-lg flex items-center space-x-1.5 shrink-0 ${
-                  hasSettledThisWeek
-                    ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20'
-                }`}
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>{hasSettledThisWeek ? '이번 주 정산 완료' : '주간 배당금 정산 받기'}</span>
-              </button>
+              <div className="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-800/90 text-indigo-300 border border-indigo-500/30 shadow-sm flex items-center space-x-1.5 shrink-0">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                <span>⏳ 매주 월요일 11:00 자동 정산 예정</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -226,23 +195,17 @@ export const CurrentWeekBestWorstDetailModal: React.FC<CurrentWeekBestWorstDetai
               </div>
 
               <div className="bg-indigo-950/50 p-3 rounded-xl border border-indigo-500/40 flex items-center justify-between">
-                <span className="text-slate-300 font-sans font-bold">최종 순 정산액</span>
+                <span className="text-slate-300 font-sans font-bold">내 주식 가치 영향 예상</span>
                 <span className={`font-black text-base ${userSettlement.netAmount >= 0 ? 'text-amber-300' : 'text-rose-400'}`}>
                   {userSettlement.netAmount >= 0 ? '+' : ''}{formatPoints(userSettlement.netAmount)}
                 </span>
               </div>
             </div>
 
-            {settlementFeedback && (
-              <div className={`p-3 rounded-xl border text-xs font-bold font-sans flex items-center space-x-2 ${
-                settlementFeedback.type === 'error'
-                  ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
-                  : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-              }`}>
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>{settlementFeedback.message}</span>
-              </div>
-            )}
+            <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-700/50 text-[11px] text-slate-400 font-sans flex items-center space-x-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <span>💡 실시간 순위는 매일 투표에 따라 변동되며, 최종 배당금 및 주가 영향은 매주 월요일 11:00 마감 시점 순위로 확정 지급됩니다.</span>
+            </div>
           </div>
 
         </div>

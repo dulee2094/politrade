@@ -179,7 +179,7 @@ export const NoticeGuideDetailModal: React.FC<NoticeGuideDetailModalProps> = ({
                     <span>3. 주간 주주 배당금 & 감액 정산</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    매주 월요일 11:00 정산 시 보유 주식이 **Best 3 선정 시 주당 +1,000P 배당금**을 지급받으며, **Worst 3 지정 시 주당 -1,000P 손실 감액** 정산됩니다.
+                    매주 월요일 11:00 정산 시 보유 주식이 **Best 3 선정 시 순위별 차등 배당 (1위 +3,000P / 2위 +2,000P / 3위 +1,000P)**을 지급받으며, **Worst 3 지정 시 순위별 차등 감액 (1위 -3,000P / 2위 -2,000P / 3위 -1,000P)** 정산됩니다.
                   </p>
                 </div>
 

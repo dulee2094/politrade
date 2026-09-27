@@ -20,9 +20,15 @@ export interface WeeklySettlementResult {
   isQuorumMet: boolean;
 }
 
-export const DIVIDEND_PER_SHARE = 1000;
-export const PENALTY_PER_SHARE = 1000;
 export const MIN_VOTES_REQUIRED = 31; // 30명 초과 = 최소 31표 이상
+
+// 순위별 배당/감액 단가 (1위 3,000P / 2위 2,000P / 3위 1,000P/주)
+export function getRankRewardRate(rankIndex: number): number {
+  if (rankIndex === 0) return 3000;
+  if (rankIndex === 1) return 2000;
+  if (rankIndex === 2) return 1000;
+  return 1000;
+}
 
 export function calculateWeeklySettlement(
   holdingsMap: Record<string, Holding> = {},
@@ -39,44 +45,43 @@ export function calculateWeeklySettlement(
   const qualifiedBestPols = weeklySummary.bestTop3.filter(b => b.voteCount >= MIN_VOTES_REQUIRED && b.voteCount > quorum30Pct);
   const qualifiedWorstPols = weeklySummary.worstTop3.filter(w => w.voteCount >= MIN_VOTES_REQUIRED && w.voteCount > quorum30Pct);
 
-  const bestIds = qualifiedBestPols.map(b => b.politicianId);
-  const worstIds = qualifiedWorstPols.map(w => w.politicianId);
-
   Object.values(holdingsMap).forEach(holding => {
     if (!holding || holding.shares <= 0) return;
 
     const polId = holding.politicianId;
-    const isBest = bestIds.includes(polId);
-    const isWorst = worstIds.includes(polId);
 
-    if (isBest) {
-      const bestPol = qualifiedBestPols.find(b => b.politicianId === polId);
-      const polName = bestPol ? bestPol.politicianName : polId;
-      const amount = holding.shares * DIVIDEND_PER_SHARE;
+    // Check Best Top 3 Rank
+    const bestRankIdx = qualifiedBestPols.findIndex(b => b.politicianId === polId);
+    if (bestRankIdx !== -1) {
+      const bestPol = qualifiedBestPols[bestRankIdx];
+      const ratePerShare = getRankRewardRate(bestRankIdx);
+      const amount = holding.shares * ratePerShare;
 
       totalDividend += amount;
       breakdown.push({
         politicianId: polId,
-        politicianName: polName,
+        politicianName: bestPol.politicianName,
         type: 'BEST_DIVIDEND',
         shares: holding.shares,
-        ratePerShare: DIVIDEND_PER_SHARE,
+        ratePerShare: ratePerShare,
         amount: amount,
       });
     }
 
-    if (isWorst) {
-      const worstPol = qualifiedWorstPols.find(w => w.politicianId === polId);
-      const polName = worstPol ? worstPol.politicianName : polId;
-      const amount = holding.shares * PENALTY_PER_SHARE;
+    // Check Worst Top 3 Rank
+    const worstRankIdx = qualifiedWorstPols.findIndex(w => w.politicianId === polId);
+    if (worstRankIdx !== -1) {
+      const worstPol = qualifiedWorstPols[worstRankIdx];
+      const ratePerShare = getRankRewardRate(worstRankIdx);
+      const amount = holding.shares * ratePerShare;
 
       totalPenalty += amount;
       breakdown.push({
         politicianId: polId,
-        politicianName: polName,
+        politicianName: worstPol.politicianName,
         type: 'WORST_PENALTY',
         shares: holding.shares,
-        ratePerShare: PENALTY_PER_SHARE,
+        ratePerShare: ratePerShare,
         amount: -amount,
       });
     }

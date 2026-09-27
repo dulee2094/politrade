@@ -78,7 +78,9 @@ export const HeroAssetSpotlight: React.FC<HeroAssetSpotlightProps> = ({
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-base font-black text-white tracking-wide">마이 자산 대시보드 (Overview)</h2>
+              <h3 className="text-lg font-black text-white flex items-center gap-2 flex-wrap tracking-tight">
+                <span className="whitespace-nowrap">마이 자산 현황</span>
+              </h3>
             </div>
           </div>
         </div>

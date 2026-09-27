@@ -43,7 +43,7 @@ export function generateMarketBriefing(
     if (phase2Count > 0) {
       commentary += `총 ${phase2Count}개 종목이 10주 공모 완판에 성공하여 Phase 2 호가창 실시간 매매 정규 시장에서 활발히 거래되고 있습니다.`;
     } else {
-      commentary += `현재 10인 의원 전 종목이 Phase 1 공모가(10,000 P) 정액 청약 단계에 있으며, 10주 완판 시 즉시 호가창 시장으로 상장 전환됩니다.`;
+      commentary += `현재 10인 의원 전 종목이 Phase 1 공모가(50,000 P) 정액 청약 단계에 있으며, 10주 완판 시 즉시 호가창 시장으로 상장 전환됩니다.`;
     }
   }
 

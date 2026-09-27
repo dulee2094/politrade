@@ -1,7 +1,9 @@
 import { LimitOrder, OrderBookSnapshot, OrderBookLevel } from './orderbookTypes';
 
-export const INITIAL_IPO_PRICE = 10000;
+export const INITIAL_IPO_PRICE = 50000;
 export const INITIAL_IPO_TARGET_SHARES = 10; // 10 shares for testing
+
+export const TICK_INTERVAL = 1000;
 
 /**
  * Generates initial 5-level mock orderbook around current price.
@@ -9,29 +11,29 @@ export const INITIAL_IPO_TARGET_SHARES = 10; // 10 shares for testing
  * Bids: sorted descending by price (highest bid first)
  */
 export function generateMockOrderBook(currentPrice: number): OrderBookSnapshot {
-  const basePrice = Math.max(1000, currentPrice || 10000);
+  const basePrice = Math.max(TICK_INTERVAL, currentPrice || INITIAL_IPO_PRICE);
   
   const asks: OrderBookLevel[] = [
-    { price: basePrice + 50, shares: 2, totalPoints: (basePrice + 50) * 2 },
-    { price: basePrice + 100, shares: 4, totalPoints: (basePrice + 100) * 4 },
-    { price: basePrice + 200, shares: 6, totalPoints: (basePrice + 200) * 6 },
-    { price: basePrice + 300, shares: 8, totalPoints: (basePrice + 300) * 8 },
-    { price: basePrice + 400, shares: 12, totalPoints: (basePrice + 400) * 12 },
+    { price: basePrice + 1000, shares: 1, totalPoints: (basePrice + 1000) * 1 },
+    { price: basePrice + 2000, shares: 1, totalPoints: (basePrice + 2000) * 1 },
+    { price: basePrice + 3000, shares: 2, totalPoints: (basePrice + 3000) * 2 },
+    { price: basePrice + 4000, shares: 1, totalPoints: (basePrice + 4000) * 1 },
+    { price: basePrice + 5000, shares: 1, totalPoints: (basePrice + 5000) * 1 },
   ];
 
   const bids: OrderBookLevel[] = [
-    { price: basePrice - 50, shares: 3, totalPoints: (basePrice - 50) * 3 },
-    { price: basePrice - 100, shares: 5, totalPoints: (basePrice - 100) * 5 },
-    { price: basePrice - 200, shares: 9, totalPoints: (basePrice - 200) * 9 },
-    { price: basePrice - 300, shares: 11, totalPoints: (basePrice - 300) * 11 },
-    { price: basePrice - 400, shares: 15, totalPoints: (basePrice - 400) * 15 },
+    { price: Math.max(TICK_INTERVAL, basePrice - 1000), shares: 1, totalPoints: Math.max(TICK_INTERVAL, basePrice - 1000) * 1 },
+    { price: Math.max(TICK_INTERVAL, basePrice - 2000), shares: 2, totalPoints: Math.max(TICK_INTERVAL, basePrice - 2000) * 2 },
+    { price: Math.max(TICK_INTERVAL, basePrice - 3000), shares: 1, totalPoints: Math.max(TICK_INTERVAL, basePrice - 3000) * 1 },
+    { price: Math.max(TICK_INTERVAL, basePrice - 4000), shares: 1, totalPoints: Math.max(TICK_INTERVAL, basePrice - 4000) * 1 },
+    { price: Math.max(TICK_INTERVAL, basePrice - 5000), shares: 1, totalPoints: Math.max(TICK_INTERVAL, basePrice - 5000) * 1 },
   ];
 
   return { asks, bids };
 }
 
 export function ensureMinOrderBookLevels(orderBook: OrderBookSnapshot, currentPrice: number): OrderBookSnapshot {
-  const basePrice = Math.max(1000, currentPrice || 10000);
+  const basePrice = Math.max(TICK_INTERVAL, currentPrice || INITIAL_IPO_PRICE);
   
   // Clean & sort asks ascending by price (only keep positive shares)
   let asks = Array.isArray(orderBook?.asks)
@@ -49,14 +51,14 @@ export function ensureMinOrderBookLevels(orderBook: OrderBookSnapshot, currentPr
   if (asks.length < 5) {
     const existingPrices = new Set(asks.map(a => a.price));
     let startPrice = asks.length > 0 ? asks[asks.length - 1].price : basePrice;
-    let nextOffset = 50;
+    let nextOffset = TICK_INTERVAL;
     while (asks.length < 5) {
       let p = startPrice + nextOffset;
       if (!existingPrices.has(p)) {
-        asks.push({ price: p, shares: 5, totalPoints: p * 5 });
+        asks.push({ price: p, shares: 1, totalPoints: p * 1 });
         existingPrices.add(p);
       }
-      nextOffset += 50;
+      nextOffset += TICK_INTERVAL;
     }
     asks.sort((a, b) => a.price - b.price);
   }
@@ -65,15 +67,15 @@ export function ensureMinOrderBookLevels(orderBook: OrderBookSnapshot, currentPr
   if (bids.length < 5) {
     const existingPrices = new Set(bids.map(b => b.price));
     let startPrice = bids.length > 0 ? bids[bids.length - 1].price : basePrice;
-    let nextOffset = 50;
+    let nextOffset = TICK_INTERVAL;
     while (bids.length < 5) {
-      let p = Math.max(100, startPrice - nextOffset);
+      let p = Math.max(TICK_INTERVAL, startPrice - nextOffset);
       if (!existingPrices.has(p) && p > 0) {
-        bids.push({ price: p, shares: 5, totalPoints: p * 5 });
+        bids.push({ price: p, shares: 1, totalPoints: p * 1 });
         existingPrices.add(p);
       }
-      nextOffset += 50;
-      if (p <= 100) break;
+      nextOffset += TICK_INTERVAL;
+      if (p <= TICK_INTERVAL) break;
     }
     bids.sort((a, b) => b.price - a.price);
   }
