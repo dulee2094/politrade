@@ -6,6 +6,8 @@ export interface PulseVoteRecord {
   date: string; // YYYY-MM-DD
   bestPoliticianIds: string[];
   worstPoliticianIds: string[];
+  targetPoliticianId?: string;
+  targetVoteType?: 'BEST' | 'WORST';
   oneLineReview?: string;
   likes: number;
   createdAt: string;

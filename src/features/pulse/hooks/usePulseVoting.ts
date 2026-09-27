@@ -9,6 +9,43 @@ const LOCAL_STORAGE_SETTLED_KEY = 'politrade_pulse_settled_v3';
 export const DAILY_VOTE_REWARD = 1000; // 매일 투표 보상 1,000 P (1천P)
 export const BEST_REVIEW_REWARD = 100000; // 베스트 한줄평 포상금 100,000 P (10만P)
 
+export function getReviewTargetInfo(rev: PulseVoteRecord, politicians: any[]) {
+  // 1. Explicit targetPoliticianId
+  if (rev.targetPoliticianId) {
+    const pol = politicians.find(p => p.id === rev.targetPoliticianId);
+    if (pol) {
+      return {
+        politician: pol,
+        voteType: rev.targetVoteType || (rev.bestPoliticianIds.includes(pol.id) ? 'BEST' : 'WORST'),
+      };
+    }
+  }
+
+  // 2. Mentioned name in review text
+  if (rev.oneLineReview) {
+    const matchedPol = politicians.find(p => rev.oneLineReview?.includes(p.name));
+    if (matchedPol) {
+      const isWorst = rev.worstPoliticianIds.includes(matchedPol.id);
+      return {
+        politician: matchedPol,
+        voteType: isWorst ? 'WORST' : 'BEST',
+      };
+    }
+  }
+
+  // 3. Fallback to first best or first worst
+  if (rev.bestPoliticianIds && rev.bestPoliticianIds.length > 0) {
+    const pol = politicians.find(p => p.id === rev.bestPoliticianIds[0]);
+    if (pol) return { politician: pol, voteType: 'BEST' as const };
+  }
+  if (rev.worstPoliticianIds && rev.worstPoliticianIds.length > 0) {
+    const pol = politicians.find(p => p.id === rev.worstPoliticianIds[0]);
+    if (pol) return { politician: pol, voteType: 'WORST' as const };
+  }
+
+  return null;
+}
+
 export function usePulseVoting() {
   const { user, politicians, awardUserPoints } = useStore();
 
@@ -32,6 +69,8 @@ export function usePulseVoting() {
         date: todayStr,
         bestPoliticianIds: ['POL03', 'POL01', 'POL04'],
         worstPoliticianIds: ['POL02', 'POL05', 'POL07'],
+        targetPoliticianId: 'POL03',
+        targetVoteType: 'BEST',
         oneLineReview: '우원식 국회의장의 상임위 중재안과 이준석 의원의 반도체 특구 법안이 실질적 민생 도움이 됨!',
         likes: 24,
         createdAt: '1시간 전',
@@ -43,6 +82,8 @@ export function usePulseVoting() {
         date: todayStr,
         bestPoliticianIds: ['POL03', 'POL01', 'POL06'],
         worstPoliticianIds: ['POL02', 'POL08', 'POL09'],
+        targetPoliticianId: 'POL01',
+        targetVoteType: 'BEST',
         oneLineReview: '청년 기술 스타트업 육성법 발의한 이준석 의원에 1표! 야당 중재 노고 인정합니다.',
         likes: 18,
         createdAt: '3시간 전',
@@ -54,6 +95,8 @@ export function usePulseVoting() {
         date: todayStr,
         bestPoliticianIds: ['POL04', 'POL01', 'POL03'],
         worstPoliticianIds: ['POL05', 'POL07', 'POL10'],
+        targetPoliticianId: 'POL04',
+        targetVoteType: 'BEST',
         oneLineReview: '박주민 보건복지위원장의 약자 복지 입법 속도감이 돋보입니다. 의료 공백 중재 기대!',
         likes: 12,
         createdAt: '5시간 전',
@@ -65,6 +108,8 @@ export function usePulseVoting() {
         date: todayStr,
         bestPoliticianIds: ['POL01', 'POL04', 'POL06'],
         worstPoliticianIds: ['POL02', 'POL05', 'POL09'],
+        targetPoliticianId: 'POL03',
+        targetVoteType: 'BEST',
         oneLineReview: '국회의장의 공정한 민생 안건 안배에 깊이 동의합니다. 민생 위기 극복에 집중해 주세요.',
         likes: 8,
         createdAt: '7시간 전',
@@ -120,6 +165,9 @@ export function usePulseVoting() {
     }
 
     const userId = user?.verifiedEmail || user?.name || 'user';
+    const targetPoliticianId = bestIds[0] || worstIds[0];
+    const targetVoteType = bestIds.length > 0 ? 'BEST' : 'WORST';
+
     const newRecord: PulseVoteRecord = {
       id: 'pv_' + Date.now(),
       userId,
@@ -128,6 +176,8 @@ export function usePulseVoting() {
       date: todayStr,
       bestPoliticianIds: bestIds,
       worstPoliticianIds: worstIds,
+      targetPoliticianId,
+      targetVoteType,
       oneLineReview: review?.trim() || undefined,
       likes: 0,
       createdAt: '방금 전',

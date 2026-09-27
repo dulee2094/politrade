@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { usePulseVoting } from '../hooks/usePulseVoting';
+import { usePulseVoting, getReviewTargetInfo } from '../hooks/usePulseVoting';
 import { useStore } from '../../../context/StoreContext';
+import { PoliticianAvatar } from '../../../shared/ui/PoliticianAvatar';
 import { 
   ArrowLeft, Sparkles, ThumbsUp, CheckCircle2, MessageSquare, Vote, 
   Search, Filter, Clock, Trophy, Heart
@@ -195,6 +196,7 @@ export const WeeklyOneLineReviewsDetailView: React.FC<WeeklyOneLineReviewsDetail
           <div className="space-y-2">
             {filteredAndSortedReviews.map((rev, idx) => {
               const isLikedByMe = userLikedReviewIds.includes(rev.id);
+              const targetInfo = getReviewTargetInfo(rev, politicians);
 
               return (
                 <div
@@ -208,7 +210,7 @@ export const WeeklyOneLineReviewsDetailView: React.FC<WeeklyOneLineReviewsDetail
                   }`}
                 >
                   {/* Left Main Information */}
-                  <div className="flex items-center space-x-3 min-w-0 flex-1">
+                  <div className="flex items-center space-x-2.5 min-w-0 flex-1 flex-wrap sm:flex-nowrap gap-y-1.5">
                     
                     {/* Rank Badge */}
                     <span className={`w-5 h-5 rounded-md text-[10px] font-black font-mono flex items-center justify-center shrink-0 ${
@@ -237,6 +239,27 @@ export const WeeklyOneLineReviewsDetailView: React.FC<WeeklyOneLineReviewsDetail
                       <span className="text-xs font-extrabold text-white">{rev.userName}</span>
                       <span className="text-[10px] text-slate-500 font-mono">{rev.createdAt}</span>
                     </div>
+
+                    {/* Target Politician & Vote Selection Badge */}
+                    {targetInfo && (
+                      <div className="flex items-center space-x-1.5 px-2 py-0.5 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 shadow-sm">
+                        <PoliticianAvatar
+                          src={targetInfo.politician.imageUrl}
+                          name={targetInfo.politician.name}
+                          party={targetInfo.politician.party as any}
+                          className="w-4 h-4 rounded-md shrink-0"
+                        />
+                        <span className="text-xs font-black text-white">{targetInfo.politician.name}</span>
+                        <span className="text-[9px] text-slate-400 font-mono hidden md:inline">{targetInfo.politician.party}</span>
+                        <span className={`text-[9px] font-black px-1.5 py-0.2 rounded-md border flex items-center gap-0.5 ${
+                          targetInfo.voteType === 'BEST'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                        }`}>
+                          {targetInfo.voteType === 'BEST' ? '👍 BEST' : '👎 WORST'}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Compact Quoted Review Text */}
                     <p className="text-xs text-slate-200 font-medium leading-normal bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 min-w-0 flex-1 truncate sm:whitespace-normal">

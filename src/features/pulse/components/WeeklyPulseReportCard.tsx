@@ -64,21 +64,9 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
       <div className="flex-1 flex flex-col justify-between space-y-4">
 
         {/* ================================================================ */}
-        {/* GROUP 1: 🔒 지난 주 확정 결과 & 배당 정산 (Past Week Closed Group Box) */}
+        {/* GROUP 1: 지난 주 확정 결과 (Past Week Group Box) */}
         {/* ================================================================ */}
         <div className="bg-slate-950/80 p-4.5 rounded-3xl border border-indigo-500/40 space-y-3.5 shadow-xl">
-          <div className="flex items-center justify-between border-b border-indigo-500/30 pb-2">
-            <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-indigo-400" />
-              <h4 className="text-sm font-black text-indigo-200 flex items-center gap-1.5">
-                <span>🔒 지난 주 확정 결과 & 배당 정산</span>
-              </h4>
-            </div>
-            <span className="text-[10px] font-mono font-extrabold text-indigo-300 bg-indigo-950/90 px-2.5 py-0.5 rounded-md border border-indigo-500/30">
-              CLOSED · 정산 완료
-            </span>
-          </div>
-
           {/* 1. 지난 주 베스트/워스트 3인 선정결과 */}
           <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-indigo-500/20 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
@@ -199,22 +187,9 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
 
 
         {/* ================================================================ */}
-        {/* GROUP 2: ⚡ 금주 실시간 득표 현황 (Current Week Live Group Box) */}
+        {/* GROUP 2: 금주 실시간 득표 현황 (Current Week Group Box) */}
         {/* ================================================================ */}
         <div className="bg-slate-950/80 p-4.5 rounded-3xl border border-emerald-500/40 space-y-3.5 shadow-xl">
-          <div className="flex items-center justify-between border-b border-emerald-500/30 pb-2">
-            <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-              <h4 className="text-sm font-black text-emerald-200 flex items-center gap-1.5">
-                <span className="text-emerald-400 font-mono">⚡</span>
-                <span>금주 실시간 득표 & 한줄평 현황</span>
-              </h4>
-            </div>
-            <span className="text-[10px] font-mono font-extrabold text-emerald-300 bg-emerald-950/90 px-2.5 py-0.5 rounded-md border border-emerald-500/30">
-              LIVE · 실시간 집계 중
-            </span>
-          </div>
-
           {/* 3. 금주 베스트/워스트 투표 현황 */}
           <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-emerald-500/20 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
