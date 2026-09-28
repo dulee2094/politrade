@@ -1,36 +1,36 @@
 import React from 'react';
-import { ShieldCheck, TrendingUp, Calendar, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, TrendingUp, Flame, CheckCircle2 } from 'lucide-react';
 
 export const FeatureCards: React.FC = () => {
   const features = [
     {
-      icon: <ShieldCheck className="w-6 h-6 text-blue-400" />,
-      badge: '신뢰 검증 회원',
-      title: '신뢰도 높은 검증 회원 시스템 (Trust & Verification)',
-      description: '가짜 뉴스와 상업적 어뷰징을 예방하고 공적 토론의 신뢰성을 보장하기 위한 도메인 검증 시스템. 자유 닉네임으로 취재 및 의견 개진의 안전한 익명성을 보장합니다.',
-      list: ['신뢰할 수 있는 도메인 검증', '자유 닉네임 익명성 보장', '가짜 뉴스/어뷰징 100% 차단'],
-    },
-    {
       icon: <TrendingUp className="w-6 h-6 text-indigo-400" />,
-      badge: 'AMM Bonding Curve',
-      title: '스마트 유동성 체결 엔진 (Bonding Curve)',
-      description: '매수 수량이 몰리면 주가가 즉시 상승하고, 매도가 몰리면 하락하는 자동화 시장 조성자(AMM)로 유동성 기근 없이 100% 즉시 체결됩니다.',
-      list: ['1,000주 유동성 풀 기준', '실시간 슬리피지 & 주가 영향도 계산', '24시간 인터랙티브 차트'],
+      badge: 'POLI 주식 마켓',
+      title: '상장 국회의원 (30인+α) 실시간 매매',
+      description: '차세대 정치 대장주와 저평가 우량주를 발굴하고, AMM 유동성 풀 및 실시간 호가창 주문 시스템으로 시세를 정밀 거래합니다.',
+      list: ['상장 국회의원 30인+α 시세', 'AMM 호가창 100% 체결', '24시간 인터랙티브 차트'],
     },
     {
-      icon: <Calendar className="w-6 h-6 text-amber-400" />,
-      badge: '월간 정기 지원금',
-      title: '매월 1일 정기 지원금 (100,000 P) 자동 입금',
-      description: '현금 결제나 포인트 획득용 도배를 완벽히 배제했습니다. 모든 회원이 매월 동일한 소액 예산으로 순수 지지도 예측력을 겨룹니다.',
-      list: ['현금 충전 결제 0원', '활동 도배 어뷰징 0%', '매월 1일 자동 이월 지급'],
+      icon: <Flame className="w-6 h-6 text-amber-400" />,
+      badge: '주간 민심 펄스',
+      title: '주간 민심 펄스 & 1줄 리뷰 참여',
+      description: '매주 주요 공적 이슈에 대한 긍정/부정 여론 투표와 베스트 1줄 평 참여로 살아있는 실시간 민심 지표를 함께 만들어갑니다.',
+      list: ['주간 핫 이슈 투표', '베스트 1줄 리뷰 선정', '실시간 여론 지표 시각화'],
+    },
+    {
+      icon: <ShieldCheck className="w-6 h-6 text-blue-400" />,
+      badge: '언론사 도메인 검증',
+      title: '신뢰도 높은 기자 인증 & 리더보드',
+      description: 'KBS, 조선일보 등 언론사 이메일 도메인 검증으로 인증된 취재 기자 칭호 및 전문성 높은 이슈 분석 활동 지수를 선사합니다.',
+      list: ['언론사 도메인 이메일 검증', '취재반장 기자 전용 배지', '기자 활동 지수 랭킹 경쟁'],
     },
   ];
 
   return (
     <div className="space-y-6">
       <div className="text-center sm:text-left space-y-1">
-        <h2 className="text-xl font-extrabold text-white">Politrade만의 3대 혁신 시스템</h2>
-        <p className="text-xs text-slate-400">신뢰성 높은 지지도 예측과 투명한 AMM 주가 체결 엔진</p>
+        <h2 className="text-xl font-extrabold text-white">Politrade 핵심 평가 및 거래 시스템</h2>
+        <p className="text-xs text-slate-400">재미있게 즐기고 깊이 있게 참여하는 정치 가치 지표 플랫폼</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -48,7 +48,6 @@ export const LandingMain: React.FC<LandingMainProps> = ({ onEnterApp }) => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 pb-16 flex-1 w-full">
         <HeroSection
           onOpenSignUp={() => setIsSignUpModalOpen(true)}
-          onOpenLogin={() => setIsLoginModalOpen(true)}
           onEnterApp={onEnterApp}
         />
 
