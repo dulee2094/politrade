@@ -59,11 +59,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onEnterA
             <span>실시간 여론 지표 & {BRAND_STOCK_NAME} 거래 시스템</span>
           </div>
 
-          {/* Main Title (Option A) */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.35] tracking-tight break-keep">
-            가볍게 즐기고 깊이 있게 참여하는 정치 시세판 <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
-              주간 민심 펄스 & 상장 국회의원 (30인+α) POLI 주식 거래 시스템
+          {/* Main Title */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.6] sm:leading-[1.7] tracking-tight break-keep space-y-2 sm:space-y-3">
+            <span className="block text-white">
+              재미삼아 하다보면 의미를 발견하게 되는
+            </span>
+            <span className="block text-white">
+              실시간 정치 시세판
+            </span>
+            <span className="block bg-gradient-to-r from-blue-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
+              POLI 주식거래 시스템
             </span>
           </h1>
 
@@ -82,7 +87,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onEnterA
               <Flame className="w-4 h-4 text-amber-400" /> 주간 민심 펄스 & 1줄 평
             </span>
             <span className="flex items-center gap-1.5 bg-slate-900/80 px-3.5 py-2 rounded-xl border border-slate-800 shadow-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" /> 언론사 검증 기자 리더보드
+              <ShieldCheck className="w-4 h-4 text-emerald-400" /> 개인정보 최소화 (이메일 인증)
             </span>
           </div>
         </div>

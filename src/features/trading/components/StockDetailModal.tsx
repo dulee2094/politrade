@@ -344,40 +344,12 @@ export const StockDetailModal: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-extrabold text-white">
-                  {isIPO ? 'Phase 1 공모 청약' : 'Phase 2 호가 주문'}
+                  {isIPO ? 'Phase 1 공모 청약' : 'Phase 2 지정가 호가 주문'}
                 </h3>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  {isIPO ? `공모가 ${formatPoints(INITIAL_IPO_PRICE)}` : '지정가 / 시장가 선택'}
+                  {isIPO ? `공모가 ${formatPoints(INITIAL_IPO_PRICE)}` : '안전 지정가 매매'}
                 </span>
               </div>
-
-              {/* Order Class Switcher (Limit vs Market) - Only in Phase 2 */}
-              {!isIPO && (
-                <div className="grid grid-cols-2 gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setOrderClass('LIMIT')}
-                    className={`py-1.5 rounded-lg transition-all ${
-                      orderClass === 'LIMIT'
-                        ? 'bg-blue-600 text-white shadow'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    🎯 지정가 (Limit)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setOrderClass('MARKET')}
-                    className={`py-1.5 rounded-lg transition-all ${
-                      orderClass === 'MARKET'
-                        ? 'bg-blue-600 text-white shadow'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    ⚡ 시장가 (Market)
-                  </button>
-                </div>
-              )}
 
               {/* Order Execution Action Buttons (Buy Order vs Sell Order) */}
               <div className="grid grid-cols-2 gap-2">
@@ -398,7 +370,7 @@ export const StockDetailModal: React.FC = () => {
                       ? '🔒 매수 (장마감)'
                       : isIPO
                       ? '공모 청약 주문하기'
-                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매수 주문하기`}
+                      : '지정가 매수 주문하기'}
                   </span>
                 </button>
                 <button
@@ -418,13 +390,13 @@ export const StockDetailModal: React.FC = () => {
                       ? '🔒 매도 (장마감)'
                       : isIPO
                       ? '공모 환불 주문하기'
-                      : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} 매도 주문하기`}
+                      : '지정가 매도 주문하기'}
                   </span>
                 </button>
               </div>
 
-              {/* Order Price Input (Visible when Limit Order in Phase 2) */}
-              {!isIPO && orderClass === 'LIMIT' && (
+              {/* Order Price Input (Visible in Phase 2) */}
+              {!isIPO && (
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-300">
                     <span>주문 가격 (P)</span>
@@ -497,9 +469,7 @@ export const StockDetailModal: React.FC = () => {
                   <span className="text-indigo-400 font-bold font-sans">
                     {isIPO
                       ? `${formatPoints(INITIAL_IPO_PRICE)} 공모가`
-                      : orderClass === 'LIMIT'
-                      ? '지정가 체결 / 미체결 잔량 호가 등록'
-                      : '실시간 시장가 체결'}
+                      : '지정가 체결 / 미체결 잔량 호가 등록'}
                   </span>
                 </div>
               </div>
@@ -558,14 +528,14 @@ export const StockDetailModal: React.FC = () => {
                 }`}>
                   {isIPO
                     ? tradeType === 'BUY' ? '공모 청약 주문' : '공모 환불 주문'
-                    : `${orderClass === 'LIMIT' ? '지정가' : '시장가'} ${tradeType === 'BUY' ? '매수' : '매도'} 주문`}
+                    : `지정가 ${tradeType === 'BUY' ? '매수' : '매도'} 주문`}
                 </span>
               </div>
 
               <div className="flex items-center justify-between border-t border-slate-700/50 pt-2">
                 <span className="text-slate-400 font-sans">주문 단가</span>
                 <span className="font-bold text-white">
-                  {isIPO ? `${formatPoints(INITIAL_IPO_PRICE)} (공모가)` : orderClass === 'LIMIT' ? `${formatPoints(parseInt(priceInput, 10) || currentPrice)}` : '실시간 시장가'}
+                  {isIPO ? `${formatPoints(INITIAL_IPO_PRICE)} (공모가)` : `${formatPoints(parseInt(priceInput, 10) || currentPrice)} (지정가)`}
                 </span>
               </div>
 

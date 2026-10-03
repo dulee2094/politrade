@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../../../context/StoreContext';
-import { executeOrderBookMatch, generateMockOrderBook, INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
+import { INITIAL_IPO_PRICE } from '../../../core/orderbook/orderbookEngine';
 import { Politician } from '../../../types';
 
 export function useTradingForm(politician?: Politician) {
   const { user, placeOrder, cancelOrder } = useStore();
 
   const [tradeType, setTradeType] = useState<'BUY' | 'SELL'>('BUY');
-  const [orderClass, setOrderClass] = useState<'LIMIT' | 'MARKET'>('LIMIT');
+  const [orderClass, setOrderClass] = useState<'LIMIT'>('LIMIT');
   const [sharesInput, setSharesInput] = useState<string>('1');
   const [priceInput, setPriceInput] = useState<string>(
     politician?.currentPrice ? politician.currentPrice.toString() : INITIAL_IPO_PRICE.toString()
@@ -29,22 +29,16 @@ export function useTradingForm(politician?: Politician) {
 
   const isIPO = politician?.phase === 'IPO';
 
-  // Calculate Quotes
+  // Calculate Quotes (Strict Limit Order Pricing)
   let estimatedCostOrRefund = 0;
   let estimatedAvgPrice = spotPrice;
 
   if (isIPO) {
     estimatedCostOrRefund = sharesNum * INITIAL_IPO_PRICE;
     estimatedAvgPrice = INITIAL_IPO_PRICE;
-  } else if (orderClass === 'LIMIT') {
+  } else {
     estimatedCostOrRefund = sharesNum * priceNum;
     estimatedAvgPrice = priceNum;
-  } else {
-    // MARKET order preview
-    const safeOrderBook = politician?.orderBook || generateMockOrderBook(spotPrice);
-    const matchRes = executeOrderBookMatch(safeOrderBook, 'MARKET', tradeType, spotPrice, sharesNum);
-    estimatedCostOrRefund = matchRes.totalCostOrRefund || (sharesNum * spotPrice);
-    estimatedAvgPrice = matchRes.avgExecutedPrice || spotPrice;
   }
 
   const handleSelectPrice = (price: number) => {
@@ -59,16 +53,16 @@ export function useTradingForm(politician?: Politician) {
       setFeedback({ type: 'error', message: '수량을 1주 이상 입력해주세요.' });
       return;
     }
-    if (orderClass === 'LIMIT' && priceNum <= 0) {
+    if (priceNum <= 0) {
       setFeedback({ type: 'error', message: '올바른 주문 가격을 입력해주세요.' });
       return;
     }
 
     const res = placeOrder(
       politician.id,
-      orderClass,
+      'LIMIT',
       tradeType,
-      orderClass === 'LIMIT' ? priceNum : spotPrice,
+      priceNum,
       sharesNum
     );
 

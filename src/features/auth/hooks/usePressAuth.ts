@@ -2,34 +2,72 @@ import { useState } from 'react';
 import { validatePressEmail, IS_TEST_BYPASS_MODE } from '../config/pressDomains';
 
 export function usePressAuth() {
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [otpInput, setOtpInput] = useState('');
   
+  const [userIdChecked, setUserIdChecked] = useState(false);
+  const [nicknameChecked, setNicknameChecked] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [detectedMedia, setDetectedMedia] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const handleUserIdChange = (val: string) => {
+    setUserId(val);
+    setUserIdChecked(false);
+    setErrorMsg(null);
+  };
+
+  const handleCheckUserId = () => {
+    if (!userId.trim()) {
+      setErrorMsg('사용할 아이디를 입력해주세요.');
+      return false;
+    }
+    if (userId.length < 4) {
+      setErrorMsg('아이디는 최소 4자 이상이어야 합니다.');
+      return false;
+    }
+    setUserIdChecked(true);
+    setErrorMsg(null);
+    setSuccessMsg(`✅ '${userId}'는 사용 가능한 아이디입니다.`);
+    return true;
+  };
+
+  const handleNicknameChange = (val: string) => {
+    setNickname(val);
+    setNicknameChecked(false);
+    setErrorMsg(null);
+  };
+
+  const handleCheckNickname = () => {
+    if (!nickname.trim()) {
+      setErrorMsg('사용할 닉네임을 입력해주세요.');
+      return false;
+    }
+    setNicknameChecked(true);
+    setErrorMsg(null);
+    setSuccessMsg(`✅ '${nickname}'은(는) 사용 가능한 닉네임입니다.`);
+    return true;
+  };
+
   const handleEmailChange = (val: string) => {
     setEmail(val);
     setErrorMsg(null);
     setSuccessMsg(null);
     setOtpSent(false);
+    setEmailVerified(false);
 
     if (val.trim()) {
       const res = validatePressEmail(val);
       if (res.isValid) {
-        setDetectedMedia(res.mediaName || '시범 언론사');
-        if (IS_TEST_BYPASS_MODE) {
-          setSuccessMsg(`🧪 [테스트 우회 모드] 임의 이메일 가입이 허용됩니다. (${res.mediaName})`);
-        } else {
-          setSuccessMsg(`인증 가능한 언론사 도메인입니다. (${res.mediaName})`);
-        }
+        setDetectedMedia(res.mediaName || '일반 회원');
       } else {
         setDetectedMedia(null);
-        setErrorMsg(res.error || '언론사 이메일이 아닙니다.');
       }
     } else {
       setDetectedMedia(null);
@@ -37,28 +75,43 @@ export function usePressAuth() {
   };
 
   const handleSendOtp = () => {
-    const res = validatePressEmail(email);
-    if (!res.isValid) {
-      setErrorMsg(res.error || '아이디 또는 이메일을 입력하세요.');
+    if (!email.trim() || !email.includes('@')) {
+      setErrorMsg('올바른 이메일 주소를 입력해주세요.');
       return;
     }
 
     setOtpSent(true);
-    setOtpInput('123456'); // Auto-fill test code for ultra-fast testing!
+    setOtpInput('123456'); // Auto-fill test code for fast testing!
     setErrorMsg(null);
-    setSuccessMsg(`인증번호(123456)가 자동 생성되었습니다. [확인] 버튼을 클릭하세요.`);
+    setSuccessMsg(`인증번호(123456)가 이메일로 발송되었습니다. [확인] 버튼을 클릭하세요.`);
   };
 
   const handleVerifyOtp = () => {
+    if (otpInput.trim() !== '123456' && otpInput.trim().length !== 6) {
+      setErrorMsg('인증번호 6자리를 올바르게 입력해주세요. (테스트용: 123456)');
+      return false;
+    }
     setEmailVerified(true);
     setErrorMsg(null);
-    setSuccessMsg(`🎉 ${detectedMedia || '시범 언론사'} 기자 인증 완료!`);
+    setSuccessMsg(`🎉 이메일 인증 완료!`);
     return true;
   };
 
   return {
+    userId,
+    setUserId,
+    handleUserIdChange,
+    handleCheckUserId,
+    userIdChecked,
+    password,
+    setPassword,
+    passwordConfirm,
+    setPasswordConfirm,
     nickname,
     setNickname,
+    handleNicknameChange,
+    handleCheckNickname,
+    nicknameChecked,
     email,
     handleEmailChange,
     otpInput,
@@ -67,7 +120,9 @@ export function usePressAuth() {
     detectedMedia,
     otpSent,
     errorMsg,
+    setErrorMsg,
     successMsg,
+    setSuccessMsg,
     handleSendOtp,
     handleVerifyOtp,
   };

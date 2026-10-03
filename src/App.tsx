@@ -27,6 +27,7 @@ import { CurrentWeekBestWorstDetailModal } from './features/pulse/components/Cur
 import { DailyBestWorstVoteModal } from './features/pulse/components/DailyBestWorstVoteModal';
 import { WeeklyOneLineReviewsDetailView } from './features/pulse/components/WeeklyOneLineReviewsDetailView';
 import { NoticeGuideBanner } from './features/notice/components/NoticeGuideBanner';
+import { MarketStatusBadge } from './shared/ui/MarketStatusBadge';
 import { NoticeGuideDetailModal } from './features/notice/components/NoticeGuideDetailModal';
 import { usePulseVoting } from './features/pulse/hooks/usePulseVoting';
 import { ShieldAlert, Sparkles, TrendingUp, Calendar, Newspaper, ArrowRight } from 'lucide-react';
@@ -96,6 +97,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
           </div>
         )}
 
+        <MarketStatusBadge />
         <NoticeGuideBanner onOpenNoticeModal={onOpenNoticeModal} />
       </div>
 
