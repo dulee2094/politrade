@@ -357,7 +357,7 @@ export const StockDetailModal: React.FC = () => {
                   type="button"
                   onClick={() => handleOrderInitiate('BUY')}
                   disabled={!mStatus.isOpen}
-                  className={`py-3 px-2 rounded-xl font-sans font-extrabold text-xs transition-all shadow-md flex items-center justify-center space-x-1 ${
+                  className={`py-2.5 px-2 rounded-xl font-sans font-extrabold text-xs transition-all shadow-md flex items-center justify-center text-center ${
                     !mStatus.isOpen
                       ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
                       : tradeType === 'BUY'
@@ -365,19 +365,25 @@ export const StockDetailModal: React.FC = () => {
                       : 'bg-emerald-700/80 hover:bg-emerald-600 text-white opacity-90'
                   }`}
                 >
-                  <span>
-                    {!mStatus.isOpen
-                      ? '🔒 매수 (장마감)'
-                      : isIPO
-                      ? '공모 청약 주문하기'
-                      : '지정가 매수 주문하기'}
-                  </span>
+                  {!mStatus.isOpen ? (
+                    <span>🔒 매수 (장마감)</span>
+                  ) : isIPO ? (
+                    <span className="block leading-snug">
+                      <span className="block">공모 청약</span>
+                      <span className="block">주문하기</span>
+                    </span>
+                  ) : (
+                    <span className="block leading-snug">
+                      <span className="block">지정가 매수</span>
+                      <span className="block">주문하기</span>
+                    </span>
+                  )}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleOrderInitiate('SELL')}
                   disabled={!mStatus.isOpen}
-                  className={`py-3 px-2 rounded-xl font-sans font-extrabold text-xs transition-all shadow-md flex items-center justify-center space-x-1 ${
+                  className={`py-2.5 px-2 rounded-xl font-sans font-extrabold text-xs transition-all shadow-md flex items-center justify-center text-center ${
                     !mStatus.isOpen
                       ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
                       : tradeType === 'SELL'
@@ -385,13 +391,19 @@ export const StockDetailModal: React.FC = () => {
                       : 'bg-rose-700/80 hover:bg-rose-600 text-white opacity-90'
                   }`}
                 >
-                  <span>
-                    {!mStatus.isOpen
-                      ? '🔒 매도 (장마감)'
-                      : isIPO
-                      ? '공모 환불 주문하기'
-                      : '지정가 매도 주문하기'}
-                  </span>
+                  {!mStatus.isOpen ? (
+                    <span>🔒 매도 (장마감)</span>
+                  ) : isIPO ? (
+                    <span className="block leading-snug">
+                      <span className="block">공모 환불</span>
+                      <span className="block">주문하기</span>
+                    </span>
+                  ) : (
+                    <span className="block leading-snug">
+                      <span className="block">지정가 매도</span>
+                      <span className="block">주문하기</span>
+                    </span>
+                  )}
                 </button>
               </div>
 

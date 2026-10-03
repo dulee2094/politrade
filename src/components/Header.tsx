@@ -76,46 +76,22 @@ export const Header: React.FC<HeaderProps> = ({
           {/* 1. Left: Logo & Brand */}
           <div className="flex items-center space-x-6">
             <PolitradeLogo size="md" onClick={handleLogoClick} />
-
-            {/* 2. Desktop Quick Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleNavClick(item.id)}
-                    className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all ${
-                      isActive
-                        ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-inner'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
           </div>
 
           {/* 3. Right Header Profile Badge & Integrated Hamburger Menu */}
           <div className="flex items-center space-x-2 sm:space-x-3" ref={menuRef}>
 
-            {/* Reporter Profile Badge Chip */}
+            {/* User Profile Badge Chip */}
             <button
               type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center space-x-2 bg-slate-800/90 hover:bg-slate-800 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-700/80 cursor-pointer transition-all shadow-md group text-left"
+              className="flex items-center space-x-2 bg-slate-800/90 hover:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700/80 cursor-pointer transition-all shadow-md group text-left hover:border-blue-500/50"
             >
-              <PressBadge mediaName={user.pressName || 'KBS'} />
-              <span className="hidden sm:inline text-xs font-extrabold text-white group-hover:text-blue-300 font-sans">
-                {user.name}
-              </span>
-              <span className="text-xs font-black font-mono text-amber-400 border-l border-slate-700 pl-2">
-                {formatPoints(user.balance)}
+              <div className="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center shrink-0">
+                <User className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-extrabold text-white group-hover:text-blue-300 font-sans">
+                {user.name || '사용자'}
               </span>
             </button>
 

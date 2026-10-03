@@ -19,27 +19,11 @@ export const LandingMain: React.FC<LandingMainProps> = ({ onEnterApp }) => {
   return (
     <div className="min-h-screen flex flex-col justify-between bg-slate-950 text-slate-100 font-sans">
       
-      {/* Header Bar for Landing */}
+      {/* Header Bar for Landing (Clean & Minimalist Logo Only) */}
       <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <PolitradeLogo size="md" onClick={onEnterApp} />
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setIsLoginModalOpen(true)}
-              className="text-xs text-slate-300 hover:text-white font-bold px-3.5 py-2 rounded-xl transition-colors bg-slate-800/60 border border-slate-700/80"
-            >
-              로그인
-            </button>
-            <button
-              onClick={() => setIsSignUpModalOpen(true)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-indigo-500/20 flex items-center space-x-1"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>{BRAND_STOCK_NAME} 시작하기</span>
-            </button>
           </div>
         </div>
       </header>

@@ -14,9 +14,9 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
   onSelectPolitician,
 }) => {
   return (
-    <div className="bg-slate-950/70 p-4 rounded-2xl border border-slate-800 space-y-3 shadow-md">
+    <div className="bg-slate-950/70 p-4.5 rounded-2xl border border-slate-800 space-y-3.5 shadow-md">
       {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
         <h4 className="text-sm font-black text-white tracking-tight flex items-center gap-2">
           <span className="p-1 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
             <BarChart3 className="w-3.5 h-3.5" />
@@ -25,7 +25,7 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
         </h4>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         {topVolumeList.map((pol, idx) => {
           const approxShares = pol.currentPrice > 0 ? Math.round((pol.volume24h || 100000) / pol.currentPrice) : 0;
 
@@ -33,7 +33,7 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
             <div
               key={'vol_' + pol.id}
               onClick={() => onSelectPolitician(pol.id)}
-              className="bg-slate-800/80 hover:bg-slate-800 p-3.5 rounded-2xl border border-slate-700/60 hover:border-cyan-400/60 transition-all cursor-pointer space-y-2 group shadow-md hover:-translate-y-1 relative overflow-hidden"
+              className="bg-slate-800/80 hover:bg-slate-800 p-4 rounded-2xl border border-slate-700/60 hover:border-cyan-400/60 transition-all cursor-pointer space-y-2.5 group shadow-md hover:-translate-y-1 relative overflow-hidden"
             >
               {/* Top-Right Rank Badge Overlay */}
               <span
@@ -52,7 +52,7 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
                   src={pol.imageUrl}
                   name={pol.name}
                   party={pol.party}
-                  className="w-8 h-8 rounded-lg shrink-0"
+                  className="w-9 h-9 rounded-lg shrink-0"
                 />
                 <div className="min-w-0 flex-1">
                   <span className="font-extrabold text-xs text-white group-hover:text-cyan-300 transition-colors whitespace-nowrap block truncate">
@@ -62,7 +62,7 @@ export const YesterdayTopVolumeCard: React.FC<YesterdayTopVolumeCardProps> = ({
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-700/50 space-y-0.5">
+              <div className="pt-2.5 border-t border-slate-700/50 space-y-1">
                 <div className="flex items-center justify-between font-mono text-xs">
                   <span className="text-[10px] text-slate-400 font-sans">거래대금</span>
                   <span className="font-extrabold text-cyan-300 text-[11px]">

@@ -201,7 +201,7 @@ export const WeeklyOneLineReviewsDetailView: React.FC<WeeklyOneLineReviewsDetail
               return (
                 <div
                   key={rev.id}
-                  className={`p-3 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                  className={`p-3.5 sm:p-4 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 ${
                     idx === 0 && sortBy === 'likes'
                       ? 'bg-slate-950 border-amber-500/60 shadow-md shadow-amber-500/10'
                       : idx < 3 && sortBy === 'likes'
@@ -209,47 +209,45 @@ export const WeeklyOneLineReviewsDetailView: React.FC<WeeklyOneLineReviewsDetail
                       : 'bg-slate-950/60 border-slate-800/80 hover:bg-slate-950'
                   }`}
                 >
-                  {/* Left Main Information */}
-                  <div className="flex items-center space-x-2.5 min-w-0 flex-1 flex-wrap sm:flex-nowrap gap-y-1.5">
+                  {/* Left Column (2-Line Vertical Stack): User info (Line 1) & Target Politician Badge (Line 2) */}
+                  <div className="flex flex-col space-y-2 shrink-0 md:max-w-xs">
                     
-                    {/* Rank Badge */}
-                    <span className={`w-5 h-5 rounded-md text-[10px] font-black font-mono flex items-center justify-center shrink-0 ${
-                      sortBy === 'likes' && idx === 0
-                        ? 'bg-amber-400 text-slate-950'
-                        : sortBy === 'likes' && idx === 1
-                        ? 'bg-slate-300 text-slate-950'
-                        : sortBy === 'likes' && idx === 2
-                        ? 'bg-amber-700 text-white'
-                        : 'bg-slate-800 text-slate-400 border border-slate-700'
-                    }`}>
-                      {idx + 1}
-                    </span>
+                    {/* Line 1: Rank Badge + User Avatar + User Name (Prominent & Larger) + Time */}
+                    <div className="flex items-center space-x-2 min-w-0">
+                      <span className={`w-5 h-5 rounded-md text-[10px] font-black font-mono flex items-center justify-center shrink-0 ${
+                        sortBy === 'likes' && idx === 0
+                          ? 'bg-amber-400 text-slate-950'
+                          : sortBy === 'likes' && idx === 1
+                          ? 'bg-slate-300 text-slate-950'
+                          : sortBy === 'likes' && idx === 2
+                          ? 'bg-amber-700 text-white'
+                          : 'bg-slate-800 text-slate-400 border border-slate-700'
+                      }`}>
+                        {idx + 1}
+                      </span>
 
-                    {/* User Avatar */}
-                    {rev.userAvatar ? (
-                      <img src={rev.userAvatar} alt={rev.userName} className="w-6 h-6 rounded-full object-cover border border-slate-700 shrink-0" />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-indigo-900/60 text-indigo-300 text-[9px] font-black flex items-center justify-center border border-indigo-500/40 shrink-0">
-                        {rev.userName.slice(0, 1)}
-                      </div>
-                    )}
+                      {rev.userAvatar ? (
+                        <img src={rev.userAvatar} alt={rev.userName} className="w-6 h-6 rounded-full object-cover border border-slate-700 shrink-0" />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-indigo-900/60 text-indigo-300 text-[9px] font-black flex items-center justify-center border border-indigo-500/40 shrink-0">
+                          {rev.userName.slice(0, 1)}
+                        </div>
+                      )}
 
-                    {/* Username & Time */}
-                    <div className="flex items-center space-x-1.5 shrink-0">
-                      <span className="text-xs font-extrabold text-white">{rev.userName}</span>
-                      <span className="text-[10px] text-slate-500 font-mono">{rev.createdAt}</span>
+                      <span className="text-sm font-black text-white tracking-tight truncate">{rev.userName}</span>
+                      <span className="text-[10px] text-slate-500 font-mono shrink-0 ml-1">{rev.createdAt}</span>
                     </div>
 
-                    {/* Target Politician & Vote Selection Badge */}
+                    {/* Line 2: Target Politician & Vote Selection Sub-Badge (Slightly Smaller than User Name) */}
                     {targetInfo && (
-                      <div className="flex items-center space-x-1.5 px-2 py-0.5 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 shadow-sm">
+                      <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 shadow-sm w-fit">
                         <PoliticianAvatar
                           src={targetInfo.politician.imageUrl}
                           name={targetInfo.politician.name}
                           party={targetInfo.politician.party as any}
                           className="w-4 h-4 rounded-md shrink-0"
                         />
-                        <span className="text-xs font-black text-white">{targetInfo.politician.name}</span>
+                        <span className="text-xs font-bold text-slate-300">{targetInfo.politician.name}</span>
                         <span className="text-[9px] text-slate-400 font-mono hidden md:inline">{targetInfo.politician.party}</span>
                         <span className={`text-[9px] font-black px-1.5 py-0.2 rounded-md border flex items-center gap-0.5 ${
                           targetInfo.voteType === 'BEST'
@@ -260,16 +258,18 @@ export const WeeklyOneLineReviewsDetailView: React.FC<WeeklyOneLineReviewsDetail
                         </span>
                       </div>
                     )}
+                  </div>
 
-                    {/* Compact Quoted Review Text */}
-                    <p className="text-xs text-slate-200 font-medium leading-normal bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 min-w-0 flex-1 truncate sm:whitespace-normal">
+                  {/* Middle Column: Main One-Line Review Quote (Spacious & Readable) */}
+                  <div className="flex-1 min-w-0 my-1 md:my-0">
+                    <p className="text-sm sm:text-base text-slate-100 font-semibold leading-relaxed bg-slate-900/90 px-4 py-3 rounded-2xl border border-slate-800 tracking-wide break-keep">
                       "{rev.oneLineReview}"
                     </p>
                   </div>
 
-                  {/* Right Actions: Vote Count & Button */}
-                  <div className="flex items-center justify-between sm:justify-end space-x-2.5 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-800/80">
-                    <span className="text-xs font-mono font-extrabold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
+                  {/* Right Column (2-Line Vertical Stack): Votes Count (Line 1) & Like Action Button (Line 2) */}
+                  <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center space-x-2 md:space-x-0 space-y-0 md:space-y-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/80">
+                    <span className="text-xs font-mono font-extrabold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 whitespace-nowrap">
                       {rev.likes}표 획득
                     </span>
 
@@ -280,7 +280,7 @@ export const WeeklyOneLineReviewsDetailView: React.FC<WeeklyOneLineReviewsDetail
                       className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all shadow-sm flex items-center space-x-1 whitespace-nowrap ${
                         isLikedByMe
                           ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-                          : 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-amber-500/10'
+                          : 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-amber-500/10 hover:scale-[1.02]'
                       }`}
                     >
                       {isLikedByMe ? (

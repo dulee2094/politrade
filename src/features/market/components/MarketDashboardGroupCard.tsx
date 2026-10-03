@@ -19,10 +19,10 @@ export const MarketDashboardGroupCard: React.FC<MarketDashboardGroupCardProps> =
   onGoToMarket,
 }) => {
   return (
-    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border-2 border-blue-500/60 shadow-[0_0_25px_rgba(59,130,246,0.2)] h-full flex flex-col justify-between space-y-4">
+    <div className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border-2 border-blue-500/60 shadow-[0_0_25px_rgba(59,130,246,0.2)] h-full flex flex-col justify-between space-y-5">
       
       {/* Left Main Dashboard Top Header */}
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5 shrink-0">
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
           <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shrink-0">
             <TrendingUp className="w-5 h-5 text-white" />
@@ -47,7 +47,7 @@ export const MarketDashboardGroupCard: React.FC<MarketDashboardGroupCardProps> =
       </div>
 
       {/* Flexible Equal-Height Inner Content Container */}
-      <div className="flex-1 flex flex-col justify-between space-y-4">
+      <div className="flex-1 flex flex-col justify-between space-y-5">
         {/* 1. 시가총액 TOP 3 종목 카드 */}
         <MarketTop3SpotlightCard 
           politicians={politicians}

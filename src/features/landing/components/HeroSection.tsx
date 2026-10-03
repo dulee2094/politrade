@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, ArrowRight, ShieldCheck, Sparkles, Key, Vote, Lock, Mail, UserPlus, Flame } from 'lucide-react';
+import { TrendingUp, ArrowRight, ShieldCheck, Sparkles, Key, Lock, Mail, UserPlus, Flame } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { useStore } from '../../../context/StoreContext';
 import { validatePressEmail } from '../../auth/config/pressDomains';
@@ -53,27 +53,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onEnterA
         
         {/* Left Column (7/12): Main Pitch & Option A Headlines */}
         <div className="lg:col-span-7 space-y-6 text-center lg:text-left break-keep">
-          {/* Top Tagline */}
-          <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-1.5 text-xs text-blue-300 font-medium shadow-md">
-            <Vote className="w-4 h-4 text-blue-400" />
-            <span>실시간 여론 지표 & {BRAND_STOCK_NAME} 거래 시스템</span>
-          </div>
-
           {/* Main Title */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.6] sm:leading-[1.7] tracking-tight break-keep space-y-2 sm:space-y-3">
-            <span className="block text-white">
-              재미삼아 하다보면 의미를 발견하게 되는
-            </span>
-            <span className="block text-white">
-              실시간 정치 시세판
-            </span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.3] sm:leading-[1.4] tracking-tight break-keep space-y-2">
             <span className="block bg-gradient-to-r from-blue-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
               POLI 주식거래 시스템
             </span>
+            <span className="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-blue-400 font-mono tracking-wider">
+              POLITRADE
+            </span>
           </h1>
 
-          {/* Sub Title (Option A) */}
-          <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed sm:leading-7 break-keep mx-auto lg:mx-0">
+          {/* Sub Title */}
+          <p className="text-base sm:text-lg text-slate-200 font-bold leading-relaxed break-keep">
+            재미삼아 하다보면 의미를 발견하게 되는 실시간 정치 시세판
+          </p>
+
+          {/* Sub Description */}
+          <p className="text-sm text-slate-300 max-w-xl leading-relaxed sm:leading-7 break-keep mx-auto lg:mx-0">
             플레이할수록 여의도 정치의 흐름이 눈에 보이는 신개념 여론 지표! <br className="hidden sm:inline" />
             <strong className="text-amber-300 font-bold">잠재력 높은 차세대 대장주</strong>와 <strong className="text-indigo-300 font-bold">묻혀있는 저평가 우량주</strong>를 직접 발굴해 보세요.
           </p>
@@ -155,44 +151,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onEnterA
                   </div>
                 )}
 
-                {/* Primary Login Button */}
-                <button
-                  type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/25 flex items-center justify-center space-x-2 border border-indigo-400/30 group"
-                >
-                  <Key className="w-4 h-4 text-indigo-200" />
-                  <span>회원 로그인 및 입장</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
+                {/* 2-Column Action Buttons: [로그인] vs [회원가입] */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <button
+                    type="submit"
+                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/25 flex items-center justify-center space-x-1.5 border border-indigo-400/30 group"
+                  >
+                    <Key className="w-4 h-4 text-indigo-200" />
+                    <span>로그인</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={onOpenSignUp}
+                    className="w-full bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white font-extrabold text-xs py-3.5 rounded-xl transition-all border border-slate-700/80 flex items-center justify-center space-x-1.5 shadow-sm"
+                  >
+                    <UserPlus className="w-4 h-4 text-amber-400" />
+                    <span>회원가입</span>
+                  </button>
+                </div>
 
               </form>
 
-              {/* Divider */}
-              <div className="relative flex items-center justify-center pt-1">
-                <div className="border-t border-slate-800 w-full" />
-                <span className="bg-slate-900 px-3 text-[11px] text-slate-500 font-mono shrink-0">OR</span>
-              </div>
-
-              {/* Secondary Actions: SignUp & Guest Mode */}
-              <div className="space-y-2.5">
-                <button
-                  type="button"
-                  onClick={onOpenSignUp}
-                  className="w-full bg-slate-800/90 hover:bg-slate-800 text-slate-200 hover:text-white font-extrabold text-xs py-3 rounded-xl transition-all border border-slate-700/80 flex items-center justify-center space-x-2 shadow-sm"
-                >
-                  <UserPlus className="w-4 h-4 text-amber-400" />
-                  <span>🚀 {BRAND_STOCK_NAME} 시작하기 (회원가입)</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={onEnterApp}
-                  className="w-full text-center text-xs text-slate-400 hover:text-blue-400 font-bold py-1.5 transition-colors flex items-center justify-center space-x-1"
-                >
-                  <span>👀 로그인 없이 시범 서비스 둘러보기</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              {/* Guest Mode Link */}
+              <button
+                type="button"
+                onClick={onEnterApp}
+                className="w-full text-center text-xs text-slate-400 hover:text-blue-400 font-bold py-1.5 transition-colors flex items-center justify-center space-x-1 pt-1"
+              >
+                <span>👀 로그인 없이 시범 서비스 둘러보기</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
 
             </div>
           </div>

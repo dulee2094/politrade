@@ -31,10 +31,10 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
 
   return (
-    <div className="relative overflow-hidden bg-slate-900 p-5 rounded-3xl border-2 border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.2)] h-full flex flex-col justify-between space-y-4">
+    <div className="relative overflow-hidden bg-slate-900 p-6 rounded-3xl border-2 border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.2)] h-full flex flex-col justify-between space-y-5">
 
       {/* Dashboard Top Header */}
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5 shrink-0">
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
           <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg shrink-0">
             <Award className="w-5 h-5 text-slate-950" />
@@ -61,15 +61,15 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
       </div>
 
       {/* Flexible Equal-Height Inner Content Container */}
-      <div className="flex-1 flex flex-col justify-between space-y-2.5">
+      <div className="flex-1 flex flex-col justify-between space-y-5">
 
         {/* ================================================================ */}
         {/* GROUP 1: 지난 주 확정 결과 (Past Week Group Box) */}
         {/* ================================================================ */}
-        <div className="bg-slate-950/80 p-3.5 rounded-3xl border border-indigo-500/40 space-y-2.5 shadow-xl">
+        <div className="bg-slate-950/80 p-4.5 rounded-3xl border border-indigo-500/40 space-y-3.5 shadow-xl">
           {/* 1. 지난 주 베스트/워스트 3인 선정결과 */}
-          <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-indigo-500/20 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="bg-slate-900/80 p-4 rounded-2xl border border-indigo-500/20 space-y-3.5">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
               <span className="text-sm font-black text-white tracking-tight">지난 주 베스트/워스트 선정결과</span>
 
               {(onOpenPastBestWorstDetail || onOpenDetail) && (
@@ -84,20 +84,20 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
               {/* Past Best 1 */}
-              <div className="bg-slate-950/90 p-2.5 rounded-xl border border-emerald-500/30 space-y-1.5 shadow-sm">
-                <div className="text-[11px] font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800/60 pb-1">
+              <div className="bg-slate-950/90 p-3 rounded-xl border border-emerald-500/30 space-y-2 shadow-sm">
+                <div className="text-[11px] font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800/60 pb-1.5">
                   <span>🏆 지난주 확정 1위 BEST</span>
                   <span className="text-[9px] text-emerald-300 font-mono">+3,000P/주 배당</span>
                 </div>
                 {weeklySummary.bestTop3.slice(0, 1).map((pol) => (
-                  <div key={'pb_' + pol.politicianId} className="flex items-center justify-between p-1.5 px-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs">
-                    <div className="flex items-center space-x-2 min-w-0">
+                  <div key={'pb_' + pol.politicianId} className="flex items-center justify-between p-2 px-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs">
+                    <div className="flex items-center space-x-2.5 min-w-0">
                       <span className="w-4 h-4 rounded text-[10px] font-black font-mono bg-amber-400 text-slate-950 flex items-center justify-center shrink-0">
                         1
                       </span>
-                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-6 h-6 rounded-md shrink-0" />
+                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-7 h-7 rounded-md shrink-0" />
                       <span className="font-extrabold text-white text-xs truncate">{pol.politicianName}</span>
                       <span className="text-[10px] text-slate-400 shrink-0">{pol.party}</span>
                     </div>
@@ -109,18 +109,18 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
               </div>
 
               {/* Past Worst 1 */}
-              <div className="bg-slate-950/90 p-2.5 rounded-xl border border-rose-500/30 space-y-1.5 shadow-sm">
-                <div className="text-[11px] font-bold text-rose-400 flex items-center justify-between border-b border-slate-800/60 pb-1">
+              <div className="bg-slate-950/90 p-3 rounded-xl border border-rose-500/30 space-y-2 shadow-sm">
+                <div className="text-[11px] font-bold text-rose-400 flex items-center justify-between border-b border-slate-800/60 pb-1.5">
                   <span>⚠️ 지난주 확정 1위 WORST</span>
                   <span className="text-[9px] text-rose-300 font-mono">-3,000P/주 감액</span>
                 </div>
                 {weeklySummary.worstTop3.slice(0, 1).map((pol) => (
-                  <div key={'pw_' + pol.politicianId} className="flex items-center justify-between p-1.5 px-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs">
-                    <div className="flex items-center space-x-2 min-w-0">
+                  <div key={'pw_' + pol.politicianId} className="flex items-center justify-between p-2 px-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs">
+                    <div className="flex items-center space-x-2.5 min-w-0">
                       <span className="w-4 h-4 rounded text-[10px] font-black font-mono bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center shrink-0">
                         1
                       </span>
-                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-6 h-6 rounded-md shrink-0" />
+                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-7 h-7 rounded-md shrink-0" />
                       <span className="font-extrabold text-white text-xs truncate">{pol.politicianName}</span>
                       <span className="text-[10px] text-slate-400 shrink-0">{pol.party}</span>
                     </div>
@@ -134,8 +134,8 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
           </div>
 
           {/* 2. 지난 주 베스트 한 줄평 선정결과 */}
-          <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-amber-500/20 space-y-2.5">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="bg-slate-900/80 p-4 rounded-2xl border border-amber-500/20 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
               <div className="flex items-center space-x-1.5 text-sm font-black text-white tracking-tight">
                 <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>지난 주 베스트 한 줄평 선정결과</span>
@@ -161,9 +161,9 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
                 oneLineReview: '우원식 국회의장의 상임위 중재안과 이준석 의원의 반도체 특구 법안이 실질적 민생 도움이 됨!',
               };
               return (
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-start sm:items-center space-x-2.5 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 sm:mt-0">
+                <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start sm:items-center space-x-3 min-w-0">
+                    <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-sm shrink-0 mt-0.5 sm:mt-0">
                       🥇
                     </div>
                     <div className="min-w-0">
@@ -185,10 +185,10 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
         {/* ================================================================ */}
         {/* GROUP 2: 금주 실시간 득표 현황 (Current Week Group Box) */}
         {/* ================================================================ */}
-        <div className="bg-slate-950/80 p-3.5 rounded-3xl border border-emerald-500/40 space-y-2.5 shadow-xl">
+        <div className="bg-slate-950/80 p-4.5 rounded-3xl border border-emerald-500/40 space-y-3.5 shadow-xl">
           {/* 3. 금주 베스트/워스트 투표 현황 */}
-          <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-emerald-500/20 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="bg-slate-900/80 p-4 rounded-2xl border border-emerald-500/20 space-y-3.5">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
               <span className="text-sm font-black text-white tracking-tight">금주 베스트/워스트 투표 현황</span>
 
               {(onOpenCurrentBestWorstDetail || onOpenDetail) && (
@@ -203,19 +203,19 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
               {/* Live Best 1 */}
-              <div className="bg-slate-950/90 p-2.5 rounded-xl border border-emerald-500/20 space-y-1.5">
+              <div className="bg-slate-950/90 p-3 rounded-xl border border-emerald-500/20 space-y-2">
                 <div className="text-[11px] font-bold text-emerald-400 flex items-center justify-between">
                   <span>🥇 금주 실시간 1위 BEST</span>
                 </div>
                 {weeklySummary.bestTop3.slice(0, 1).map((pol) => (
-                  <div key={'lb_' + pol.politicianId} className="flex items-center justify-between p-1.5 px-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs">
-                    <div className="flex items-center space-x-2 min-w-0">
+                  <div key={'lb_' + pol.politicianId} className="flex items-center justify-between p-2 px-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs">
+                    <div className="flex items-center space-x-2.5 min-w-0">
                       <span className="w-4 h-4 rounded text-[10px] font-black font-mono bg-amber-400 text-slate-950 flex items-center justify-center shrink-0">
                         1
                       </span>
-                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-6 h-6 rounded-md shrink-0" />
+                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-7 h-7 rounded-md shrink-0" />
                       <span className="font-extrabold text-white text-xs truncate">{pol.politicianName}</span>
                       <span className="text-[10px] text-slate-400 shrink-0">{pol.party}</span>
                     </div>
@@ -225,17 +225,17 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
               </div>
 
               {/* Live Worst 1 */}
-              <div className="bg-slate-950/90 p-2.5 rounded-xl border border-rose-500/20 space-y-1.5">
+              <div className="bg-slate-950/90 p-3 rounded-xl border border-rose-500/20 space-y-2">
                 <div className="text-[11px] font-bold text-rose-400 flex items-center justify-between">
                   <span>🚨 금주 실시간 1위 WORST</span>
                 </div>
                 {weeklySummary.worstTop3.slice(0, 1).map((pol) => (
-                  <div key={'lw_' + pol.politicianId} className="flex items-center justify-between p-1.5 px-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs">
-                    <div className="flex items-center space-x-2 min-w-0">
+                  <div key={'lw_' + pol.politicianId} className="flex items-center justify-between p-2 px-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs">
+                    <div className="flex items-center space-x-2.5 min-w-0">
                       <span className="w-4 h-4 rounded text-[10px] font-black font-mono bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center shrink-0">
                         1
                       </span>
-                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-6 h-6 rounded-md shrink-0" />
+                      <PoliticianAvatar src={pol.imageUrl} name={pol.politicianName} party={pol.party as any} className="w-7 h-7 rounded-md shrink-0" />
                       <span className="font-extrabold text-white text-xs truncate">{pol.politicianName}</span>
                       <span className="text-[10px] text-slate-400 shrink-0">{pol.party}</span>
                     </div>
@@ -247,8 +247,8 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
           </div>
 
           {/* 4. 금주 한줄평 득표 현황 */}
-          <div className="bg-slate-900/80 p-3.5 rounded-2xl border border-amber-500/20 space-y-2.5">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="bg-slate-900/80 p-4 rounded-2xl border border-amber-500/20 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
               <div className="flex items-center space-x-1.5 text-sm font-black text-white tracking-tight">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
                 <span>금주 한줄평 득표 현황</span>
@@ -274,9 +274,9 @@ export const WeeklyPulseReportCard: React.FC<WeeklyPulseReportCardProps> = ({
                 oneLineReview: '우원식 국회의장의 상임위 중재안과 이준석 의원의 반도체 특구 법안이 실질적 민생 도움이 됨!',
               };
               return (
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-start sm:items-center space-x-2.5 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 sm:mt-0">
+                <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start sm:items-center space-x-3 min-w-0">
+                    <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-sm shrink-0 mt-0.5 sm:mt-0">
                       🥇
                     </div>
                     <div className="min-w-0">
