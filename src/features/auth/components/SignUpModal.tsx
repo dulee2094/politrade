@@ -90,11 +90,9 @@ export const SignUpModal: React.FC<SignUpModalProps> = ({ isOpen, onClose }) => 
               <UserPlus className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-white flex items-center gap-1.5">
-                <span>POLITRADE 회원가입</span>
-                <span className="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30 font-mono">PRIVACY PROTECTED</span>
+              <h2 className="text-lg font-black text-white">
+                POLITRADE 회원가입
               </h2>
-              <p className="text-xs text-slate-400">개인정보 최소 수집 (아이디 / 비밀번호 / 닉네임 / 이메일 인증)</p>
             </div>
           </div>
 
@@ -282,7 +280,7 @@ export const SignUpModal: React.FC<SignUpModalProps> = ({ isOpen, onClose }) => 
             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center space-x-1 mt-2"
           >
             <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>회원가입 완료 (+300,000 P 지급)</span>
+            <span>회원가입 완료</span>
           </button>
 
         </form>

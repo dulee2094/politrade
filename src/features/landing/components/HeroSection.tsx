@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, ArrowRight, ShieldCheck, Sparkles, Key, Lock, Mail, UserPlus, Flame } from 'lucide-react';
+import { ArrowRight, Key, Lock, Mail, UserPlus } from 'lucide-react';
 import { BRAND_STOCK_NAME } from '../../../config/constants';
 import { useStore } from '../../../context/StoreContext';
 import { validatePressEmail } from '../../auth/config/pressDomains';
@@ -64,28 +64,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenSignUp, onEnterA
           </h1>
 
           {/* Sub Title */}
-          <p className="text-base sm:text-lg text-slate-200 font-bold leading-relaxed break-keep">
+          <p className="text-lg sm:text-xl lg:text-2xl text-slate-200 font-bold leading-relaxed break-keep">
             재미삼아 하다보면 의미를 발견하게 되는 실시간 정치 시세판
           </p>
 
           {/* Sub Description */}
-          <p className="text-sm text-slate-300 max-w-xl leading-relaxed sm:leading-7 break-keep mx-auto lg:mx-0">
+          <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed sm:leading-8 break-keep mx-auto lg:mx-0">
             플레이할수록 여의도 정치의 흐름이 눈에 보이는 신개념 여론 지표! <br className="hidden sm:inline" />
             <strong className="text-amber-300 font-bold">잠재력 높은 차세대 대장주</strong>와 <strong className="text-indigo-300 font-bold">묻혀있는 저평가 우량주</strong>를 직접 발굴해 보세요.
           </p>
 
-          {/* Key Feature Highlights Badges */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2 text-xs text-slate-300 font-mono">
-            <span className="flex items-center gap-1.5 bg-slate-900/80 px-3.5 py-2 rounded-xl border border-slate-800 shadow-sm">
-              <TrendingUp className="w-4 h-4 text-blue-400" /> 상장 의원 (30인+α) 호가창 매매
-            </span>
-            <span className="flex items-center gap-1.5 bg-slate-900/80 px-3.5 py-2 rounded-xl border border-slate-800 shadow-sm">
-              <Flame className="w-4 h-4 text-amber-400" /> 주간 민심 펄스 & 1줄 평
-            </span>
-            <span className="flex items-center gap-1.5 bg-slate-900/80 px-3.5 py-2 rounded-xl border border-slate-800 shadow-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" /> 개인정보 최소화 (이메일 인증)
-            </span>
-          </div>
         </div>
 
         {/* Right Column (5/12): Inline Login & SignUp Form Card with Ambient Glow */}
